@@ -1,5 +1,5 @@
 package de.bbq.java.tasks.school;
-//huhu
+//jhkhkjhkhkhhkhjk
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
