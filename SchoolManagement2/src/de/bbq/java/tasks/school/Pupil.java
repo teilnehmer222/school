@@ -7,8 +7,13 @@ public class Pupil {
 	private Course course; // = new ArrayList<>();
 	private String name;
 
-	Pupil(String name) {
+	private Pupil(String name) {
 		this.name = name;
+	}
+	public static Pupil createNewPupil(String name) {
+		Pupil p = new Pupil(name);
+		pupilList.add(p);
+		return p;
 	}
 
 	public void addCourse(Course cours) {

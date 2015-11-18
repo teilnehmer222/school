@@ -13,10 +13,15 @@ public class Course {
 	private Teacher teacher;
 	private String name;
 
-	public Course(String name) {
+	private Course(String name) {
 		this.name = name;
 	}
-
+	public static Course createNewCourse(String name) {
+		Course c = new Course(name);
+		courseList.add(c);
+		return c;
+	}
+	
 	public void addPupil(Pupil pupil) {
 		pupils.add(pupil);
 	}

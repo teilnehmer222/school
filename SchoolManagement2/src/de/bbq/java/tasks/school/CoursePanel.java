@@ -114,7 +114,7 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 														// einen Kursnamen
 														// eingeben:");
 			try {
-				Course c = new Course(newName); // Course.generateNewName());
+				Course c = Course.createNewCourse(newName); // Course.generateNewName());
 				Course.addCource(c);
 			} catch (Exception e) {
 				// TODO: handle exception

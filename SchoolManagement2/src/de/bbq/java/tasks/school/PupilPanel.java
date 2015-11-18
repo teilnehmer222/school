@@ -126,7 +126,7 @@ public class PupilPanel extends JPanel implements ActionListener, ListSelectionL
 			String newName = Pupil.generateNewName(); 
 			// JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
 			try {
-				Pupil p = new Pupil(newName); // Course.generateNewName());
+				Pupil p = Pupil.createNewPupil(newName); // Course.generateNewName());
 				Pupil.addPupil(p);
 			} catch (Exception e) {
 				// TODO: handle exception

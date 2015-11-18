@@ -126,7 +126,7 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 			String newName = Teacher.generateNewName();
 			// JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
 			try {
-				Teacher t = new Teacher(newName); // Course.generateNewName());
+				Teacher t = Teacher.createNewTeacher(newName); // Course.generateNewName());
 				Teacher.addTeacher(t);
 			} catch (Exception e) {
 				// TODO: handle exception

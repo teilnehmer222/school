@@ -7,8 +7,13 @@ public class Teacher {
 	private ArrayList<Course> courses = new ArrayList();
 	private String name;
 
-	Teacher(String name) {
+	private Teacher(String name) {
 		this.name = name;
+	}
+	public static Teacher createNewTeacher(String name) {
+		Teacher t = new Teacher(name);
+		teacherList.add(t);
+		return t;
 	}
 
 	public void addCourse(Course cours) {
