@@ -110,9 +110,9 @@ public class School implements Serializable {
 
 			// Student
 			StudentDF student = new StudentDF();
-			student.setFirstName("David");
-			student.setFirstName("Fridman");
-			cal.set(1975, 22, 4);
+			student.setFirstName("Darf");
+			student.setFirstName("Froad");
+			cal.set(1975, 21, 7);
 			student.setBirthDate(cal.getTime());
 			Adress adress = new Adress();
 			adress.setCity("Berlin");
