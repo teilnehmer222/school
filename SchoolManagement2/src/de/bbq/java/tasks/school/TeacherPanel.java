@@ -146,9 +146,11 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 				if (selectedTeacher != null) {
 					try {
 						School.addCourseToTeacher(selectedCourse.getId(), selectedTeacher.getId());
-/*						selectedTeacher.addCourseId(selectedCourse.getId());
-						selectedTeacher.*/
-						//Course.writeBack(selectedTeacher);
+						/*
+						 * selectedTeacher.addCourseId(selectedCourse.getId());
+						 * selectedTeacher.
+						 */
+						// Course.writeBack(selectedTeacher);
 					} catch (Exception e) {
 						System.out.println(e.getMessage());
 					}
@@ -177,19 +179,10 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 		this.courseSelectedModel.clear();
 		if (this.selectedTeacher != null) {
 			for (CourseDF c : CourseDF.getCourses()) {
-				if (this.selectedTeacher.getCourses().contains(c.getId())) {
+				if (c.getMyTeacherId() == this.selectedTeacher.getId()) {
 					courseSelectedModel.addElement(c);
-				} else {
-					boolean found = false;
-					for (Teacher t : Teacher.getTeacherList()) {
-						if (t.getCourseList().contains(c)) {
-							found = true;
-							break;
-						}
-					}
-					if (!found) {
-						coursePoolModel.addElement(c);
-					}
+				} else if (c.getMyTeacherId() == -1) {
+					coursePoolModel.addElement(c);
 				}
 			}
 		}
