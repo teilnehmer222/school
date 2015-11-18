@@ -24,23 +24,23 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 public class PupilPanel extends JPanel implements ActionListener, ListSelectionListener {
-	private JButton addPupil, delPupil, addCourse, remCourse;
-	private JList pupilsJList, coursePoolJList, courseSelectedJList;
-	private DefaultListModel<Pupil> pupilModel;
-	private DefaultListModel<Course> coursePoolModel, courseSelectedModel;
+	private JButton addStudent, delStudent, addCourse, remCourse;
+	private JList studentsJList, coursePoolJList, courseSelectedJList;
+	private DefaultListModel<StudentDF> studentModel;
+	private DefaultListModel<CourseDF> coursePoolModel, courseSelectedModel;
 	private boolean refresh = true;
-	private Pupil selectedPupil;
+	private StudentDF selectedStudent;
 
 	public PupilPanel() {
 		this.setLayout(null); // new GridLayout(1, 1));
-		pupilModel = new DefaultListModel<>();
-		pupilsJList = new JList(pupilModel); // data has type Object[]
-		this.add(pupilsJList);
-		pupilsJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		pupilsJList.setLayoutOrientation(JList.VERTICAL);
-		pupilsJList.setVisibleRowCount(-1);
-		pupilsJList.addListSelectionListener(this);
-		pupilsJList.addMouseListener(new MouseAdapter() {
+		studentModel = new DefaultListModel<>();
+		studentsJList = new JList(studentModel); // data has type Object[]
+		this.add(studentsJList);
+		studentsJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		studentsJList.setLayoutOrientation(JList.VERTICAL);
+		studentsJList.setVisibleRowCount(-1);
+		studentsJList.addListSelectionListener(this);
+		studentsJList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent evt) {
 				JList list = (JList) evt.getSource();
 				int index = -1;
@@ -52,26 +52,26 @@ public class PupilPanel extends JPanel implements ActionListener, ListSelectionL
 					index = list.locationToIndex(evt.getPoint());
 				}
 				if (index >= 0) {
-					Pupil editItem = pupilModel.get(index);
+					StudentDF editItem = studentModel.get(index);
 					new EditFrame(editItem);
 				}
 			}
 		});
-		pupilsJList.setCellRenderer(new SchoolListCellRenderer());
+		studentsJList.setCellRenderer(new SchoolListCellRenderer());
 
-		JScrollPane pupScroller = new JScrollPane(pupilsJList);
+		JScrollPane pupScroller = new JScrollPane(studentsJList);
 		pupScroller.setPreferredSize(new Dimension(206, 300));
 
 		pupScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		pupScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		pupScroller.setViewportBorder(new LineBorder(Color.BLACK));
 
-		this.addPupil = SchoolLauncher.getButton("newPupil", 5, 5, 100, 20, this, "Hinzufügen", "Neuer Schüler");
-		this.add(this.addPupil);
+		this.addStudent = SchoolLauncher.getButton("newPupil", 5, 5, 100, 20, this, "Hinzufügen", "Neuer Schüler");
+		this.add(this.addStudent);
 
 		// listScroller.getViewport().add(addCourse, null);
-		this.delPupil = SchoolLauncher.getButton("delPupil", 110, 5, 100, 20, this, "Löschen", "Schüler löschen");
-		this.add(this.delPupil);
+		this.delStudent = SchoolLauncher.getButton("delPupil", 110, 5, 100, 20, this, "Löschen", "Schüler löschen");
+		this.add(this.delStudent);
 
 		pupScroller.setBounds(5, 30, 205, 300);
 		this.add(pupScroller);
@@ -122,45 +122,46 @@ public class PupilPanel extends JPanel implements ActionListener, ListSelectionL
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		this.refresh = true;
-		if (arg0.getSource() == addPupil) {
+		if (arg0.getSource() == addStudent) {
 			String newName = Pupil.generateNewName(); 
 			// JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
 			try {
-				Pupil p = Pupil.createNewPupil(newName); // Course.generateNewName());
-				Pupil.addPupil(p);
+				StudentDF s = new StudentDF(); // Course.generateNewName());
+				s.setFirstName(newName);
+				StudentDF.addStudentToList(s);
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
 			//pupilsJList.setSelectedIndex(index+1);
-			this.selectedPupil = (Pupil) pupilsJList.getSelectedValue();
-		} else if (arg0.getSource() == delPupil) {
-			if (this.selectedPupil == null || !Pupil.getPupilList().contains(this.selectedPupil)) {
-				pupilsJList.setSelectedIndex(pupilsJList.getSelectedIndex());
-				this.selectedPupil = (Pupil) pupilsJList.getSelectedValue();
+			this.selectedStudent = (StudentDF) studentsJList.getSelectedValue();
+		} else if (arg0.getSource() == delStudent) {
+			if (this.selectedStudent == null || !StudentDF.getList().contains(this.selectedStudent)) {
+				studentsJList.setSelectedIndex(studentsJList.getSelectedIndex());
+				this.selectedStudent = (StudentDF) studentsJList.getSelectedValue();
 			}
-			Pupil.getPupilList().remove(this.selectedPupil);
+			StudentDF.getList().remove(this.selectedStudent);
 		}
 		if (arg0.getSource() == addCourse) {
-			Course selectedCourse = (Course) coursePoolJList.getSelectedValue();
+			CourseDF selectedCourse = (CourseDF) coursePoolJList.getSelectedValue();
 			if (selectedCourse != null) {
-				if (selectedPupil != null) {
+				if (selectedStudent != null) {
 					try {
-						selectedPupil.addCourse(selectedCourse);
-						Course.writeBack(selectedPupil);
+						School.addStudentToCourse(selectedStudent.getId(), selectedCourse.getId());
+						//Course.writeBack(selectedStudent);
 					} catch (Exception e) {
 						System.out.println(e.getMessage());
 					}
 				}
 			}
 		} else if (arg0.getSource() == remCourse) {
-			Course selectedCourse = (Course) courseSelectedJList.getSelectedValue();
+			CourseDF selectedCourse = (CourseDF) courseSelectedJList.getSelectedValue();
 			if (selectedCourse != null) {
-				if (this.selectedPupil != null) {
-					if (this.selectedPupil.hasCourse(selectedCourse)) { // getCourseList().contains(selectedCourse))
+				if (this.selectedStudent != null) {
+					if (this.selectedStudent.getMyCourseId() ==selectedCourse.getId()) { // getCourseList().contains(selectedCourse))
 																		// {
 						try {
-							this.selectedPupil.clearCourse(); // remCourse(selectedCourse);
-							Course.writeBack(selectedPupil);
+							School.removeStudentFromCourse(selectedStudent.getId(), selectedCourse.getId());
+							//Course.writeBack(selectedStudent);
 						} catch (Exception e) {
 							System.out.println(e.getMessage());
 						}
@@ -173,44 +174,44 @@ public class PupilPanel extends JPanel implements ActionListener, ListSelectionL
 	}
 
 	public void refresh() {
-		int selIndex = pupilsJList.getSelectedIndex();
+		int selIndex = studentsJList.getSelectedIndex();
 		this.refresh = true;
-		this.pupilModel.clear();
-		for (Pupil p : Pupil.getPupilList()) {
-			this.pupilModel.addElement(p);
+		this.studentModel.clear();
+		for (StudentDF p : StudentDF.getList()) {
+			this.studentModel.addElement(p);
 		}
 		this.coursePoolModel.clear();
 		this.courseSelectedModel.clear();
-		if (this.selectedPupil != null) {
-			for (Course c : Course.getCourseList()) {
-				if (!this.selectedPupil.hasCourse()) {
+		if (this.selectedStudent != null) {
+			for (CourseDF c : CourseDF.getCourses()) {
+				if (this.selectedStudent.getMyCourseId() !=c.getId()) {
 					coursePoolModel.addElement(c);
-				} else if (this.selectedPupil.hasCourse(c)) { // getCourseList().contains(c))
+				} else {
 																// {
 					courseSelectedModel.addElement(c);
-				} else {
-					// coursePoolModel.addElement(c);
-				}
+				} /*else {
+					 coursePoolModel.addElement(c);
+				}*/
 			}
 		}
 		if (selIndex < 0) {
 			//do Nothing
-		} else if (selIndex < pupilModel.getSize()) {
-			pupilsJList.setSelectedIndex(selIndex);
+		} else if (selIndex < studentModel.getSize()) {
+			studentsJList.setSelectedIndex(selIndex);
 		} else {
-			pupilsJList.setSelectedIndex(pupilModel.getSize() - 1);
+			studentsJList.setSelectedIndex(studentModel.getSize() - 1);
 		}
 		this.refresh = false;
-		this.selectedPupil = (Pupil) pupilsJList.getSelectedValue();
+		this.selectedStudent = (StudentDF) studentsJList.getSelectedValue();
 	}
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		if (!this.refresh) {
-			if (e.getSource() == pupilsJList) {
-				Pupil selPupil = (Pupil) pupilsJList.getSelectedValue();
-				if (selPupil != null) {
-					this.selectedPupil = selPupil;
+			if (e.getSource() == studentsJList) {
+				StudentDF selStudent = (StudentDF) studentsJList.getSelectedValue();
+				if (selStudent != null) {
+					this.selectedStudent = selStudent;
 					refresh();
 				}
 			}

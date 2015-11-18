@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -27,11 +28,11 @@ import javax.swing.event.ListSelectionListener;
 
 public class CoursePanel extends JPanel implements ActionListener, ListSelectionListener {
 	private JButton addCourse, delCourse;
-	private JList<Course> coursesJList;
-	private JList<Pupil> pupilsJList;
+	private JList<CourseDF> coursesJList;
+	private JList<StudentDF> studentsJList;
 	private JTextField teacher;
-	private DefaultListModel<Course> courseModel;
-	private DefaultListModel<Pupil> pupilModel;
+	private DefaultListModel<CourseDF> courseModel;
+	private DefaultListModel<StudentDF> studentModel;
 	private boolean refresh = true;
 
 	public CoursePanel() {
@@ -56,7 +57,7 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 					index = list.locationToIndex(evt.getPoint());
 				}
 				if (index >= 0) {
-					Course editItem = courseModel.get(index);
+					CourseDF editItem = courseModel.get(index);
 					new EditFrame(editItem);
 				}
 			}
@@ -86,15 +87,15 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 		teacher.setEditable(false);
 		this.add(teacher);
 
-		pupilModel = new DefaultListModel();
-		pupilsJList = new JList(pupilModel); // data has type Object[]
-		this.add(pupilsJList);
-		pupilsJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		pupilsJList.setLayoutOrientation(JList.VERTICAL);
-		pupilsJList.setVisibleRowCount(-1);
-		pupilsJList.addListSelectionListener(this);
+		studentModel = new DefaultListModel();
+		studentsJList = new JList(studentModel); // data has type Object[]
+		this.add(studentsJList);
+		studentsJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		studentsJList.setLayoutOrientation(JList.VERTICAL);
+		studentsJList.setVisibleRowCount(-1);
+		studentsJList.addListSelectionListener(this);
 
-		JScrollPane pupScroller = new JScrollPane(pupilsJList);
+		JScrollPane pupScroller = new JScrollPane(studentsJList);
 		pupScroller.setPreferredSize(new Dimension(206, 300));
 
 		pupScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -114,19 +115,14 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 														// einen Kursnamen
 														// eingeben:");
 			try {
-				Course c = Course.createNewCourse(newName); // Course.generateNewName());
-				Course.addCource(c);
+				CourseDF c = new CourseDF(newName); // Course.generateNewName());
+				CourseDF.addCourseToList(c);
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
 		} else if (arg0.getSource() == delCourse) {
-			Course selected = (Course) coursesJList.getSelectedValue();
-			for (Course c : Course.getCourseList()) {
-				if (c.equals(selected)) {
-					Course.getCourseList().remove(c);
-					break;
-				}
-			}
+			CourseDF selected = (CourseDF) coursesJList.getSelectedValue();
+			CourseDF.removeCourse(selected);
 		}
 		this.refresh = false;
 		refresh();
@@ -135,7 +131,7 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 	public void refresh() {
 		this.refresh = true;
 		this.courseModel.clear();
-		for (Course c : Course.getCourseList()) {
+		for (CourseDF c : CourseDF.getCourses()) {
 			this.courseModel.addElement(c);
 		}
 		this.refresh = false;
@@ -144,19 +140,19 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 	@Override
 	public void valueChanged(ListSelectionEvent arg0) {
 		if (!this.refresh && arg0.getSource() == coursesJList) {
-			Course selectedCourse = (Course) coursesJList.getSelectedValue();
+			CourseDF selectedCourse = (CourseDF) coursesJList.getSelectedValue();
 			if (selectedCourse != null) {
-				if (selectedCourse.getTeacher() != null) {
-					teacher.setText(selectedCourse.getTeacher().toString());
-				} else {
+				if (selectedCourse.getMyTeacherId() != -1) {
+					teacher.setText(selectedCourse.getCourseName());
+				} else 
 					teacher.setText("");
 				}
-				ArrayList<Pupil> pupils = selectedCourse.getPupils();
-				this.pupilModel.clear();
-				for (Pupil p : pupils) {
-					this.pupilModel.addElement(p);
+				List<Long> studentIds = selectedCourse.getStudentIds();
+				this.studentModel.clear();
+				for (Long id : studentIds) {
+					this.studentModel.addElement(StudentDF.findStudentById(id));
 				}
 			}
 		}
 	}
-}
+

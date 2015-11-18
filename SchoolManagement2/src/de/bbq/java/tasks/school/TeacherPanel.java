@@ -27,10 +27,10 @@ import javax.swing.event.ListSelectionListener;
 public class TeacherPanel extends JPanel implements ActionListener, ListSelectionListener {
 	private JButton addTeacher, delTeacher, addCourse, remCourse;
 	private JList teachersJList, coursePoolJList, courseSelectedJList;
-	private DefaultListModel<Teacher> teacherModel;
-	private DefaultListModel<Course> coursePoolModel, courseSelectedModel;
+	private DefaultListModel<TeacherDF> teacherModel;
+	private DefaultListModel<CourseDF> coursePoolModel, courseSelectedModel;
 	private boolean refresh = true;
-	private Teacher selectedTeacher;
+	private TeacherDF selectedTeacher;
 
 	public TeacherPanel() {
 		this.setLayout(null); // new GridLayout(1, 1));
@@ -53,7 +53,7 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 					index = list.locationToIndex(evt.getPoint());
 				}
 				if (index >= 0) {
-					Teacher editItem = teacherModel.get(index);
+					TeacherDF editItem = teacherModel.get(index);
 					new EditFrame(editItem);
 				}
 			}
@@ -126,43 +126,39 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 			String newName = Teacher.generateNewName();
 			// JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
 			try {
-				Teacher t = Teacher.createNewTeacher(newName); // Course.generateNewName());
-				Teacher.addTeacher(t);
+				TeacherDF t = new TeacherDF(); // Course.generateNewName());
+				t.setFirstName(newName);
+				TeacherDF.addTeacherToList(t);
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
-			this.selectedTeacher = (Teacher) teachersJList.getSelectedValue();
+			this.selectedTeacher = (TeacherDF) teachersJList.getSelectedValue();
 		} else if (arg0.getSource() == delTeacher) {
-			if (this.selectedTeacher == null || !Teacher.getTeacherList().contains(this.selectedTeacher)) {
+			if (this.selectedTeacher == null || !TeacherDF.getTeachers().contains(this.selectedTeacher)) {
 				teachersJList.setSelectedIndex(teachersJList.getSelectedIndex());
-				this.selectedTeacher = (Teacher) teachersJList.getSelectedValue();
+				this.selectedTeacher = (TeacherDF) teachersJList.getSelectedValue();
 			}
-			Teacher.getTeacherList().remove(selectedTeacher);
+			TeacherDF.removeTeacher(selectedTeacher);
 		}
 		if (arg0.getSource() == addCourse) {
-			Course selectedCourse = (Course) coursePoolJList.getSelectedValue();
+			CourseDF selectedCourse = (CourseDF) coursePoolJList.getSelectedValue();
 			if (selectedCourse != null) {
 				if (selectedTeacher != null) {
 					try {
-						selectedTeacher.addCourse(selectedCourse);
-						Course.writeBack(selectedTeacher);
+						School.addCourseToTeacher(selectedCourse.getId(), selectedTeacher.getId());
+/*						selectedTeacher.addCourseId(selectedCourse.getId());
+						selectedTeacher.*/
+						//Course.writeBack(selectedTeacher);
 					} catch (Exception e) {
 						System.out.println(e.getMessage());
 					}
 				}
 			}
 		} else if (arg0.getSource() == remCourse) {
-			Course selectedCourse = (Course) courseSelectedJList.getSelectedValue();
+			CourseDF selectedCourse = (CourseDF) courseSelectedJList.getSelectedValue();
 			if (selectedCourse != null) {
 				if (this.selectedTeacher != null) {
-					if (this.selectedTeacher.getCourseList().contains(selectedCourse)) {
-						this.selectedTeacher.remCourse(selectedCourse);
-						try {
-							Course.writeBack(selectedTeacher);
-						} catch (Exception e) {
-							System.out.println(e.getMessage());
-						}
-					}
+					selectedTeacher.removeCourseId(selectedCourse.getId());
 				}
 			}
 		}
@@ -174,14 +170,14 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 		int selIndex = teachersJList.getSelectedIndex();
 		this.refresh = true;
 		this.teacherModel.clear();
-		for (Teacher t : Teacher.getTeacherList()) {
+		for (TeacherDF t : TeacherDF.getTeachers()) {
 			this.teacherModel.addElement(t);
 		}
 		this.coursePoolModel.clear();
 		this.courseSelectedModel.clear();
 		if (this.selectedTeacher != null) {
-			for (Course c : Course.getCourseList()) {
-				if (this.selectedTeacher.getCourseList().contains(c)) {
+			for (CourseDF c : CourseDF.getCourses()) {
+				if (this.selectedTeacher.getCourses().contains(c.getId())) {
 					courseSelectedModel.addElement(c);
 				} else {
 					boolean found = false;
@@ -205,14 +201,14 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 			teachersJList.setSelectedIndex(teacherModel.getSize() - 1);
 		}
 		this.refresh = false;
-		this.selectedTeacher = (Teacher) teachersJList.getSelectedValue();
+		this.selectedTeacher = (TeacherDF) teachersJList.getSelectedValue();
 	}
 
 	@Override
 	public void valueChanged(ListSelectionEvent arg0) {
 		if (!this.refresh) {
 			if (arg0.getSource() == teachersJList) {
-				Teacher selTeacher = (Teacher) teachersJList.getSelectedValue();
+				TeacherDF selTeacher = (TeacherDF) teachersJList.getSelectedValue();
 				if (selTeacher != null) {
 					this.selectedTeacher = selTeacher;
 					refresh();

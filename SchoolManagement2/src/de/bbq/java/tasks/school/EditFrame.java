@@ -27,7 +27,7 @@ public class EditFrame extends JFrame implements ActionListener {
 
 	}
 
-	EditFrame(Pupil p) {
+	EditFrame(StudentDF editItem) {
 		setTitle("Schüler editieren");
 		JLabel label = new JLabel("Nachname:");
 		label.setBounds(5, 5, 100, 20);
@@ -99,7 +99,7 @@ public class EditFrame extends JFrame implements ActionListener {
 		Construct();
 	}
 
-	EditFrame(Course c) {
+	EditFrame(CourseDF c) {
 		setTitle("Kurs editieren");
 		JLabel label = new JLabel("Kursname:");
 		label.setBounds(5, 5, 100, 20);
@@ -162,7 +162,7 @@ public class EditFrame extends JFrame implements ActionListener {
 		Construct();
 	}
 
-	EditFrame(Teacher t) {
+	EditFrame(TeacherDF t) {
 		setTitle("Leerer editieren");
 		JLabel label = new JLabel("Nachname:");
 		label.setBounds(5, 5, 100, 20);
