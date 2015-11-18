@@ -31,7 +31,7 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 	 * 
 	 */
 	private static final long serialVersionUID = -7720278844639602571L;
-	private JButton addCourse, delCourse;
+	private JButton addCourse, delCourse, saveAll, loadAll;
 	private JList<CourseDF> coursesJList;
 	private JList<StudentDF> studentsJList;
 	private JTextField teacher;
@@ -81,6 +81,14 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 		// listScroller.getViewport().add(addCourse, null);
 		delCourse = SchoolLauncher.getButton("delCourse", 110, 5, 100, 20, this, "Löschen", "Kurs löschen");
 		this.add(delCourse);
+
+		saveAll = SchoolLauncher.getButton("saveAll", 450, 5, 130, 20, this, "Alles speichern",
+				"Kurse, Leerer und Schüler speichern");
+		this.add(saveAll);
+
+		loadAll = SchoolLauncher.getButton("loadAll", 590, 5, 120, 20, this, "Alles laden",
+				"Kurse, Leerer und Schüler laden");
+		this.add(loadAll);
 
 		coursScroller.setBounds(5, 30, 205, 300);
 		this.add(coursScroller);
@@ -156,6 +164,10 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 				for (Long id : studentIds) {
 					this.studentModel.addElement(StudentDF.findStudentById(id));
 				}
+						} else if (!this.refresh && arg0.getSource() == saveAll) {
+			// DO that
+		} else if (!this.refresh && arg0.getSource() == loadAll) {
+			// DO IT
 			}
 		}
 	}
