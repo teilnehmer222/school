@@ -25,7 +25,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
+//hallo
 public class CoursePanel extends JPanel implements ActionListener, ListSelectionListener {
 	private JButton addCourse, delCourse;
 	private JList<CourseDF> coursesJList;
@@ -48,7 +48,7 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 		coursesJList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent evt) {
 				JList list = (JList) evt.getSource();
-				int index = -1;
+				int index = -1; 
 				if (evt.getClickCount() == 2) {
 					// Double-click detected
 					index = list.locationToIndex(evt.getPoint());
