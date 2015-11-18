@@ -56,5 +56,12 @@ public class StudentDF extends SchoolMember{
 		return foundStudent;
 	}
 	
+	public static String generateNewName() {
+		String[] array = new String[] { "Depp", "Trottel", "Idiot", "Armleuchter", "Hirni", "Totalversager",
+				"Baumschulabbrecher", "Volltrottel", "Extremdepp", "Superidiot" };
+		int randomNum = 0 + (int) (Math.random() * array.length);
+		return array[randomNum];
+	}
+	
 
 }

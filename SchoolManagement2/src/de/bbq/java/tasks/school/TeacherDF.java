@@ -65,5 +65,10 @@ public String toString() {
 	 */
 	private static final long serialVersionUID = -3548796163205043453L;
 	
+	public static String generateNewName() {
+		String[] array = new String[] {"Leerer A", "Musikleerer", "Deuschleerer", "Fielleerer", "Entlährer" };
+		int randomNum = 0 + (int)(Math.random()*array.length); 
+		return array[randomNum];
+	}
 
 }

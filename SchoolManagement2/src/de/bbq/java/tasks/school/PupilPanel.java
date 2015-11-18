@@ -123,7 +123,7 @@ public class PupilPanel extends JPanel implements ActionListener, ListSelectionL
 	public void actionPerformed(ActionEvent arg0) {
 		this.refresh = true;
 		if (arg0.getSource() == addStudent) {
-			String newName = Pupil.generateNewName(); 
+			String newName = StudentDF.generateNewName(); 
 			// JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
 			try {
 				StudentDF s = new StudentDF(); // Course.generateNewName());
@@ -187,11 +187,8 @@ public class PupilPanel extends JPanel implements ActionListener, ListSelectionL
 				if (this.selectedStudent.getMyCourseId() !=c.getId()) {
 					coursePoolModel.addElement(c);
 				} else {
-																// {
 					courseSelectedModel.addElement(c);
-				} /*else {
-					 coursePoolModel.addElement(c);
-				}*/
+				} 
 			}
 		}
 		if (selIndex < 0) {

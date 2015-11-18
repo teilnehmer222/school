@@ -123,7 +123,7 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 	public void actionPerformed(ActionEvent arg0) {
 		this.refresh = true;
 		if (arg0.getSource() == addTeacher) {
-			String newName = Teacher.generateNewName();
+			String newName = TeacherDF.generateNewName();
 			// JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
 			try {
 				TeacherDF t = new TeacherDF(); // Course.generateNewName());

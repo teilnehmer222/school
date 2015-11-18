@@ -27,6 +27,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 public class CoursePanel extends JPanel implements ActionListener, ListSelectionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7720278844639602571L;
 	private JButton addCourse, delCourse;
 	private JList<CourseDF> coursesJList;
 	private JList<StudentDF> studentsJList;
@@ -38,8 +42,8 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 	public CoursePanel() {
 		this.setLayout(null); // new GridLayout(1, 1));
 
-		this.courseModel = new DefaultListModel();
-		this.coursesJList = new JList(this.courseModel);// array); // data has
+		this.courseModel = new DefaultListModel<CourseDF>();
+		this.coursesJList = new JList<CourseDF>(this.courseModel);// array); // data has
 		this.add(coursesJList);
 		coursesJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		coursesJList.setLayoutOrientation(JList.VERTICAL);
@@ -111,7 +115,7 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 	public void actionPerformed(ActionEvent arg0) {
 		this.refresh = true;
 		if (arg0.getSource() == addCourse) {
-			String newName = Course.generateNewName(); // JOptionPane.showInputDialog("Bitte
+			String newName = CourseDF.generateNewName(); // JOptionPane.showInputDialog("Bitte
 														// einen Kursnamen
 														// eingeben:");
 			try {

@@ -4,10 +4,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.management.ImmutableDescriptor;
-
+/**
+ * @author teilnehmer
+ *
+ */
 public class CourseDF implements Serializable {
 	private static List<CourseDF> courses = new ArrayList<>();
+	
+	final static String[] names = new String[] { "Schlafuntericht", "Nichtstun 2.0", "Däumchendrehen",
+			"Aus dem Fenster schauen", "Stinken für Dummies", "Wie saue ich das Klo voll", "Waschbecken verstopfen II",
+			"Feueralarm drücken", "Aufzug blockieren", "Türen verkeilen", "Kernschmelze leichtgemacht", "Deppenradar" };
+	
 	/**
 	 * 
 	 */
@@ -30,14 +37,7 @@ public class CourseDF implements Serializable {
 		return studentIds;
 	}
 
-	public static List<CourseDF> getCourses() {
-		return courses;
-	}
-
-	public static void removeCourse(CourseDF course) {
-		courses.remove(course);
-	}
-
+	@Override
 	public String toString() {
 		return courseName;
 
@@ -51,10 +51,34 @@ public class CourseDF implements Serializable {
 		this.courseName = courseName;
 	}
 
-	public static void addCourseToList(CourseDF course) {
-		courses.add(course);
+	public long getId() {
+		return id;
 	}
 
+	public long getMyTeacherId() {
+		return myTeacherId;
+	}
+	
+
+	public void setMyTeacherId(long myTeacherId) {
+		this.myTeacherId = myTeacherId;
+	}
+
+	public void addStudent(Long studentId) {
+		studentIds.add(studentId);
+	}
+
+	public void removeStudent(long id) {
+		for (long studentEntry : studentIds) {
+			if (studentEntry == id) {
+				studentIds.remove(id);
+			}
+		}
+	}
+
+	/**
+	 * static methods
+	 */
 	public static CourseDF findCourseById(long courseId) {
 		CourseDF foundCourse = null;
 		for (CourseDF course : courses) {
@@ -74,28 +98,20 @@ public class CourseDF implements Serializable {
 		return hasTeaacher;
 	}
 
-	public long getId() {
-		return id;
+	public static List<CourseDF> getCourses() {
+		return courses;
 	}
 
-	public long getMyTeacherId() {
-		return myTeacherId;
+	public static void removeCourse(CourseDF course) {
+		courses.remove(course);
 	}
 
-	public void setMyTeacherId(long myTeacherId) {
-		this.myTeacherId = myTeacherId;
+	public static void addCourseToList(CourseDF course) {
+		courses.add(course);
 	}
-
-	public void addStudent(Long studentId) {
-		studentIds.add(studentId);
+	
+	public static String generateNewName() {
+		int randomNum = 0 + (int) (Math.random() * names.length);
+		return names[randomNum];
 	}
-
-	public void removeStudent(long id) {
-		for (long studentEntry : studentIds) {
-			if (studentEntry == id) {
-				studentIds.remove(id);
-			}
-		}
-	}
-
 }
