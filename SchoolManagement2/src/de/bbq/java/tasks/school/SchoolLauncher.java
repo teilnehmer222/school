@@ -23,7 +23,7 @@ public class SchoolLauncher extends JFrame {
 	private static final int winHight = 430;
 	private CoursePanel panel1;
 	private TeacherPanel panel2;
-	private PupilPanel panel3;
+	private StudentPanel panel3;
 	public static void main(String[] args) {
 		// frame.add(keyboardExample);
 		SchoolLauncher automat = new SchoolLauncher();
@@ -43,7 +43,7 @@ public class SchoolLauncher extends JFrame {
         tabbedPane.addTab("Leerer", icon, panel2,"Leerer");
         tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
          
-        panel3 = new PupilPanel();// makeTextPanel("Hier sollen die Schüler aufgelistet werden");
+        panel3 = new StudentPanel();// makeTextPanel("Hier sollen die Schüler aufgelistet werden");
         tabbedPane.addTab("Schüler", icon, panel3,"Schüler");
         panel3.setPreferredSize(new Dimension(410, 50));
         tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);

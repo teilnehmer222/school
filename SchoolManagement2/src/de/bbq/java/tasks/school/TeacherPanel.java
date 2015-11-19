@@ -31,6 +31,7 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 	private DefaultListModel<CourseDF> coursePoolModel, courseSelectedModel;
 	private boolean refresh = true;
 	private TeacherDF selectedTeacher;
+	private DAOTeacher store = new DAOTeacher();
 
 	public TeacherPanel() {
 		this.setLayout(null); // new GridLayout(1, 1));
@@ -126,9 +127,9 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 			String newName = TeacherDF.generateNewName();
 			// JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
 			try {
-				TeacherDF t = TeacherDF.createTeacher(newName); // Course.generateNewName());
+				TeacherDF t = TeacherDF.createTeacher(newName,store); // Course.generateNewName());
 				//t.setFirstName(newName);
-				TeacherDF.addTeacherToList(t);
+				//TeacherDF.addTeacherToList(t);
 			} catch (Exception e) {
 				// TODO: handle exception
 			}

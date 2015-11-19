@@ -23,7 +23,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class PupilPanel extends JPanel implements ActionListener, ListSelectionListener {
+public class StudentPanel extends JPanel implements ActionListener, ListSelectionListener {
 	private JButton addStudent, delStudent, addCourse, remCourse;
 	private JList studentsJList, coursePoolJList, courseSelectedJList;
 	private DefaultListModel<StudentDF> studentModel;
@@ -31,7 +31,9 @@ public class PupilPanel extends JPanel implements ActionListener, ListSelectionL
 	private boolean refresh = true;
 	private StudentDF selectedStudent;
 
-	public PupilPanel() {
+	private DAOStudent store = new DAOStudent();
+	
+	public StudentPanel() {
 		this.setLayout(null); // new GridLayout(1, 1));
 		studentModel = new DefaultListModel<>();
 		studentsJList = new JList(studentModel); // data has type Object[]
@@ -126,7 +128,7 @@ public class PupilPanel extends JPanel implements ActionListener, ListSelectionL
 			String newName = StudentDF.generateNewName(); 
 			// JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
 			try {
-				StudentDF s = StudentDF.createStudent(newName);
+				StudentDF s = StudentDF.createStudent(newName,store);
 				//StudentDF.addStudentToList(s);
 			} catch (Exception e) {
 				// TODO: handle exception

@@ -2,31 +2,73 @@ package de.bbq.java.tasks.school;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import javax.swing.JOptionPane;
 
 /**
  * @author teilnehmer
  *
  */
-public class CourseDF implements Serializable {
-	private static final long serialVersionUID = -4457277057001458163L;
-	static long highestCourseId = 1000;
-	
-	private static List<CourseDF> courses = new ArrayList<>();
-
+public class CourseDF implements ICourse, Serializable, DAInterface {
 	final static String[] names = new String[] { "Schlafuntericht", "Nichtstun 2.0", "Däumchendrehen",
 			"Aus dem Fenster schauen", "Stinken für Dummies", "Wie saue ich das Klo voll", "Waschbecken verstopfen II",
-			"Feueralarm drücken", "Aufzug blockieren", "Türen verkeilen", "Kernschmelze leichtgemacht", "Deppenradar" };
+			"Feueralarm drücken", "Aufzug blockieren", "Türen verkeilen", "Kernschmelze leichtgemacht", "Deppenradar", "Mülleimer vollkotzen" };
 
-
-	// private long myTeacherId = -1;
-	private TeacherDF teacher;
-	// private List<Long> studentIds = new ArrayList<>();
-	private List<StudentDF> students = new ArrayList<>();
+	private static final long serialVersionUID = -4457277057001458163L;
+	private static long highestCourseId = 1000;
 	
-	//Serializable Properties
+	private static ArrayList<CourseDF> courses = new ArrayList<>();
+
+	private TeacherDF teacher;
+	private ArrayList<StudentDF> students = new ArrayList<>();
+	
+	private DAOSchool dataAccessObject;
+	
+	// Serializable Properties
 	private long id;
 	private String courseName;
+
+	private String topic;
+	private Date endTime;
+	private Date startTime;
+	private Integer roomNumber;
+	private Boolean needsBeamer;
+	
+	public Date getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
+	}
+
+	public void setStudents(ArrayList<StudentDF> students) {
+		this.students = students;
+	}
+
+	public void setNeedsBeamer(Boolean needsBeamer) {
+		this.needsBeamer = needsBeamer;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
+	}
+
+	public void setRoomNumber(int roomNumber) {
+		this.roomNumber = roomNumber;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
+	private String language;
 
 	private static long createNewID() {
 		return CourseDF.highestCourseId++;
@@ -38,122 +80,120 @@ public class CourseDF implements Serializable {
 		courses.add(this);
 	}
 
-	public static CourseDF createCourse(String courseName) {
-		return new CourseDF(courseName);
+	public static CourseDF createCourse(String courseName,DAOSchool store) {
+		CourseDF c =new CourseDF(courseName);
+		c.dataAccessObject = store;
+		return c;
 	};
 
-	// public List<Long> getStudentIds() {
-	// return studentIds;
-	// }
-	public List<StudentDF> getStudents() {
-		return students;
+	public ArrayList<StudentDF> getStudents() {
+		return this.students;
 	}
 
 	@Override
 	public String toString() {
-		return courseName;
+		return this.courseName;
 
 	}
 
 	public String getCourseName() {
-		return courseName;
+		return this.courseName;
 	}
 
 	public void setCourseName(String courseName) {
 		this.courseName = courseName;
 	}
 
-	public long NURZUMSPEICHERN() {
-		return id;
-	}
-
-	// private long getMyTeacherId() {
-	// return myTeacherId;
-	// }
-
 	public void setTeacher(TeacherDF t) {
 		this.teacher = t;
-		// unnecercarry:
-		// myTeacherId = t.getId();
 	}
 
 	public TeacherDF getTeacher() {
 		return this.teacher;
 	}
 
-	// private void setMyTeacherId(long myTeacherId) {
-	// this.myTeacherId = myTeacherId;
-	// }
-
-	// public void addStudent(Long studentId) {
-	// studentIds.add(studentId);
-	// }
 
 	public void addStudent(StudentDF student) {
-		students.add(student);
+		this.students.add(student);
 	}
 
 	public void removeStudent(StudentDF student) {
-		if (students.contains(student)) {
-			students.remove(student);
+		if (this.students.contains(student)) {
+			this.students.remove(student);
 		}
 	}
-	// public void removeStudent(long id) {
-	// for (long studentEntry : studentIds) {
-	// if (studentEntry == id) {
-	// studentIds.remove(id);
-	// }
-	// }
-	// }
-
-	/**
-	 * static methods
-	 */
-	public static CourseDF findCourseById(long courseId) {
-		CourseDF foundCourse = null;
-		for (CourseDF course : courses) {
-			if (course.id == courseId) {
-				foundCourse = course;
-				break;
-			}
-		}
-		return foundCourse;
-	}
-
+	
 	public boolean hasTeacher() {
-		// boolean hasTeaacher = false;
-		// CourseDF course = findCourseById(this.id);
-		// if (course.getMyTeacherId() != -1)
-		// hasTeaacher = true;
-		return (this.getTeacher() != null); // this.getMyTeacherId() != -1;
+		return (this.getTeacher() != null); 
 	}
 
-	// private static boolean hasTeacher(long courseId) {
-	//
-	// }
-
-	public static List<CourseDF> getCourses() {
+	public static ArrayList<CourseDF> getCourses() {
 		return courses;
 	}
-
-	public void delete() {
-		// TODO: delete from data-source
-		courses.remove(this);
-
-	}
-	// I do not want to HAVE TO CALL YOUR LOGIC in my code!!!!!!->indirect
-	// public static void removeCourse(CourseDF course) {
-	// courses.remove(course);
-	// }
-
-	// I do not want to HAVE TO CALL YOUR LOGIC in my code!!!!!!->indirect
-	// construction
-	// public static void addCourseToList(CourseDF course) {
-	// courses.add(course);
-	// }
-
+	
 	public static String generateNewName() {
 		int randomNum = 0 + (int) (Math.random() * names.length);
 		return names[randomNum];
 	}
+
+	@Override
+	public boolean saveElement() {
+		return this.dataAccessObject.saveElement(this);
+	}
+
+	@Override
+	public boolean loadElement() {
+		return this.dataAccessObject.loadElement(this);
+	}
+
+	@Override
+	public <E> boolean saveList(ArrayList<E> list) {
+		return this.dataAccessObject.saveList(courses);
+	}
+
+	@Override
+	public <E> boolean loadList(ArrayList<E> list) {
+		return this.dataAccessObject.loadList(courses);
+	}
+
+	@Override
+	public boolean deleteElement() {
+		courses.remove(this);
+		return this.dataAccessObject.deleteElement(this); 
+	}
+
+	public String getNeedsBeamer() {
+		return this.needsBeamer.toString();
+	}
+
+
+	public String getTopic() {
+		return this.topic;
+	}
+
+	public Date getEndTime() {
+		return this.endTime;
+	}
+
+	public Date getSartTime() {
+		return this.startTime;
+	}
+
+	public Integer getRoomNumber() {
+		return this.roomNumber;
+	}
+
+	public String getLanguage() {
+		return this.language;
+	}
+
+	public void update() {
+		if (courses.contains(this)) {
+			JOptionPane.showMessageDialog(null, "DOIT");
+		}
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }

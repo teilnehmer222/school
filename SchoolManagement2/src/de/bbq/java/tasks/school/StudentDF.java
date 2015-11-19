@@ -3,19 +3,21 @@ package de.bbq.java.tasks.school;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StudentDF extends SchoolMember {
+public class StudentDF extends SchoolMember implements IStudent, DAInterface  {
 	private static final long serialVersionUID = -8838146635169751075L;
 
-	private static List<StudentDF> students = new ArrayList<>();
+	private static ArrayList<StudentDF> students = new ArrayList<>();
 	private CourseDF course;
-
-	private StudentDF(String firstName) {
+	private DAOSchool dataAccessObject;
+	
+	private StudentDF(String firstName,DAOSchool store) {
 		super();
+		this.dataAccessObject = store;
 		super.setFirstName(firstName);
 	}
 
-	public static StudentDF createStudent(String firstName) {
-		StudentDF student = new StudentDF(firstName);
+	public static StudentDF createStudent(String firstName, DAOSchool store) {
+		StudentDF student = new StudentDF(firstName,store);
 		students.add(student);
 		return student;
 	}
@@ -40,7 +42,7 @@ public class StudentDF extends SchoolMember {
 		}
 	}
 
-	public static List<StudentDF> getList() {
+	public static ArrayList<StudentDF> getList() {
 		return students;
 	}
 
@@ -70,22 +72,48 @@ public class StudentDF extends SchoolMember {
 //		students.add(student);
 //	}
 
-	public static StudentDF findStudentById(long studentId) {
-		StudentDF foundStudent = null;
-		for (StudentDF student : students) {
-			if (student.getSchoolMemberId() == studentId) {
-				foundStudent = student;
-				break;
-			}
-		}
-		return foundStudent;
-	}
+//	public static StudentDF findStudentById(long studentId) {
+//		StudentDF foundStudent = null;
+//		for (StudentDF student : students) {
+//			if (student.getSchoolMemberId() == studentId) {
+//				foundStudent = student;
+//				break;
+//			}
+//		}
+//		return foundStudent;
+//	}
 
 	public static String generateNewName() {
 		String[] array = new String[] { "Depp", "Trottel", "Idiot", "Armleuchter", "Hirni", "Totalversager",
 				"Baumschulabbrecher", "Volltrottel", "Extremdepp", "Superidiot" };
 		int randomNum = 0 + (int) (Math.random() * array.length);
 		return array[randomNum];
+	}
+
+	@Override
+	public boolean saveElement() {
+		return this.dataAccessObject.saveElement(this); 
+	}
+
+	@Override
+	public boolean loadElement() {
+		return this.dataAccessObject.loadElement(this); 
+	}
+
+	@Override
+	public <E> boolean saveList(ArrayList<E> list) {
+		return this.dataAccessObject.saveList(students); 
+	}
+
+	@Override
+	public <E> boolean loadList(ArrayList<E> list) {
+		return this.dataAccessObject.loadList(students); 
+	}
+
+	@Override
+	public boolean deleteElement() {
+		students.remove(this);
+		return this.dataAccessObject.deleteElement(this); 
 	}
 
 }
