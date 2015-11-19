@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -15,8 +16,8 @@ import javax.swing.JTextField;
 public class EditFrame extends JFrame implements ActionListener {
 	ArrayList<Component> fields = new ArrayList<>();
 	JButton exit;
-	JTextField Fach, Start, Ende, Sprache, Raum, Beamer;
-
+	JTextField Fach, Start, Ende, Sprache, Raum;
+	JCheckBox Beamer;
 	CourseDF c;
 	TeacherDF t;
 	StudentDF s;
@@ -179,9 +180,10 @@ public class EditFrame extends JFrame implements ActionListener {
 		add(Raum);
 		fields.add(Raum);
 
-		this.Beamer = new JTextField();
+		this.Beamer = new JCheckBox();
 		Beamer.setBounds(110, 155, 200, 20);
 		Beamer.setName("Beamer:");
+		Beamer.setSelected((boolean) c.getNeedsBeamer());
 		add(Beamer);
 		fields.add(Beamer);
 
@@ -282,9 +284,9 @@ public class EditFrame extends JFrame implements ActionListener {
 				}
 				try {
 					Date d = DateFormat.getDateInstance().parse(Start.getText());
-					c.setEndTime(d);
+					c.setStartTime(d);
 				} catch (Exception e2) {
-					c.setEndTime(new Date());
+					c.setStartTime(new Date());
 				}
 				c.setLanguage(Sprache.getText());
 				try {
@@ -292,7 +294,7 @@ public class EditFrame extends JFrame implements ActionListener {
 				} catch (Exception e2) {
 					c.setRoomNumber(0);
 				}
-				c.update();
+				c.setNeedsBeamer(this.Beamer.isSelected());
 			}
 			this.dispose();
 		}

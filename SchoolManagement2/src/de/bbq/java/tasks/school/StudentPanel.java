@@ -31,9 +31,10 @@ public class StudentPanel extends JPanel implements ActionListener, ListSelectio
 	private boolean refresh = true;
 	private StudentDF selectedStudent;
 
-	private DAOStudent store = new DAOStudent();
-	
-	public StudentPanel() {
+	private DaoSchoolAbstract store;
+
+	public StudentPanel(DaoSchoolAbstract DaoStore) {
+		this.store = DaoStore;
 		this.setLayout(null); // new GridLayout(1, 1));
 		studentModel = new DefaultListModel<>();
 		studentsJList = new JList(studentModel); // data has type Object[]
@@ -125,22 +126,22 @@ public class StudentPanel extends JPanel implements ActionListener, ListSelectio
 	public void actionPerformed(ActionEvent arg0) {
 		this.refresh = true;
 		if (arg0.getSource() == addStudent) {
-			String newName = StudentDF.generateNewName(); 
+			String newName = StudentDF.generateNewName();
 			// JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
 			try {
-				StudentDF s = StudentDF.createStudent(newName,store);
-				//StudentDF.addStudentToList(s);
+				StudentDF s = StudentDF.createStudent(newName, store);
+				// StudentDF.addStudentToList(s);
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
-			//pupilsJList.setSelectedIndex(index+1);
+			// pupilsJList.setSelectedIndex(index+1);
 			this.selectedStudent = (StudentDF) studentsJList.getSelectedValue();
 		} else if (arg0.getSource() == delStudent) {
-			if (this.selectedStudent == null || !StudentDF.getList().contains(this.selectedStudent)) {
+			if (this.selectedStudent == null || !StudentDF.getStudents().contains(this.selectedStudent)) {
 				studentsJList.setSelectedIndex(studentsJList.getSelectedIndex());
 				this.selectedStudent = (StudentDF) studentsJList.getSelectedValue();
 			}
-			StudentDF.getList().remove(this.selectedStudent);
+			StudentDF.getStudents().remove(this.selectedStudent);
 		}
 		if (arg0.getSource() == addCourse) {
 			CourseDF selectedCourse = (CourseDF) coursePoolJList.getSelectedValue();
@@ -148,8 +149,9 @@ public class StudentPanel extends JPanel implements ActionListener, ListSelectio
 				if (selectedStudent != null) {
 					try {
 						selectedCourse.addStudent(selectedStudent);
-						//School.addStudentToCourse(selectedStudent.getId(), selectedCourse.NURZUMSPEICHERN());
-						//Course.writeBack(selectedStudent);
+						// School.addStudentToCourse(selectedStudent.getId(),
+						// selectedCourse.NURZUMSPEICHERN());
+						// Course.writeBack(selectedStudent);
 					} catch (Exception e) {
 						System.out.println(e.getMessage());
 					}
@@ -159,13 +161,16 @@ public class StudentPanel extends JPanel implements ActionListener, ListSelectio
 			CourseDF selectedCourse = (CourseDF) courseSelectedJList.getSelectedValue();
 			if (selectedCourse != null) {
 				if (this.selectedStudent != null) {
-					//if (this.selectedStudent.getMyCourseId() ==selectedCourse.NURZUMSPEICHERN()) { // getCourseList().contains(selectedCourse))
+					// if (this.selectedStudent.getMyCourseId()
+					// ==selectedCourse.NURZUMSPEICHERN()) { //
+					// getCourseList().contains(selectedCourse))
 					if (this.selectedStudent.hasCourse(selectedCourse)) { // getCourseList().contains(selectedCourse))
-																		// {
+																			// {
 						try {
 							selectedCourse.removeStudent(selectedStudent);
-							//School.removeStudentFromCourse(selectedStudent.getId(), selectedCourse.NURZUMSPEICHERN());
-							//Course.writeBack(selectedStudent);
+							// School.removeStudentFromCourse(selectedStudent.getId(),
+							// selectedCourse.NURZUMSPEICHERN());
+							// Course.writeBack(selectedStudent);
 						} catch (Exception e) {
 							System.out.println(e.getMessage());
 						}
@@ -180,24 +185,41 @@ public class StudentPanel extends JPanel implements ActionListener, ListSelectio
 	public void refresh() {
 		int selIndex = studentsJList.getSelectedIndex();
 		this.refresh = true;
-		this.studentModel.clear();
-		for (StudentDF p : StudentDF.getList()) {
+		StudentDF cindex = null;
+		for (int index = this.studentModel.getSize(); index > 0; index--) {
+			try {
+				cindex = (StudentDF) this.studentModel.getElementAt(index - 1);
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, e.getMessage());
+			}
+
+			if (!CourseDF.getCourses().contains(cindex)) {
+				try {
+					this.studentModel.remove(index - 1);
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(null, e.getMessage());
+				}
+
+			}
+		}
+		for (StudentDF p : StudentDF.getStudents()) {
 			this.studentModel.addElement(p);
 		}
 		this.coursePoolModel.clear();
 		this.courseSelectedModel.clear();
 		if (this.selectedStudent != null) {
 			for (CourseDF c : CourseDF.getCourses()) {
-				//if (this.selectedStudent.getMyCourseId() !=c.NURZUMSPEICHERN()) {
+				// if (this.selectedStudent.getMyCourseId()
+				// !=c.NURZUMSPEICHERN()) {
 				if (this.selectedStudent.hasCourse(c)) {
 					coursePoolModel.addElement(c);
 				} else {
 					courseSelectedModel.addElement(c);
-				} 
+				}
 			}
 		}
 		if (selIndex < 0) {
-			//do Nothing
+			// do Nothing
 		} else if (selIndex < studentModel.getSize()) {
 			studentsJList.setSelectedIndex(selIndex);
 		} else {

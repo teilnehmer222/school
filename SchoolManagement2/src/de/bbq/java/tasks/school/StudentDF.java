@@ -3,21 +3,26 @@ package de.bbq.java.tasks.school;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StudentDF extends SchoolMember implements IStudent, DAInterface  {
+public class StudentDF extends SchoolMember implements IStudent, DaoSchoolInterface {
 	private static final long serialVersionUID = -8838146635169751075L;
 
 	private static ArrayList<StudentDF> students = new ArrayList<>();
 	private CourseDF course;
-	private DAOSchool dataAccessObject;
-	
-	private StudentDF(String firstName,DAOSchool store) {
+	private static DaoSchoolAbstract dataAccessObject;
+
+	private StudentDF(String firstName) {
 		super();
-		this.dataAccessObject = store;
+
 		super.setFirstName(firstName);
 	}
 
-	public static StudentDF createStudent(String firstName, DAOSchool store) {
-		StudentDF student = new StudentDF(firstName,store);
+	public static StudentDF createStudent(String firstName, DaoSchoolAbstract store) {
+		StudentDF student = new StudentDF(firstName);
+		if (dataAccessObject == null) {
+			dataAccessObject = store;
+		} else if (!dataAccessObject.getClass().equals(store.getClass())) {
+			dataAccessObject = store;
+		}
 		students.add(student);
 		return student;
 	}
@@ -42,7 +47,7 @@ public class StudentDF extends SchoolMember implements IStudent, DAInterface  {
 		}
 	}
 
-	public static ArrayList<StudentDF> getList() {
+	public static ArrayList<StudentDF> getStudents() {
 		return students;
 	}
 
@@ -68,20 +73,20 @@ public class StudentDF extends SchoolMember implements IStudent, DAInterface  {
 		this.course = course;
 	}
 
-//	public static void addStudentToList(StudentDF student) {
-//		students.add(student);
-//	}
+	// public static void addStudentToList(StudentDF student) {
+	// students.add(student);
+	// }
 
-//	public static StudentDF findStudentById(long studentId) {
-//		StudentDF foundStudent = null;
-//		for (StudentDF student : students) {
-//			if (student.getSchoolMemberId() == studentId) {
-//				foundStudent = student;
-//				break;
-//			}
-//		}
-//		return foundStudent;
-//	}
+	// public static StudentDF findStudentById(long studentId) {
+	// StudentDF foundStudent = null;
+	// for (StudentDF student : students) {
+	// if (student.getSchoolMemberId() == studentId) {
+	// foundStudent = student;
+	// break;
+	// }
+	// }
+	// return foundStudent;
+	// }
 
 	public static String generateNewName() {
 		String[] array = new String[] { "Depp", "Trottel", "Idiot", "Armleuchter", "Hirni", "Totalversager",
@@ -92,28 +97,40 @@ public class StudentDF extends SchoolMember implements IStudent, DAInterface  {
 
 	@Override
 	public boolean saveElement() {
-		return this.dataAccessObject.saveElement(this); 
+		this.setSaved(true);
+		return this.dataAccessObject.saveElement(this);
 	}
 
 	@Override
 	public boolean loadElement() {
-		return this.dataAccessObject.loadElement(this); 
+		this.setSaved(false);
+		return this.dataAccessObject.loadElement(this);
 	}
 
 	@Override
-	public <E> boolean saveList(ArrayList<E> list) {
-		return this.dataAccessObject.saveList(students); 
+	public boolean saveAll() {
+		return this.dataAccessObject.saveAll();
 	}
 
 	@Override
-	public <E> boolean loadList(ArrayList<E> list) {
-		return this.dataAccessObject.loadList(students); 
+	public boolean loadAll() {
+
+		return this.dataAccessObject.loadAll();
 	}
 
 	@Override
 	public boolean deleteElement() {
 		students.remove(this);
-		return this.dataAccessObject.deleteElement(this); 
+		return this.dataAccessObject.deleteElement(this);
 	}
 
+	private transient boolean saved = false;
+
+	public boolean isSaved() {
+		return saved;
+	}
+
+	public void setSaved(boolean saved) {
+		this.saved = saved;
+	}
 }

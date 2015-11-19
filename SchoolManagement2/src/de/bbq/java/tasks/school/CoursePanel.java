@@ -39,9 +39,10 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 	private DefaultListModel<StudentDF> studentModel;
 	private boolean refresh = true;
 
-	private DAOCourse store = new DAOCourse();
+	private DaoSchoolAbstract store;
 
-	public CoursePanel() {
+	public CoursePanel(DaoSchoolAbstract DaoStore) {
+		this.store = DaoStore;
 		this.setLayout(null); // new GridLayout(1, 1));
 
 		this.courseModel = new DefaultListModel<CourseDF>();
@@ -134,9 +135,31 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
+			// TODO: DELETE SHOW
+			if (CourseDF.getCourses().size() > 1)
+				this.store = new DaoSchoolJdbc();
 		} else if (arg0.getSource() == delCourse) {
 			CourseDF selected = (CourseDF) coursesJList.getSelectedValue();
-			selected.deleteElement();
+			if (selected != null) {
+				selected.deleteElement();
+			}
+		} else if (arg0.getSource() == saveAll) {
+			if (!CourseDF.getCourses().isEmpty()) {
+				CourseDF.getCourses().get(0).saveAll();
+			} else if (!TeacherDF.getTeachers().isEmpty()) {
+				TeacherDF.getTeachers().get(0).saveAll();
+			} else 	if (!StudentDF.getStudents().isEmpty()) {
+				StudentDF.getStudents().get(0).saveAll();
+			}
+				
+		} else if (arg0.getSource() == loadAll) {
+			if (!CourseDF.getCourses().isEmpty()) {
+				CourseDF.getCourses().get(0).loadAll();
+			} else if (!TeacherDF.getTeachers().isEmpty()) {
+				TeacherDF.getTeachers().get(0).loadAll();
+			} else 	if (!StudentDF.getStudents().isEmpty()) {
+				StudentDF.getStudents().get(0).loadAll();
+			}
 		}
 		this.refresh = false;
 		refresh();
@@ -144,7 +167,24 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 
 	public void refresh() {
 		this.refresh = true;
+		CourseDF cindex = null;
 		// this.courseModel.clear();
+		for (int index = this.courseModel.getSize(); index > 0; index--) {
+			try {
+				cindex = (CourseDF) this.courseModel.getElementAt(index - 1);
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, e.getMessage());
+			}
+
+			if (!CourseDF.getCourses().contains(cindex)) {
+				try {
+					this.courseModel.remove(index - 1);
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(null, e.getMessage());
+				}
+
+			}
+		}
 		for (CourseDF c : CourseDF.getCourses()) {
 			if (!this.courseModel.contains(c)) {
 				this.courseModel.addElement(c);
@@ -177,12 +217,6 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 			for (StudentDF student : selectedCourse.getStudents()) {
 				this.studentModel.addElement(student);
 			}
-		} else if (!this.refresh && arg0.getSource() == saveAll) {
-			if (selectedCourse != null)
-				selectedCourse.saveElement();
-		} else if (!this.refresh && arg0.getSource() == loadAll) {
-			if (selectedCourse != null)
-				selectedCourse.loadElement();
 		}
 	}
 }

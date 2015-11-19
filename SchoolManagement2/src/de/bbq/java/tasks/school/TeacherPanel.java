@@ -31,9 +31,10 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 	private DefaultListModel<CourseDF> coursePoolModel, courseSelectedModel;
 	private boolean refresh = true;
 	private TeacherDF selectedTeacher;
-	private DAOTeacher store = new DAOTeacher();
+	private DaoSchoolAbstract store;
 
-	public TeacherPanel() {
+	public TeacherPanel(DaoSchoolAbstract DaoStore) {
+		this.store = DaoStore;
 		this.setLayout(null); // new GridLayout(1, 1));
 		teacherModel = new DefaultListModel<>();
 		teachersJList = new JList(teacherModel); // data has type Object[]
@@ -127,9 +128,9 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 			String newName = TeacherDF.generateNewName();
 			// JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
 			try {
-				TeacherDF t = TeacherDF.createTeacher(newName,store); // Course.generateNewName());
-				//t.setFirstName(newName);
-				//TeacherDF.addTeacherToList(t);
+				TeacherDF t = TeacherDF.createTeacher(newName, store); // Course.generateNewName());
+				// t.setFirstName(newName);
+				// TeacherDF.addTeacherToList(t);
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
@@ -184,7 +185,7 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 					selectedTeacher.removeCourse(selectedCourse);
 				}
 			}
-		}
+		} else 
 		this.refresh = false;
 		refresh();
 	}
@@ -192,7 +193,24 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 	public void refresh() {
 		int selIndex = teachersJList.getSelectedIndex();
 		this.refresh = true;
-		this.teacherModel.clear();
+		// this.teacherModel.clear();
+		TeacherDF cindex = null;
+		for (int index = this.teacherModel.getSize(); index > 0; index--) {
+			try {
+				cindex = (TeacherDF) this.teacherModel.getElementAt(index - 1);
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, e.getMessage());
+			}
+
+			if (!CourseDF.getCourses().contains(cindex)) {
+				try {
+					this.teacherModel.remove(index - 1);
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(null, e.getMessage());
+				}
+
+			}
+		}
 		for (TeacherDF t : TeacherDF.getTeachers()) {
 			this.teacherModel.addElement(t);
 		}
@@ -200,17 +218,17 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 		this.courseSelectedModel.clear();
 		if (this.selectedTeacher != null) {
 			for (CourseDF c : CourseDF.getCourses()) {
-				if (c.getTeacher().equals(selectedTeacher)) {
+				if (this.selectedTeacher.equals(c.getTeacher())) {
 					courseSelectedModel.addElement(c);
-				}else if (!c.hasTeacher()) {
+				} else if (!c.hasTeacher()) {
 					coursePoolModel.addElement(c);
 				}
-				
-//				if (c.getMyTeacherId() == this.selectedTeacher.getId()) {
-//					courseSelectedModel.addElement(c);
-//				} else if (c.getMyTeacherId() == -1) {
-//					coursePoolModel.addElement(c);
-//				}
+
+				// if (c.getMyTeacherId() == this.selectedTeacher.getId()) {
+				// courseSelectedModel.addElement(c);
+				// } else if (c.getMyTeacherId() == -1) {
+				// coursePoolModel.addElement(c);
+				// }
 			}
 		}
 		if (selIndex < 0) {
