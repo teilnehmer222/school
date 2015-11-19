@@ -9,32 +9,44 @@ import java.util.List;
  *
  */
 public class CourseDF implements Serializable {
-	private static List<CourseDF> courses = new ArrayList<>();
+	private static final long serialVersionUID = -4457277057001458163L;
+	static long highestCourseId = 1000;
 	
+	private static List<CourseDF> courses = new ArrayList<>();
+
 	final static String[] names = new String[] { "Schlafuntericht", "Nichtstun 2.0", "Däumchendrehen",
 			"Aus dem Fenster schauen", "Stinken für Dummies", "Wie saue ich das Klo voll", "Waschbecken verstopfen II",
 			"Feueralarm drücken", "Aufzug blockieren", "Türen verkeilen", "Kernschmelze leichtgemacht", "Deppenradar" };
+
+
+	// private long myTeacherId = -1;
+	private TeacherDF teacher;
+	// private List<Long> studentIds = new ArrayList<>();
+	private List<StudentDF> students = new ArrayList<>();
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4457277057001458163L;
+	//Serializable Properties
 	private long id;
-	private long myTeacherId = -1;
-	private List<Long> studentIds = new ArrayList<>();
 	private String courseName;
 
-	public CourseDF() {
-		this.id = School.highestCourseId++;
+	private static long createNewID() {
+		return CourseDF.highestCourseId++;
 	}
 
-	public CourseDF(String courseName) {
-		this.id = School.highestCourseId++;
+	private CourseDF(String courseName) {
+		this.id = CourseDF.createNewID();
 		this.courseName = courseName;
+		courses.add(this);
 	}
 
-	public List<Long> getStudentIds() {
-		return studentIds;
+	public static CourseDF createCourse(String courseName) {
+		return new CourseDF(courseName);
+	};
+
+	// public List<Long> getStudentIds() {
+	// return studentIds;
+	// }
+	public List<StudentDF> getStudents() {
+		return students;
 	}
 
 	@Override
@@ -51,30 +63,48 @@ public class CourseDF implements Serializable {
 		this.courseName = courseName;
 	}
 
-	public long getId() {
+	public long NURZUMSPEICHERN() {
 		return id;
 	}
 
-	public long getMyTeacherId() {
-		return myTeacherId;
-	}
-	
+	// private long getMyTeacherId() {
+	// return myTeacherId;
+	// }
 
-	public void setMyTeacherId(long myTeacherId) {
-		this.myTeacherId = myTeacherId;
-	}
-
-	public void addStudent(Long studentId) {
-		studentIds.add(studentId);
+	public void setTeacher(TeacherDF t) {
+		this.teacher = t;
+		// unnecercarry:
+		// myTeacherId = t.getId();
 	}
 
-	public void removeStudent(long id) {
-		for (long studentEntry : studentIds) {
-			if (studentEntry == id) {
-				studentIds.remove(id);
-			}
+	public TeacherDF getTeacher() {
+		return this.teacher;
+	}
+
+	// private void setMyTeacherId(long myTeacherId) {
+	// this.myTeacherId = myTeacherId;
+	// }
+
+	// public void addStudent(Long studentId) {
+	// studentIds.add(studentId);
+	// }
+
+	public void addStudent(StudentDF student) {
+		students.add(student);
+	}
+
+	public void removeStudent(StudentDF student) {
+		if (students.contains(student)) {
+			students.remove(student);
 		}
 	}
+	// public void removeStudent(long id) {
+	// for (long studentEntry : studentIds) {
+	// if (studentEntry == id) {
+	// studentIds.remove(id);
+	// }
+	// }
+	// }
 
 	/**
 	 * static methods
@@ -82,7 +112,7 @@ public class CourseDF implements Serializable {
 	public static CourseDF findCourseById(long courseId) {
 		CourseDF foundCourse = null;
 		for (CourseDF course : courses) {
-			if (course.getId() == courseId) {
+			if (course.id == courseId) {
 				foundCourse = course;
 				break;
 			}
@@ -90,26 +120,38 @@ public class CourseDF implements Serializable {
 		return foundCourse;
 	}
 
-	public static boolean hasTeacher(long courseId) {
-		boolean hasTeaacher = false;
-		CourseDF course = findCourseById(courseId);
-		if (course.getMyTeacherId() != -1)
-			hasTeaacher = true;
-		return hasTeaacher;
+	public boolean hasTeacher() {
+		// boolean hasTeaacher = false;
+		// CourseDF course = findCourseById(this.id);
+		// if (course.getMyTeacherId() != -1)
+		// hasTeaacher = true;
+		return (this.getTeacher() != null); // this.getMyTeacherId() != -1;
 	}
+
+	// private static boolean hasTeacher(long courseId) {
+	//
+	// }
 
 	public static List<CourseDF> getCourses() {
 		return courses;
 	}
 
-	public static void removeCourse(CourseDF course) {
-		courses.remove(course);
-	}
+	public void delete() {
+		// TODO: delete from data-source
+		courses.remove(this);
 
-	public static void addCourseToList(CourseDF course) {
-		courses.add(course);
 	}
-	
+	// I do not want to HAVE TO CALL YOUR LOGIC in my code!!!!!!->indirect
+	// public static void removeCourse(CourseDF course) {
+	// courses.remove(course);
+	// }
+
+	// I do not want to HAVE TO CALL YOUR LOGIC in my code!!!!!!->indirect
+	// construction
+	// public static void addCourseToList(CourseDF course) {
+	// courses.add(course);
+	// }
+
 	public static String generateNewName() {
 		int randomNum = 0 + (int) (Math.random() * names.length);
 		return names[randomNum];

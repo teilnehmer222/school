@@ -16,55 +16,69 @@ public class School implements Serializable {
 	 */
 	private static final long serialVersionUID = 5102428526913361257L;
 
-	static long highestCourseId = 1000;
-	static long highestMemberId = 1000;
+//	static long highestCourseId = 1000;
+//	static long highestMemberId = 1000;
 
-	public static void addCourseToTeacher(long courseId, long teacherId) {
-		if (!CourseDF.hasTeacher(courseId)) {
-			CourseDF course = CourseDF.findCourseById(courseId);
-			TeacherDF teacher = TeacherDF.findTeacherById(teacherId);
-			teacher.addCourseId(courseId);
-			course.setMyTeacherId(teacherId);
-		}
+//	public static void addCourseToTeacher(CourseDF course, long teacherId) { //long courseId
+//		//CourseDF course = CourseDF.findCourseById(courseId);
+//		if (!course.hasTeacher()) { //courseId)) {
+//			//CourseDF course = CourseDF.findCourseById(courseId);
+//			TeacherDF teacher = TeacherDF.findTeacherById(teacherId);
+//			//teacher.addCourseId(courseId);
+//			try {
+//				teacher.addCourse(course);
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			//course.setMyTeacherId(teacherId);
+//		}
+//
+//	}
 
-	}
+//	public static void removeCourseFromTeacher(long courseId, long teacherId) {
+//		CourseDF course = CourseDF.findCourseById(courseId);
+//		TeacherDF teacher = TeacherDF.findTeacherById(teacherId);
+//		teacher.removeCourse(course);
+//		//teacher.removeCourseId(courseId);
+//		//course.setMyTeacherId(-1);
+//
+//	}
 
-	public static void removeCourseFromTeacher(long courseId, long teacherId) {
-		CourseDF course = CourseDF.findCourseById(courseId);
-		TeacherDF teacher = TeacherDF.findTeacherById(teacherId);
-		teacher.removeCourseId(courseId);
-		course.setMyTeacherId(-1);
+//	public static void addStudentToCourse(long studentId, long courseId) {
+//		if (!StudentDF.hasCourse(studentId)) {
+//			StudentDF student = StudentDF.findStudentById(studentId);
+//			CourseDF course = CourseDF.findCourseById(courseId);
+//			//course.addStudent(studentId);
+//			course.addStudent(student);
+//			student.setMyCourseId(courseId);
+//		}
+//
+//	}
 
-	}
-
-	public static void addStudentToCourse(long studentId, long courseId) {
-		if (!StudentDF.hasCourse(studentId)) {
-			StudentDF student = StudentDF.findStudentById(studentId);
-			CourseDF course = CourseDF.findCourseById(courseId);
-			course.addStudent(studentId);
-			student.setMyCourseId(courseId);
-		}
-
-	}
-
-	public static void removeStudentFromCourse(long studentId, long courseId) {
-		StudentDF student = StudentDF.findStudentById(studentId);
-		CourseDF course = CourseDF.findCourseById(courseId);
-		course.removeStudent(studentId);
-		student.setMyCourseId(-1);
-
-	}
+//	public static void removeStudentFromCourse(long studentId, long courseId) {
+//		StudentDF student = StudentDF.findStudentById(studentId);
+//		CourseDF course = CourseDF.findCourseById(courseId);
+//		//course.removeStudent(studentId);
+//		course.removeStudent(student);
+//		student.setMyCourseId(-1);
+//
+//	}
 
 	private void writeObject(ObjectOutputStream stream) throws IOException {
 		stream.defaultWriteObject();
-		stream.writeObject(highestCourseId);
-		stream.writeObject(highestMemberId);
+//		stream.writeObject( highestCourseId);
+//		stream.writeObject(highestMemberId);
+		
+		stream.writeObject(CourseDF.highestCourseId);
+		stream.writeObject(SchoolMember.highestMemberId);
+		
 	}
 
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
-		highestCourseId = (long) stream.readObject();
-		highestMemberId = (long) stream.readObject();
+		CourseDF.highestCourseId = (long) stream.readObject();
+		SchoolMember.highestMemberId = (long) stream.readObject();
 	}
 
 	/*public static void main(String arg[]) {

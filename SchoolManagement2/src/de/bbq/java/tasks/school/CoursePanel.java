@@ -43,7 +43,8 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 		this.setLayout(null); // new GridLayout(1, 1));
 
 		this.courseModel = new DefaultListModel<CourseDF>();
-		this.coursesJList = new JList<CourseDF>(this.courseModel);// array); // data has
+		this.coursesJList = new JList<CourseDF>(this.courseModel);// array); //
+																	// data has
 		this.add(coursesJList);
 		coursesJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		coursesJList.setLayoutOrientation(JList.VERTICAL);
@@ -124,17 +125,16 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 		this.refresh = true;
 		if (arg0.getSource() == addCourse) {
 			String newName = CourseDF.generateNewName(); // JOptionPane.showInputDialog("Bitte
-														// einen Kursnamen
-														// eingeben:");
+															// einen Kursnamen
+															// eingeben:");
 			try {
-				CourseDF c = new CourseDF(newName); // Course.generateNewName());
-				CourseDF.addCourseToList(c);
+				CourseDF c = CourseDF.createCourse(CourseDF.generateNewName());
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
 		} else if (arg0.getSource() == delCourse) {
 			CourseDF selected = (CourseDF) coursesJList.getSelectedValue();
-			CourseDF.removeCourse(selected);
+			selected.delete();
 		}
 		this.refresh = false;
 		refresh();
@@ -154,21 +154,24 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 		if (!this.refresh && arg0.getSource() == coursesJList) {
 			CourseDF selectedCourse = (CourseDF) coursesJList.getSelectedValue();
 			if (selectedCourse != null) {
-				if (selectedCourse.getMyTeacherId() != -1) {
+				if (selectedCourse.hasTeacher()) {
 					teacher.setText(selectedCourse.getCourseName());
-				} else 
+				} else
 					teacher.setText("");
-				}
-				List<Long> studentIds = selectedCourse.getStudentIds();
-				this.studentModel.clear();
-				for (Long id : studentIds) {
-					this.studentModel.addElement(StudentDF.findStudentById(id));
-				}
-						} else if (!this.refresh && arg0.getSource() == saveAll) {
+			}
+//			List<Long> studentIds = selectedCourse.getStudentIds();
+//			this.studentModel.clear();
+//			for (Long id : studentIds) {
+//				this.studentModel.addElement(StudentDF.findStudentById(id));
+//			}
+			this.studentModel.clear();
+			for (StudentDF student : selectedCourse.getStudents()) {
+				this.studentModel.addElement(student);
+			}
+		} else if (!this.refresh && arg0.getSource() == saveAll) {
 			// DO that
 		} else if (!this.refresh && arg0.getSource() == loadAll) {
 			// DO IT
-			}
 		}
 	}
-
+}

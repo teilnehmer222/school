@@ -126,9 +126,8 @@ public class PupilPanel extends JPanel implements ActionListener, ListSelectionL
 			String newName = StudentDF.generateNewName(); 
 			// JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
 			try {
-				StudentDF s = new StudentDF(); // Course.generateNewName());
-				s.setFirstName(newName);
-				StudentDF.addStudentToList(s);
+				StudentDF s = StudentDF.createStudent(newName);
+				//StudentDF.addStudentToList(s);
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
@@ -146,7 +145,8 @@ public class PupilPanel extends JPanel implements ActionListener, ListSelectionL
 			if (selectedCourse != null) {
 				if (selectedStudent != null) {
 					try {
-						School.addStudentToCourse(selectedStudent.getId(), selectedCourse.getId());
+						selectedCourse.addStudent(selectedStudent);
+						//School.addStudentToCourse(selectedStudent.getId(), selectedCourse.NURZUMSPEICHERN());
 						//Course.writeBack(selectedStudent);
 					} catch (Exception e) {
 						System.out.println(e.getMessage());
@@ -157,10 +157,12 @@ public class PupilPanel extends JPanel implements ActionListener, ListSelectionL
 			CourseDF selectedCourse = (CourseDF) courseSelectedJList.getSelectedValue();
 			if (selectedCourse != null) {
 				if (this.selectedStudent != null) {
-					if (this.selectedStudent.getMyCourseId() ==selectedCourse.getId()) { // getCourseList().contains(selectedCourse))
+					//if (this.selectedStudent.getMyCourseId() ==selectedCourse.NURZUMSPEICHERN()) { // getCourseList().contains(selectedCourse))
+					if (this.selectedStudent.hasCourse(selectedCourse)) { // getCourseList().contains(selectedCourse))
 																		// {
 						try {
-							School.removeStudentFromCourse(selectedStudent.getId(), selectedCourse.getId());
+							selectedCourse.removeStudent(selectedStudent);
+							//School.removeStudentFromCourse(selectedStudent.getId(), selectedCourse.NURZUMSPEICHERN());
 							//Course.writeBack(selectedStudent);
 						} catch (Exception e) {
 							System.out.println(e.getMessage());
@@ -184,7 +186,8 @@ public class PupilPanel extends JPanel implements ActionListener, ListSelectionL
 		this.courseSelectedModel.clear();
 		if (this.selectedStudent != null) {
 			for (CourseDF c : CourseDF.getCourses()) {
-				if (this.selectedStudent.getMyCourseId() !=c.getId()) {
+				//if (this.selectedStudent.getMyCourseId() !=c.NURZUMSPEICHERN()) {
+				if (this.selectedStudent.hasCourse(c)) {
 					coursePoolModel.addElement(c);
 				} else {
 					courseSelectedModel.addElement(c);
