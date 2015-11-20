@@ -25,7 +25,7 @@ public class SchoolLauncher extends JFrame {
 	private TeacherPanel panel2;
 	private StudentPanel panel3;
 
-	private static DaoSchoolJdbc daoJdbc = new DaoSchoolJdbc();
+	private static DaoSchoolJdbcMysql daoJdbc = new DaoSchoolJdbcMysql();
 	private static DaoSchoolFile daoFile = new DaoSchoolFile();
 	private static DaoSchoolAbstract dao = daoJdbc;
 

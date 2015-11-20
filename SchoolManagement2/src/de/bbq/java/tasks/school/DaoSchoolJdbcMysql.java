@@ -2,7 +2,7 @@ package de.bbq.java.tasks.school;
 
 import javax.swing.JOptionPane;
 
-public class DaoSchoolFile extends DaoSchoolAbstract {
+public class DaoSchoolJdbcMysql extends DaoSchoolJdbc {
 
 	@Override
 	public boolean saveElement(CourseDF course) {
@@ -15,6 +15,7 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 	public boolean saveElement(TeacherDF teacher) {
 		// TODO Auto-generated method stub
 		JOptionPane.showMessageDialog(null, this.getClass().getName() + ".saveElement(TeacherDF " + teacher.toString() + ")");
+
 		return false;
 	}
 
@@ -22,6 +23,7 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 	public boolean saveElement(StudentDF student) {
 		// TODO Auto-generated method stub
 		JOptionPane.showMessageDialog(null, this.getClass().getName() + ".saveElement(StudentDF " + student.toString() + ")");
+
 		return false;
 	}
 
@@ -60,6 +62,5 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
 
 }

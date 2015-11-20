@@ -15,8 +15,7 @@ public class CourseDF implements ICourse, Serializable, DaoSchoolInterface {
 	final static String[] names = new String[] { "Schlafuntericht", "Nichtstun 2.0", "Däumchendrehen",
 			"Aus dem Fenster schauen", "Stinken für Dummies", "Wie saue ich das Klo voll", "Waschbecken verstopfen II",
 			"Feueralarm drücken", "Aufzug blockieren", "Türen verkeilen", "Kernschmelze leichtgemacht", "Deppenradar",
-			"Mülleimer vollkotzen" };
-
+			"Mülleimer vollkotzen", "Beamer sabotieren", "Ans Fenster rotzen" };
 
 	private static final long serialVersionUID = -4457277057001458163L;
 	private static long highestCourseId = 1000;
@@ -117,14 +116,24 @@ public class CourseDF implements ICourse, Serializable, DaoSchoolInterface {
 		return this.teacher;
 	}
 
+	public void removeTeacher() {
+		this.teacher = null;
+	}
+
 	public void addStudent(StudentDF student) {
 		this.students.add(student);
+		if (student.hasCourse()) {
+			CourseDF oldCourse = student.getCourse();
+			oldCourse.removeStudent(student);
+		}
+		student.setCourse(this);
 	}
 
 	public void removeStudent(StudentDF student) {
 		if (this.students.contains(student)) {
 			this.students.remove(student);
 		}
+		student.setCourse(null);
 	}
 
 	public boolean hasTeacher() {

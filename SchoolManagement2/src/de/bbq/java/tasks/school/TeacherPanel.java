@@ -185,7 +185,7 @@ public class TeacherPanel extends JPanel implements ActionListener, ListSelectio
 					selectedTeacher.removeCourse(selectedCourse);
 				}
 			}
-		} else 
+		} 
 		this.refresh = false;
 		refresh();
 	}

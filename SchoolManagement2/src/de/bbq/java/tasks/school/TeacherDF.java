@@ -8,7 +8,7 @@ public class TeacherDF extends SchoolMember implements ITeacher, DaoSchoolInterf
 
 	private static ArrayList<TeacherDF> teachers = new ArrayList<>();
 	// private List<Long> courses = new ArrayList<>();
-	private ArrayList<CourseDF> coursesDF = new ArrayList<>();
+	private ArrayList<CourseDF> courses = new ArrayList<>();
 	private static DaoSchoolAbstract dataAccessObject;
 
 	// private boolean addCourseId(Long courseId) {
@@ -37,7 +37,7 @@ public class TeacherDF extends SchoolMember implements ITeacher, DaoSchoolInterf
 
 	public void addCourse(CourseDF course) throws Exception {
 		try {
-			coursesDF.add(course);
+			courses.add(course);
 			course.setTeacher(this);
 			// course.setMyTeacherId(myTeacherId);
 
@@ -51,12 +51,6 @@ public class TeacherDF extends SchoolMember implements ITeacher, DaoSchoolInterf
 		teachers.remove(teacher);
 	}
 
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return this.getFirstName() + " " + this.getLastName();
-	}
-
 	// private void removeCourseId(long courseId) {
 	// for (Long course : courses) {
 	// if (course == courseId) {
@@ -68,11 +62,10 @@ public class TeacherDF extends SchoolMember implements ITeacher, DaoSchoolInterf
 	// }
 
 	public void removeCourse(CourseDF course) {
-		for (CourseDF courseIt : this.coursesDF) {
-			if (courseIt.equals(course)) {
-				coursesDF.remove(course);
-				// BAD:
-				// removeCourseId(this.getId());
+		course.removeTeacher();
+		for (CourseDF courses : this.courses) {
+			if (courses.equals(course)) {
+				this.courses.remove(course);
 				break;
 			}
 
@@ -96,8 +89,8 @@ public class TeacherDF extends SchoolMember implements ITeacher, DaoSchoolInterf
 	// }
 
 	public static String generateNewName() {
-		String[] array = new String[] { "Leerer A", "Musikleerer", "Deuschleerer", "Verleerer", "Entlährer",
-				"Laubbläser", "Labersack", "Zutexter", "Volllaberer" };
+		String[] array = new String[] { "Leerer Abwesend", "Musikleerer", "Deuschleerer", "Verleerer", "Entlährer",
+				"Laubbläser", "Labersack", "Zutexter", "Volllaberer", "Berieseler", "Hintergrundrauschen", "Disturbing Noise" };
 		int randomNum = 0 + (int) (Math.random() * array.length);
 		return array[randomNum];
 	}

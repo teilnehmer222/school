@@ -185,15 +185,15 @@ public class StudentPanel extends JPanel implements ActionListener, ListSelectio
 	public void refresh() {
 		int selIndex = studentsJList.getSelectedIndex();
 		this.refresh = true;
-		StudentDF cindex = null;
+		StudentDF student = null;
 		for (int index = this.studentModel.getSize(); index > 0; index--) {
 			try {
-				cindex = (StudentDF) this.studentModel.getElementAt(index - 1);
+				student = (StudentDF) this.studentModel.getElementAt(index - 1);
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, e.getMessage());
 			}
 
-			if (!CourseDF.getCourses().contains(cindex)) {
+			if (!CourseDF.getCourses().contains(student)) {
 				try {
 					this.studentModel.remove(index - 1);
 				} catch (Exception e) {
@@ -212,9 +212,9 @@ public class StudentPanel extends JPanel implements ActionListener, ListSelectio
 				// if (this.selectedStudent.getMyCourseId()
 				// !=c.NURZUMSPEICHERN()) {
 				if (this.selectedStudent.hasCourse(c)) {
-					coursePoolModel.addElement(c);
-				} else {
 					courseSelectedModel.addElement(c);
+				} else {
+					coursePoolModel.addElement(c);
 				}
 			}
 		}

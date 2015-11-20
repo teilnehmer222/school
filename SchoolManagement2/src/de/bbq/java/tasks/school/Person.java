@@ -11,7 +11,7 @@ public class Person implements Serializable {
 
 	private String firstName;
 	private String lastName;
-	private Adress adress;
+	private Adress adress = new Adress();
 	private Date birthDate;
 
 	public String getFirstName() {
@@ -45,5 +45,20 @@ public class Person implements Serializable {
 	public void setBirthDate(Date birthDate) {
 		this.birthDate = birthDate;
 	}
-
+	
+	@Override
+	public final String toString() {
+		// TODO Auto-generated method stub
+		String first = "", last = "";
+		if (this.getFirstName() != null) {
+			first = this.getFirstName();
+		}
+		if (this.getLastName() != null) {
+			if (first.length() > 0) {
+				first += " ";
+			}
+			last = this.getLastName();
+		}
+		return first + last;
+	}
 }

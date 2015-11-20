@@ -27,9 +27,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 public class CoursePanel extends JPanel implements ActionListener, ListSelectionListener {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7720278844639602571L;
 	private JButton addCourse, delCourse, saveAll, loadAll;
 	private JList<CourseDF> coursesJList;
@@ -137,7 +134,7 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 			}
 			// TODO: DELETE SHOW
 			if (CourseDF.getCourses().size() > 1)
-				this.store = new DaoSchoolJdbc();
+				this.store = new DaoSchoolJdbcMysql();
 		} else if (arg0.getSource() == delCourse) {
 			CourseDF selected = (CourseDF) coursesJList.getSelectedValue();
 			if (selected != null) {
@@ -168,7 +165,6 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 	public void refresh() {
 		this.refresh = true;
 		CourseDF cindex = null;
-		// this.courseModel.clear();
 		for (int index = this.courseModel.getSize(); index > 0; index--) {
 			try {
 				cindex = (CourseDF) this.courseModel.getElementAt(index - 1);
@@ -190,11 +186,6 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 				this.courseModel.addElement(c);
 			}
 		}
-		// for (CourseDF c : this.courseModel) {
-		// if(!this.courseModel.contains(c)) {
-		// this.courseModel.addElement(c);
-		// }
-		// }
 		this.refresh = false;
 	}
 
@@ -204,15 +195,10 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 		if (!this.refresh && arg0.getSource() == coursesJList) {
 			if (selectedCourse != null) {
 				if (selectedCourse.hasTeacher()) {
-					teacher.setText(selectedCourse.getCourseName());
+					teacher.setText(selectedCourse.getTeacher().toString());
 				} else
 					teacher.setText("");
 			}
-			// List<Long> studentIds = selectedCourse.getStudentIds();
-			// this.studentModel.clear();
-			// for (Long id : studentIds) {
-			// this.studentModel.addElement(StudentDF.findStudentById(id));
-			// }
 			this.studentModel.clear();
 			for (StudentDF student : selectedCourse.getStudents()) {
 				this.studentModel.addElement(student);

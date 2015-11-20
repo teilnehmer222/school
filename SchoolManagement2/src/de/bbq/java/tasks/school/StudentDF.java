@@ -50,13 +50,6 @@ public class StudentDF extends SchoolMember implements IStudent, DaoSchoolInterf
 	public static ArrayList<StudentDF> getStudents() {
 		return students;
 	}
-
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return this.getFirstName() + " " + this.getLastName();
-	}
-
 	// public long getMyCourseId() {
 	// return myCourseId;
 	// }
@@ -90,7 +83,7 @@ public class StudentDF extends SchoolMember implements IStudent, DaoSchoolInterf
 
 	public static String generateNewName() {
 		String[] array = new String[] { "Depp", "Trottel", "Idiot", "Armleuchter", "Hirni", "Totalversager",
-				"Baumschulabbrecher", "Volltrottel", "Extremdepp", "Superidiot" };
+				"Baumschulabbrecher", "Volltrottel", "Extremdepp", "Superidiot", "Dummbeutel", "Trottelkopf", "Hirngesicht" };
 		int randomNum = 0 + (int) (Math.random() * array.length);
 		return array[randomNum];
 	}

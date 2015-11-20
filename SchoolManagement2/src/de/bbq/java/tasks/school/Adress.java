@@ -8,7 +8,7 @@ public class Adress implements Serializable {
 	 */
 	private static final long serialVersionUID = -2223301940441781708L;
 	private String streetName;
-	private int houseNumber;
+	private String houseNumber;
 	private int zipCode;
 	private String City;
 	private String Country;
@@ -21,11 +21,11 @@ public class Adress implements Serializable {
 		this.streetName = streetName;
 	}
 
-	public int getHouseNumber() {
+	public String getHouseNumber() {
 		return houseNumber;
 	}
 
-	public void setHouseNumber(int houseNumber) {
+	public void setHouseNumber(String houseNumber) {
 		this.houseNumber = houseNumber;
 	}
 

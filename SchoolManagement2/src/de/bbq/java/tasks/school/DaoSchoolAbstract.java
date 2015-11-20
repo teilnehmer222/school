@@ -24,7 +24,9 @@ public abstract class DaoSchoolAbstract {
 	public static boolean saveAll() {
 		for (CourseDF c : CourseDF.getCourses()) {
 			c.saveElement();
-			c.getTeacher().saveElement();
+			if (c.hasTeacher()) {
+				c.getTeacher().saveElement();
+			}
 			for (StudentDF s : c.getStudents()) {
 				s.saveElement();
 			}
@@ -45,7 +47,7 @@ public abstract class DaoSchoolAbstract {
 
 	public static boolean loadAll() {
 		ArrayList<CourseDF> MOCK = new ArrayList<>();
-		for (Object element  : MOCK) {
+		for (Object element : MOCK) {
 			((CourseDF) element).loadElement();
 		}
 		return false;
