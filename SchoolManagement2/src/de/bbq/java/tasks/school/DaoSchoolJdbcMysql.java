@@ -70,20 +70,20 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 			// StringBuffer
 			JOptionPane.showMessageDialog(null,
 					this.getClass().getName() + ".deleteElement(CourseDF " + schoolItemAbstract.toString() + ")");
-			return false;
+			return true;
 		} else if (schoolItemAbstract instanceof ITeacher) {
 			// TODO Auto-generated method stub
 			JOptionPane.showMessageDialog(null,
 					this.getClass().getName() + ".deleteElement(TeacherDF " + schoolItemAbstract.toString() + ")");
-			return false;
+			return true;
 
 		} else if (schoolItemAbstract instanceof IStudent) {
 			// TODO Auto-generated method stub
 			JOptionPane.showMessageDialog(null,
 					this.getClass().getName() + ".deleteElement(StudentDF " + schoolItemAbstract.toString() + ")");
-			return false;
+			return true;
 		}
-		return false;
+		return true;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 

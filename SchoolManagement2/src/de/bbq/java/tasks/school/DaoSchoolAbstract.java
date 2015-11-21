@@ -29,6 +29,17 @@ public abstract class DaoSchoolAbstract {
 	private void seteDao(EDaoSchool eDao) {
 		this.eDao = eDao;
 	}
+
+	public static DaoSchoolAbstract getDaoSchool(EDaoSchool eDao) {
+		switch (eDao) {
+		case File:
+			return new DaoSchoolFile();
+		case JdbcMySql:
+			return new DaoSchoolJdbcMysql();
+		default:
+			return null;
+		}
+	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +51,7 @@ public abstract class DaoSchoolAbstract {
 	public abstract boolean deleteElement(SchoolItemAbstract schoolItemAbstract);
 
 	public boolean saveAll() {
-		for (ICourse c : CourseDF.getCourses()) {
+		for (ICourse c : Course.getCourses()) {
 			c.saveElement();
 			if (c.hasTeacher()) {
 				c.getTeacher().saveElement();
@@ -64,9 +75,9 @@ public abstract class DaoSchoolAbstract {
 	}
 
 	public boolean loadAll() {
-		ArrayList<CourseDF> MOCK = new ArrayList<>();
+		ArrayList<Course> MOCK = new ArrayList<>();
 		for (Object element : MOCK) {
-			((CourseDF) element).loadElement();
+			((Course) element).loadElement();
 		}
 		return false;
 	}

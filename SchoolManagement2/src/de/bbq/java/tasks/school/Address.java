@@ -10,8 +10,8 @@ public class Address extends SchoolItemAbstract implements Serializable {
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
-	protected Address(DaoSchoolAbstract dataAccessObject) {
-		super(dataAccessObject);
+	protected Address(EDaoSchool eDataAccess) throws Exception {
+		super(eDataAccess);
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 

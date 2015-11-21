@@ -18,14 +18,22 @@ public abstract class SchoolItemAbstract implements Serializable {
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
-	public SchoolItemAbstract(DaoSchoolAbstract dataAccessObjectConrete) {
+	public SchoolItemAbstract(EDaoSchool eDataAccess) throws Exception{
 		id = SchoolItemAbstract.highestMemberId++;
-		if (dataAccessObject != null && dataAccessObjectConrete != null) {
-			if (!dataAccessObject.getClass().equals(dataAccessObjectConrete.getClass())) {
-				dataAccessObject = dataAccessObjectConrete;
+		DaoSchoolAbstract accessObject = null;
+		try {
+			accessObject = DaoSchoolAbstract.getDaoSchool(eDataAccess);			
+		} catch (Exception e) {
+			throw e;
+		}
+		if (accessObject == null) throw new Exception("Datenzugriffs-Objekt \"" + eDataAccess.name() + "\2 nicht gefunden.");
+
+		if (dataAccessObject != null && accessObject != null) {
+			if (!dataAccessObject.getClass().equals(accessObject.getClass())) {
+				dataAccessObject = accessObject;
 			}
 		} else if (dataAccessObject == null) {
-			dataAccessObject = dataAccessObjectConrete;
+			dataAccessObject = accessObject;
 		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////

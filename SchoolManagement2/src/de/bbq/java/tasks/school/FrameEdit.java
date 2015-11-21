@@ -2,11 +2,13 @@ package de.bbq.java.tasks.school;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -19,7 +21,7 @@ import org.jdatepicker.impl.UtilDateModel;
  * @author Thorsten2201
  *
  */
-public class EditFrame extends JFrame implements ActionListener {
+public class FrameEdit extends JFrame implements ActionListener {
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Static
 	private static final long serialVersionUID = -7952586514775627163L;
@@ -30,9 +32,9 @@ public class EditFrame extends JFrame implements ActionListener {
 	private int winLength = 400;
 	private int winHight = 400;
 
-	private CourseDF courseDF;
-	private TeacherDF teacherDF;
-	private StudentDF studentDF;
+	private Course courseDF;
+	private Teacher teacherDF;
+	private Student studentDF;
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -43,9 +45,10 @@ public class EditFrame extends JFrame implements ActionListener {
 	private JCheckBox beamerCheckBox;
 	private JTextField lastNameTextField, firstNameTextField;
 	private JDatePickerImpl startTextField, birthDayTextField, endTextField;
-	private JTextField streetTextField, cityTextField, zipTextField, countryTextField, roomNumberTextField,
-			streetNumberTextField;
-			/////////////////////////////////////////////////////////////////////////////////////
+	private JTextField streetTextField, cityTextField, zipTextField, countryTextField, roomNumberTextField;
+	private JTextField streetNumberTextField;
+	private JComboBox<Integer> hourStartComboBox, minuteStartComboBox, hourEndComboBox, minuteEndComboBox;
+	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// ActionListener
@@ -73,22 +76,32 @@ public class EditFrame extends JFrame implements ActionListener {
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Write control[].value to Object
 	public void ReadDataPerson(SchoolPersonAbstract per) {
+		Calendar cal = Calendar.getInstance();
 		per.setFirstName(this.firstNameTextField.getText());
 		per.setLastName(this.lastNameTextField.getText());
 		try {
 			UtilDateModel model = (UtilDateModel) this.birthDayTextField.getModel();
-			per.setBirthDate(model.getValue());
+			cal.setTime(model.getValue());
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
 		} catch (Exception e2) {
 			per.setBirthDate(null);
-		}
-
+		}		
+		per.setBirthDate(cal.getTime());
 	}
 
 	public void ReadDataAdress(Address add) {
 		if (add != null) {
 			add.setStreetName(this.streetTextField.getText());
 			add.setCity(this.cityTextField.getText());
-			add.setZipCode(Integer.parseInt(this.zipTextField.getText()));
+			try {
+				add.setZipCode(Integer.parseInt(this.zipTextField.getText()));			
+			} catch (Exception e) {
+				//TODO
+				System.out.println(e.getStackTrace());
+			}
 			add.setCountry(this.countryTextField.getText());
 			add.setHouseNumber(this.streetNumberTextField.getText());
 		}
@@ -96,27 +109,43 @@ public class EditFrame extends JFrame implements ActionListener {
 
 	public void ReadDataCourse() {
 		this.courseDF.setTopic(this.topicTextField.getText());
-		try {
-			UtilDateModel model = (UtilDateModel) this.endTextField.getModel();
-			this.courseDF.setEndTime(model.getValue());
-		} catch (Exception e2) {
-			this.courseDF.setEndTime(new Date());
-		}
+		Calendar cal = Calendar.getInstance(); // creates calendar
 		try {
 			UtilDateModel model = (UtilDateModel) this.startTextField.getModel();
-			this.courseDF.setStartTime(model.getValue());
+			cal.setTime(model.getValue());
+			cal.set(Calendar.HOUR_OF_DAY, (int) this.hourStartComboBox.getSelectedItem());
+			cal.set(Calendar.MINUTE, (int) this.minuteStartComboBox.getSelectedItem());
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
 		} catch (Exception e2) {
-			this.courseDF.setStartTime(new Date());
+			cal.setTime(new Date());
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
 		}
-		this.courseDF.setLanguage(this.languageTextField.getText());
+		this.courseDF.setStartTime(cal.getTime());
 		try {
-			this.courseDF.setRoomNumber(Integer.parseInt(this.roomNumberTextField.getText()));
+			UtilDateModel model = (UtilDateModel) this.endTextField.getModel();
+			cal.setTime(model.getValue());
+			cal.set(Calendar.HOUR_OF_DAY, (int) this.hourEndComboBox.getSelectedItem());
+			cal.set(Calendar.MINUTE, (int) this.minuteEndComboBox.getSelectedItem());
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
 		} catch (Exception e2) {
-			this.courseDF.setRoomNumber(0);
+			cal.setTime(new Date());
+			cal.set(Calendar.HOUR_OF_DAY,  0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
 		}
+		this.courseDF.setEndTime(cal.getTime());
+		this.courseDF.setLanguage(this.languageTextField.getText());
+		this.courseDF.setRoomNumber(this.roomNumberTextField.getText());
 		courseDF.setNeedsBeamer(this.beamerCheckBox.isSelected());
 	}
-
+	/////////////////////////////////////////////////////////////////////////////////////
+	
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
 	void Construct() {
@@ -153,12 +182,6 @@ public class EditFrame extends JFrame implements ActionListener {
 		label = new JLabel("Land:");
 		label.setBounds(5, 210, 100, 20);
 		add(label);
-
-		// JTextField field = new JTextField();
-		// field.setBounds(110, 5, 200, 20);
-		// field.setName("Nachname:");
-		// add(field);
-		// fields.add(field);
 
 		this.lastNameTextField = new JTextField();
 		this.lastNameTextField.setBounds(110, 30, 200, 20);
@@ -228,8 +251,8 @@ public class EditFrame extends JFrame implements ActionListener {
 		add(this.countryTextField);
 	}
 
-	EditFrame(ITeacher editItem) {
-		this.teacherDF = (TeacherDF) editItem;
+	FrameEdit(ITeacher editItem) {
+		this.teacherDF = (Teacher) editItem;
 		setTitle("Leerer editieren");
 		Construct(this.teacherDF);
 
@@ -246,8 +269,8 @@ public class EditFrame extends JFrame implements ActionListener {
 		Construct();
 	}
 
-	EditFrame(IStudent editItem) {
-		this.studentDF = (StudentDF) editItem;
+	FrameEdit(IStudent editItem) {
+		this.studentDF = (Student) editItem;
 		Construct(this.studentDF);
 		setTitle("Schüler editieren");
 
@@ -265,8 +288,8 @@ public class EditFrame extends JFrame implements ActionListener {
 		Construct();
 	}
 
-	EditFrame(ICourse editItem) {
-		this.courseDF = (CourseDF) editItem;
+	FrameEdit(ICourse editItem) {
+		this.courseDF = (Course) editItem;
 		setTitle("Kurs editieren");
 		JLabel label = new JLabel(this.courseDF.getCourseName());
 		label.setBounds(110, 5, 200, 20);
@@ -289,26 +312,12 @@ public class EditFrame extends JFrame implements ActionListener {
 		label = new JLabel("Beamer:");
 		label.setBounds(5, 170, 100, 20);
 		add(label);
-		// JTextField field = new JTextField();
-		// field.setBounds(110, 5, 200, 20);
-		// field.setName("Kursname:");
-		// add(field);
-		// fields.add(field);
 
 		this.topicTextField = new JTextField();
 		this.topicTextField.setBounds(110, 30, 200, 20);
-		this.topicTextField.setName("Fach:");
+		this.topicTextField.setName("topicTextField");
 		this.topicTextField.setText(this.courseDF.getTopic());
 		add(this.topicTextField);
-
-		// this.Start = new JTextField();
-		// Start.setBounds(110, 55, 200, 20);
-		// Start.setName("Dauer:");
-		// if (c.getSartTime() != null) {
-		// Start.setText(c.getSartTime().toString());
-		// }
-		// add(Start);
-		// fields.add(Start);
 
 		UtilDateModel model = new UtilDateModel();
 		if (this.courseDF.getSartTime() != null) {
@@ -322,9 +331,46 @@ public class EditFrame extends JFrame implements ActionListener {
 		p.put("text.year", "Jahr");
 		JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
 		this.startTextField = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-		this.startTextField.setName("Start:");
-		this.startTextField.setBounds(110, 55, 200, 26);
+		this.startTextField.setName("startTextField");
+		this.startTextField.setBounds(110, 55, 120, 26);
 		add(this.startTextField);
+		Calendar cal = Calendar.getInstance();
+		if (this.courseDF.getSartTime() != null) {
+			cal.setTime(this.courseDF.getSartTime());
+		} else {
+			cal.setTime(new Date());
+			cal.set(Calendar.HOUR_OF_DAY, (int) 0);
+			cal.set(Calendar.MINUTE, (int) 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+		}
+		int selectIndex = 0;
+		Integer[] hours = new Integer[SchoolLauncher.getWorkEnd() - SchoolLauncher.getWorkStart()];
+		for (Integer index = SchoolLauncher.getWorkStart(); index < SchoolLauncher.getWorkEnd(); index++) {
+			hours[index - SchoolLauncher.getWorkStart()] = index;
+			if (cal.get(Calendar.HOUR_OF_DAY) == index) {
+				selectIndex = index - SchoolLauncher.getWorkStart();
+			}
+
+		}
+		this.hourStartComboBox = new JComboBox<>(hours);
+		this.hourStartComboBox.setBounds(235, 57, 50, 20);
+		this.hourStartComboBox.setSelectedIndex(selectIndex);
+		this.add(hourStartComboBox);
+
+		selectIndex = 0;
+		Integer[] minutes = new Integer[60 / 5];
+		for (Integer index = 0; index < 60; index = index + 5) {
+			minutes[index / 5] = index;
+			if (cal.get(Calendar.MINUTE) == index) {
+				selectIndex = index / 5;
+			}
+
+		}
+		this.minuteStartComboBox = new JComboBox<>(minutes);
+		this.minuteStartComboBox.setBounds(290, 57, 50, 20);
+		this.minuteStartComboBox.setSelectedIndex(selectIndex);
+		this.add(minuteStartComboBox);
 
 		model = new UtilDateModel();
 		if (this.courseDF.getEndTime() != null) {
@@ -333,19 +379,54 @@ public class EditFrame extends JFrame implements ActionListener {
 		model.setSelected(true);
 		JDatePanelImpl datePanelEnd = new JDatePanelImpl(model, p);
 		this.endTextField = new JDatePickerImpl(datePanelEnd, new DateLabelFormatter());
-		this.endTextField.setName("Ende:");
-		this.endTextField.setBounds(110, 85, 200, 26);
-		add(this.endTextField);
+		this.endTextField.setName("endTextField");
+		this.endTextField.setBounds(110, 85, 120, 26);
+		this.add(this.endTextField);
+
+		if (this.courseDF.getEndTime() != null) {
+			cal.setTime(this.courseDF.getEndTime());
+		} else {
+			cal.setTime(new Date());
+			cal.set(Calendar.HOUR_OF_DAY, (int) 0);
+			cal.set(Calendar.MINUTE, (int) 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+		}
+
+		selectIndex = 0;
+		for (Integer index = SchoolLauncher.getWorkStart(); index < SchoolLauncher.getWorkEnd(); index++) {
+			if (cal.get(Calendar.HOUR_OF_DAY) == index) {
+				selectIndex = index - SchoolLauncher.getWorkStart();
+				break;
+			}
+
+		}
+		this.hourEndComboBox = new JComboBox<>(hours);
+		this.hourEndComboBox.setBounds(235, 87, 50, 20);
+		this.hourEndComboBox.setSelectedIndex(selectIndex);
+		this.add(hourEndComboBox);
+
+		selectIndex = 0;
+		for (Integer index = 0; index < 60; index = index + 5) {
+			if (cal.get(Calendar.MINUTE) == index) {
+				selectIndex = index / 5;
+				break;
+			}
+		}
+		this.minuteEndComboBox = new JComboBox<>(minutes);
+		this.minuteEndComboBox.setBounds(290, 87, 50, 20);
+		this.minuteEndComboBox.setSelectedIndex(selectIndex);
+		this.add(minuteEndComboBox);
 
 		this.languageTextField = new JTextField();
 		this.languageTextField.setBounds(110, 120, 200, 20);
-		this.languageTextField.setName("Sprache:");
+		this.languageTextField.setName("languageTextField");
 		this.languageTextField.setText(this.courseDF.getLanguage());
 		add(this.languageTextField);
 
 		this.roomNumberTextField = new JTextField();
 		this.roomNumberTextField.setBounds(110, 145, 200, 20);
-		this.roomNumberTextField.setName("Raum:");
+		this.roomNumberTextField.setName("roomNumberTextField");
 		if (this.courseDF.getRoomNumber() != null) {
 			this.roomNumberTextField.setText(this.courseDF.getRoomNumber().toString());
 		}
@@ -353,15 +434,15 @@ public class EditFrame extends JFrame implements ActionListener {
 
 		this.beamerCheckBox = new JCheckBox();
 		this.beamerCheckBox.setBounds(110, 170, 200, 20);
-		this.beamerCheckBox.setName("Beamer:");
+		this.beamerCheckBox.setName("beamerCheckBox");
 		this.beamerCheckBox.setSelected((boolean) this.courseDF.getNeedsBeamer());
 		add(this.beamerCheckBox);
 
-		this.exitButton = SchoolLauncher.getButton("Abbrechen", 110, 195, 100, 20, this, "Abbrechen",
+		this.exitButton = SchoolLauncher.getButton("exitButton", 110, 195, 100, 20, this, "Abbrechen",
 				"Nichts wie raus hier, Kurse sind anstrengend...");
 		add(this.exitButton);
 
-		this.saveButton = SchoolLauncher.getButton("Speichern", 230, 195, 100, 20, this, "Speichern",
+		this.saveButton = SchoolLauncher.getButton("saveButton", 230, 195, 100, 20, this, "Speichern",
 				"Kurs fein abspeichern damit er auch nicht verloren geht");
 		add(this.saveButton);
 		Construct();

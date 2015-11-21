@@ -8,6 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -23,7 +24,7 @@ import javax.swing.event.ListSelectionListener;
  * @author Thorsten2201
  *
  */
-public class CoursePanel extends JPanel implements ActionListener, ListSelectionListener {
+public class PanelCourse extends JPanel implements ActionListener, ListSelectionListener {
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Static
 	private static final long serialVersionUID = -7720278844639602571L;
@@ -32,12 +33,11 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Class Properties
 	private boolean refresh = true;
-	private DaoSchoolAbstract daoSchoolAbstract;
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Controls
-	private JButton addButton, deleteButton, saveAllButton, loadAllButton;
+	private JButton addCourseButton, deleteCourseButton, saveAllButton, loadAllButton;
 	private JList<ICourse> coursesJList;
 	private JList<IStudent> studentsJList;
 	private JTextField teacherTextField;
@@ -74,6 +74,21 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 				this.courseListModel.addElement(c);
 			}
 		}
+		this.deleteCourseButton.setEnabled(this.coursesJList.getSelectedValue() != null);
+		boolean enableSave = false, enableLoad = true;
+		if (!SchoolLauncher.getCourseList().isEmpty()) {
+			enableSave = true;
+		} else if (!SchoolLauncher.getTeacherList().isEmpty()) {
+			enableSave = true;
+		} else if (!SchoolLauncher.getStudentList().isEmpty()) {
+			enableSave = true;
+		}
+		int index = this.coursesJList.getSelectedIndex();
+		if (index >= 0) {
+			selectCourse(this.coursesJList.getModel().getElementAt(index));
+		}
+		this.saveAllButton.setEnabled(enableSave);
+		this.loadAllButton.setEnabled(enableLoad); // ??
 		this.refresh = false;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -84,13 +99,19 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 	public void valueChanged(ListSelectionEvent arg0) {
 		ICourse selectedCourse = this.coursesJList.getSelectedValue();
 		if (!this.refresh && arg0.getSource() == this.coursesJList) {
-			if (selectedCourse != null) {
-				if (selectedCourse.hasTeacher()) {
-					this.teacherTextField.setText(selectedCourse.getTeacher().toString());
-				} else
-					this.teacherTextField.setText("");
-			}
-			this.studentListModel.clear();
+			selectCourse(selectedCourse);
+		}
+	}
+
+	private void selectCourse(ICourse selectedCourse) {
+		if (selectedCourse != null) {
+			if (selectedCourse.hasTeacher()) {
+				this.teacherTextField.setText(selectedCourse.getTeacher().toString());
+			} else
+				this.teacherTextField.setText("");
+		}
+		this.studentListModel.clear();
+		if (selectedCourse != null) {
 			for (IStudent student : selectedCourse.getStudents()) {
 				this.studentListModel.addElement(student);
 			}
@@ -103,12 +124,17 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		this.refresh = true;
-		if (arg0.getSource() == addButton) {
-			SchoolLauncher.getNewCourse(true, this.daoSchoolAbstract);
-		} else if (arg0.getSource() == deleteButton) {
-			ICourse selected = coursesJList.getSelectedValue();
+		int index = this.coursesJList.getSelectedIndex();
+		if (arg0.getSource() == addCourseButton) {
+			SchoolLauncher.getNewCourse(true, SchoolLauncher.getSelectedDao());
+			index = this.coursesJList.getModel().getSize();
+		} else if (arg0.getSource() == deleteCourseButton) {
+			ICourse selected = this.coursesJList.getSelectedValue();
 			if (selected != null) {
 				selected.deleteElement();
+			}
+			if (index >= this.coursesJList.getModel().getSize() - 1) {
+				index--;
 			}
 		} else if (arg0.getSource() == saveAllButton) {
 			if (!SchoolLauncher.getCourseList().isEmpty()) {
@@ -130,13 +156,18 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 		}
 		this.refresh = false;
 		refresh();
+		if (index <= this.coursesJList.getModel().getSize()) {
+			this.coursesJList.setSelectedIndex(index);
+			selectCourse(this.coursesJList.getSelectedValue());
+		}
+		this.deleteCourseButton.setEnabled(this.coursesJList.getSelectedValue() != null);
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
-	public CoursePanel(DaoSchoolAbstract daoSchoolAbstract) {
-		this.daoSchoolAbstract = daoSchoolAbstract;
+	public PanelCourse() {
+		//this.daoSchoolAbstract = daoSchoolAbstract;
 		this.setLayout(null); // new GridLayout(1, 1));
 
 		this.courseListModel = new DefaultListModel<ICourse>();
@@ -158,7 +189,7 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 					index = list.locationToIndex(evt.getPoint());
 				}
 				if (index >= 0) {
-					new EditFrame(courseListModel.get(index));
+					new FrameEdit(courseListModel.get(index));
 				}
 			}
 		});
@@ -170,13 +201,14 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 		coursScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		coursScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		coursScroller.setViewportBorder(new LineBorder(Color.BLACK));
-		this.add(this.coursesJList);
+		this.add(coursScroller);
 
-		this.addButton = SchoolLauncher.getButton("newCourse", 5, 5, 100, 20, this, "Neuer Kurs", "Neuer Kurs");
-		this.add(this.addButton);
+		this.addCourseButton = SchoolLauncher.getButton("newCourse", 5, 5, 100, 20, this, "Neuer Kurs", "Neuer Kurs");
+		this.add(this.addCourseButton);
 
-		this.deleteButton = SchoolLauncher.getButton("delCourse", 110, 5, 100, 20, this, "Löschen", "Kurs löschen");
-		this.add(this.deleteButton);
+		this.deleteCourseButton = SchoolLauncher.getButton("delCourse", 110, 5, 100, 20, this, "Löschen",
+				"Kurs löschen");
+		this.add(this.deleteCourseButton);
 
 		this.saveAllButton = SchoolLauncher.getButton("saveAll", 450, 5, 130, 20, this, "Alles speichern",
 				"Kurse, Leerer und Schüler speichern");
@@ -194,7 +226,7 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 
 		this.studentListModel = new DefaultListModel<IStudent>();
 		this.studentsJList = new JList<IStudent>(this.studentListModel);
-		this.studentsJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		this.studentsJList.setSelectionModel(new DisabledItemSelectionModel());
 		this.studentsJList.setLayoutOrientation(JList.VERTICAL);
 		this.studentsJList.setVisibleRowCount(-1);
 		this.studentsJList.addListSelectionListener(this);
@@ -205,9 +237,18 @@ public class CoursePanel extends JPanel implements ActionListener, ListSelection
 		pupScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		pupScroller.setViewportBorder(new LineBorder(Color.BLACK));
 		pupScroller.setBounds(235, 30, 205, 300);
-		this.add(this.studentsJList);
+		this.add(pupScroller);
 
 		this.refresh = false;
+	}
+
+	private class DisabledItemSelectionModel extends DefaultListSelectionModel {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void setSelectionInterval(int index0, int index1) {
+			super.setSelectionInterval(-1, -1);
+		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 

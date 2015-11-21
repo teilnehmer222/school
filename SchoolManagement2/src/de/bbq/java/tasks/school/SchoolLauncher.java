@@ -24,15 +24,19 @@ public class SchoolLauncher extends JFrame {
 	private static final long serialVersionUID = -2039718453107554584L;
 	private static final int winLength = 800;
 	private static final int winHight = 430;
+	private static final int workStart = 7;
+	private static final int workEnd = 17;
 
-	private CoursePanel panel1;
-	private TeacherPanel panel2;
-	private StudentPanel panel3;
+	private PanelCourse panel1;
+	private PanelTeacher panel2;
+	private PanelStudent panel3;
 
-	private static DaoSchoolJdbcMysql daoJdbc = new DaoSchoolJdbcMysql();
-	private static DaoSchoolFile daoFile = new DaoSchoolFile();
-	private static DaoSchoolAbstract daoAbstract = daoFile;
+	private static EDaoSchool selectedDao = EDaoSchool.File;
 	/////////////////////////////////////////////////////////////////////////////////////
+
+	public static EDaoSchool getSelectedDao() {
+		return selectedDao;
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
@@ -57,15 +61,15 @@ public class SchoolLauncher extends JFrame {
 		JTabbedPane tabbedPane = new JTabbedPane();
 		ImageIcon icon = createImageIcon("middle.gif");
 
-		panel1 = new CoursePanel(daoAbstract);
+		panel1 = new PanelCourse();
 		tabbedPane.addTab("Kurse", icon, panel1, "Kurse");
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
-		panel2 = new TeacherPanel(daoAbstract);
+		panel2 = new PanelTeacher();
 		tabbedPane.addTab("Leerer", icon, panel2, "Leerer");
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
-		panel3 = new StudentPanel(daoAbstract);
+		panel3 = new PanelStudent();
 		tabbedPane.addTab("Schüler", icon, panel3, "Schüler");
 		panel3.setPreferredSize(new Dimension(410, 50));
 		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
@@ -121,34 +125,42 @@ public class SchoolLauncher extends JFrame {
 		button.addActionListener(linr);
 		return button;
 	}
+
+	public static Integer getWorkStart() {
+		return workStart;
+	}
+
+	public static Integer getWorkEnd() {
+		return workEnd;
+	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Class factories returning interfaces
 	public static ArrayList<ICourse> getCourseList() {
-		return CourseDF.getCourses();
+		return Course.getCourses();
 	}
 
 	public static ArrayList<ITeacher> getTeacherList() {
-		return TeacherDF.getTeachers();
+		return Teacher.getTeachers();
 	}
 
 	public static ArrayList<IStudent> getStudentList() {
-		return StudentDF.getStudents();
+		return Student.getStudents();
 	}
 
-	public static ICourse getNewCourse(boolean random, DaoSchoolAbstract store) {
+	public static ICourse getNewCourse(boolean random, EDaoSchool store) {
 		if (SchoolLauncher.getCourseList().size() > 1)
-			store = daoJdbc;
-		return CourseDF.createCourse(true, store);
+			store = EDaoSchool.JdbcMySql;
+		return Course.createCourse(true, store);
 	}
 
-	public static ITeacher getNewTeacher(boolean random, DaoSchoolAbstract store) {
-		return TeacherDF.createTeacher(random, store);
+	public static ITeacher getNewTeacher(boolean random, EDaoSchool store) {
+		return Teacher.createTeacher(random, store);
 	}
 
-	public static IStudent getNewStudent(boolean random, DaoSchoolAbstract store) {
-		return StudentDF.createStudent(random, store);
+	public static IStudent getNewStudent(boolean random, EDaoSchool store) {
+		return Student.createStudent(random, store);
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 

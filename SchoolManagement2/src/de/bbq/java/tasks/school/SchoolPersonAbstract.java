@@ -18,9 +18,9 @@ public abstract class SchoolPersonAbstract extends SchoolItemAbstract {
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
-	public SchoolPersonAbstract(DaoSchoolAbstract dataAccessObject) {
-		super(dataAccessObject);
-		this.address = new Address(dataAccessObject);
+	public SchoolPersonAbstract(EDaoSchool EDataAccess) throws Exception {
+		super(EDataAccess);
+		this.address = new Address(EDataAccess);
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 

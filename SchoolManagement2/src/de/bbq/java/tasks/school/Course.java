@@ -8,7 +8,7 @@ import javax.swing.JOptionPane;
  * @author teinlehmer222
  *
  */
-public class CourseDF extends SchoolItemAbstract implements ICourse {
+public class Course extends SchoolItemAbstract implements ICourse {
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Class Properties
@@ -22,15 +22,15 @@ public class CourseDF extends SchoolItemAbstract implements ICourse {
 	private String topic;
 	private Date endTime;
 	private Date startTime;
-	private Integer roomNumber;
+	private String roomNumber;
 	private Boolean needsBeamer = false;
 	private String language;
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
-	private CourseDF(String courseName, DaoSchoolAbstract dataAccessObject) {
-		super(dataAccessObject);
+	private Course(String courseName, EDaoSchool eDataAccess) throws Exception {
+		super(eDataAccess);
 		this.courseName = courseName;
 		allCourses.add(this);
 	}
@@ -43,25 +43,32 @@ public class CourseDF extends SchoolItemAbstract implements ICourse {
 
 	private static String generateNewName() {
 		String[] names = new String[] { "Schlafuntericht", "Nichtstun 2.0", "Däumchendrehen", "Aus dem Fenster schauen",
-				"Stinken für Dummies", "Wie saue ich das Klo voll", "Waschbecken verstopfen II", "Feueralarm drücken",
+				"Stinken für Dummies", "Wie saue ich das Klo voll", "Waschbecken verstopfen", "Feueralarm drücken",
 				"Aufzug blockieren", "Türen verkeilen", "Kernschmelze leichtgemacht", "Deppenradar",
-				"Mülleimer vollkotzen", "Beamer sabotieren", "Ans Fenster rotzen" };
+				"Mülleimer vollkotzen", "Beamer sabotieren", "Ans Fenster rotzen", "Kaffee Verschütten",
+				"Professionelles Furzen" };
 		int randomNum = 0 + (int) (Math.random() * names.length);
 		return names[randomNum];
 	}
 
-	private static CourseDF createCourse(String courseName, DaoSchoolAbstract dataAccessObject) {
-		CourseDF c = new CourseDF(courseName, dataAccessObject);
-		return c;
+	private static Course createCourse(String courseName, EDaoSchool store) {
+		Course course = null;
+		try {
+			course = new Course(courseName, store);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return course;
 	};
 
-	public static ICourse createCourse(boolean random, DaoSchoolAbstract store) {
-		String newName = CourseDF.generateNewName();
-		CourseDF newCourse = null;
+	public static ICourse createCourse(boolean random, EDaoSchool store) {
+		String newName = Course.generateNewName();
+		Course newCourse = null;
 		if (!random) {
 			newName = JOptionPane.showInputDialog("Bitte einen Kursnamen eingeben:");
 		}
-		newCourse = CourseDF.createCourse(newName, store);
+		newCourse = Course.createCourse(newName, store);
 		return newCourse;
 	}
 
@@ -143,7 +150,7 @@ public class CourseDF extends SchoolItemAbstract implements ICourse {
 		return this.startTime;
 	}
 
-	public Integer getRoomNumber() {
+	public String getRoomNumber() {
 		return this.roomNumber;
 	}
 
@@ -175,8 +182,8 @@ public class CourseDF extends SchoolItemAbstract implements ICourse {
 		this.endTime = endTime;
 	}
 
-	public void setRoomNumber(int roomNumber) {
-		this.roomNumber = roomNumber;
+	public void setRoomNumber(String string) {
+		this.roomNumber = string;
 	}
 
 	public void setLanguage(String language) {
@@ -204,7 +211,7 @@ public class CourseDF extends SchoolItemAbstract implements ICourse {
 	public boolean deleteElement() {
 		boolean ret = super.deleteElement();
 		if (ret) {
-			CourseDF.allCourses.remove(this);
+			Course.allCourses.remove(this);
 		}
 		return ret;
 	}

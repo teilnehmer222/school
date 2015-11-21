@@ -7,78 +7,86 @@ import javax.swing.JOptionPane;
  * @author teilnehmer222
  *
  */
-public class StudentDF extends SchoolPersonAbstract implements IStudent {
+public class Teacher extends SchoolPersonAbstract implements ITeacher {
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Class Properties
-	private transient ICourse course;
+	private transient ArrayList<ICourse> courses = new ArrayList<>();
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
-	private StudentDF(String firstName, DaoSchoolAbstract dataAccessObject) {
-		super(dataAccessObject);
+	private Teacher(String firstName, EDaoSchool eDataAccess) throws Exception {
+		super(eDataAccess);
 		super.setFirstName(firstName);
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Static
-	private static final long serialVersionUID = -8838146635169751075L;
-	private static ArrayList<IStudent> allStudents = new ArrayList<>();
+	private static final long serialVersionUID = -3548796163205043453L;
+	private static ArrayList<ITeacher> allTeachers = new ArrayList<>();
 
 	private static String generateNewName() {
-		String[] array = new String[] { "Depp", "Trottel", "Idiot", "Armleuchter", "Hirni", "Totalversager",
-				"Baumschulabbrecher", "Volltrottel", "Extremdepp", "Superidiot", "Dummbeutel", "Trottelkopf",
-				"Hirngesicht" };
+		String[] array = new String[] { "LeeGeistig Abwesender", "Musikleerer", "Deuschleerer", "Verleerer", "Entlährer",
+				"Laubbläser", "Labersack", "Zutexter", "Volllaberer", "Berieseler", "Hintergrundrauschen",
+				"Verstörendes Geräusch", "Arschkopf", "Dildogesicht", "Zwerg Nase", "Halodri",
+				"Birkenstockdepp", "Fotzenkopf","Hirschgesicht" };
 		int randomNum = 0 + (int) (Math.random() * array.length);
 		return array[randomNum];
 	}
 
-	private static StudentDF createStudent(String firstName, DaoSchoolAbstract dataAccessObject) {
-		StudentDF student = new StudentDF(firstName, dataAccessObject);
-		allStudents.add(student);
-		return student;
+	private static Teacher createTeacher(String firstName, EDaoSchool eDataAccess) {
+		Teacher teacher = null;
+		try {
+			teacher = new Teacher(firstName, eDataAccess);
+			allTeachers.add(teacher);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return teacher;
 	}
 
-	public static StudentDF createStudent(boolean random, DaoSchoolAbstract dataAccessObject) {
-		String newName = StudentDF.generateNewName();
-		StudentDF newStudent = null;
+	public static ITeacher createTeacher(boolean random, EDaoSchool eDataAccess) {
+		String newName = Teacher.generateNewName();
+		Teacher newTeacher = null;
 		if (!random) {
 			newName = JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
 		}
-		newStudent = StudentDF.createStudent(newName, dataAccessObject);
-		return newStudent;
+		Teacher.createTeacher(newName, eDataAccess);
+		return newTeacher;
 	}
 
-	public static ArrayList<IStudent> getStudents() {
-		return allStudents;
+	public static ArrayList<ITeacher> getTeachers() {
+		return allTeachers;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
-	// Getter / Setter IStudent
+	// Getter / Setter ITeacher
 	@Override
-	public ICourse getCourse() {
-		return course;
-	}
+	public void addCourse(ICourse course) throws Exception {
+		try {
+			courses.add(course);
+			course.setTeacher(this);
+			// course.setMyTeacherId(myTeacherId);
 
-	@Override
-	public void setCourse(ICourse course) {
-		this.course = course;
-	}
-
-	@Override
-	public boolean hasCourse(ICourse course) {
-		if (course != null) {
-			return course.equals(this.course);
-		} else {
-			return false;
+		} catch (Exception e) {
+			throw e;
 		}
+
 	}
 
 	@Override
-	public boolean hasCourse() {
-		return this.course != null;
+	public void removeCourse(ICourse course) {
+		course.removeTeacher();
+		for (ICourse courses : this.courses) {
+			if (courses.equals(course)) {
+				this.courses.remove(course);
+				break;
+			}
+
+		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -98,7 +106,7 @@ public class StudentDF extends SchoolPersonAbstract implements IStudent {
 	public boolean deleteElement() {
 		boolean ret = super.deleteElement();
 		if (ret) {
-			StudentDF.allStudents.remove(this);
+			Teacher.allTeachers.remove(this);
 		}
 		return ret;
 	}
