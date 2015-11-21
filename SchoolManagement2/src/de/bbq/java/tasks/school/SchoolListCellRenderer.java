@@ -6,11 +6,11 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 
+/**
+ * @author Thorsten2201
+ *
+ */
 public class SchoolListCellRenderer extends DefaultListCellRenderer {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	@Override

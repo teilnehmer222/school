@@ -1,9 +1,13 @@
 package de.bbq.java.tasks.school;
 
-public interface ITeacher {
+/**
+ * @author Thorsten2201
+ *
+ */
+public interface ITeacher extends IDaoSchool {
 	String toString();
 
-	void addCourse(CourseDF course) throws Exception;
+	void addCourse(ICourse course) throws Exception;
 
-	void removeCourse(CourseDF course);
+	void removeCourse(ICourse course);
 }

@@ -2,65 +2,89 @@ package de.bbq.java.tasks.school;
 
 import javax.swing.JOptionPane;
 
-public class DaoSchoolJdbcMysql extends DaoSchoolJdbc {
+/**
+ * @author Thorsten2201
+ *
+ */
+public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Construct
+	public DaoSchoolJdbcMysql() {
+		super(EDaoSchool.JdbcMySql);
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// DaoSchoolAbstract properties
 	@Override
-	public boolean saveElement(CourseDF course) {
-		// TODO Auto-generated method stub
-		JOptionPane.showMessageDialog(null, this.getClass().getName() + ".saveElement(CourseDF " + course.toString() + ")");
+	public boolean saveElement(SchoolItemAbstract schoolItemAbstract) {
+		if (schoolItemAbstract instanceof ICourse) {
+			// TODO Auto-generated method stub
+			// StringBuffer
+			JOptionPane.showMessageDialog(null,
+					this.getClass().getName() + ".saveElement(CourseDF " + schoolItemAbstract.toString() + ")");
+			return false;
+		} else if (schoolItemAbstract instanceof ITeacher) {
+			// TODO Auto-generated method stub
+			JOptionPane.showMessageDialog(null,
+					this.getClass().getName() + ".saveElement(TeacherDF " + schoolItemAbstract.toString() + ")");
+			return false;
+
+		} else if (schoolItemAbstract instanceof IStudent) {
+			// TODO Auto-generated method stub
+			JOptionPane.showMessageDialog(null,
+					this.getClass().getName() + ".saveElement(StudentDF " + schoolItemAbstract.toString() + ")");
+			return false;
+		}
 		return false;
 	}
 
 	@Override
-	public boolean saveElement(TeacherDF teacher) {
-		// TODO Auto-generated method stub
-		JOptionPane.showMessageDialog(null, this.getClass().getName() + ".saveElement(TeacherDF " + teacher.toString() + ")");
+	public boolean loadElement(SchoolItemAbstract schoolItemAbstract) {
+		if (schoolItemAbstract instanceof ICourse) {
+			// TODO Auto-generated method stub
+			// StringBuffer
+			JOptionPane.showMessageDialog(null,
+					this.getClass().getName() + ".loadElement(CourseDF " + schoolItemAbstract.toString() + ")");
+			return false;
+		} else if (schoolItemAbstract instanceof ITeacher) {
+			// TODO Auto-generated method stub
+			JOptionPane.showMessageDialog(null,
+					this.getClass().getName() + ".loadElement(TeacherDF " + schoolItemAbstract.toString() + ")");
+			return false;
 
+		} else if (schoolItemAbstract instanceof IStudent) {
+			// TODO Auto-generated method stub
+			JOptionPane.showMessageDialog(null,
+					this.getClass().getName() + ".loadElement(StudentDF " + schoolItemAbstract.toString() + ")");
+			return false;
+		}
 		return false;
 	}
 
 	@Override
-	public boolean saveElement(StudentDF student) {
-		// TODO Auto-generated method stub
-		JOptionPane.showMessageDialog(null, this.getClass().getName() + ".saveElement(StudentDF " + student.toString() + ")");
+	public boolean deleteElement(SchoolItemAbstract schoolItemAbstract) {
+		if (schoolItemAbstract instanceof ICourse) {
+			// TODO Auto-generated method stub
+			// StringBuffer
+			JOptionPane.showMessageDialog(null,
+					this.getClass().getName() + ".deleteElement(CourseDF " + schoolItemAbstract.toString() + ")");
+			return false;
+		} else if (schoolItemAbstract instanceof ITeacher) {
+			// TODO Auto-generated method stub
+			JOptionPane.showMessageDialog(null,
+					this.getClass().getName() + ".deleteElement(TeacherDF " + schoolItemAbstract.toString() + ")");
+			return false;
 
+		} else if (schoolItemAbstract instanceof IStudent) {
+			// TODO Auto-generated method stub
+			JOptionPane.showMessageDialog(null,
+					this.getClass().getName() + ".deleteElement(StudentDF " + schoolItemAbstract.toString() + ")");
+			return false;
+		}
 		return false;
 	}
-
-	@Override
-	public boolean loadElement(CourseDF course) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean loadElement(TeacherDF teacher) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean loadElement(StudentDF student) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean deleteElement(CourseDF course) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean deleteElement(TeacherDF teacher) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean deleteElement(StudentDF student) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
 }

@@ -1,41 +1,64 @@
 package de.bbq.java.tasks.school;
 
 import java.util.ArrayList;
-import java.util.List;
+import javax.swing.JOptionPane;
 
-public class TeacherDF extends SchoolMember implements ITeacher, DaoSchoolInterface {
-	private static final long serialVersionUID = -3548796163205043453L;
+/**
+ * @author teilnehmer222
+ *
+ */
+public class TeacherDF extends SchoolPersonAbstract implements ITeacher {
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Class Properties
+	private transient ArrayList<ICourse> courses = new ArrayList<>();
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	private static ArrayList<TeacherDF> teachers = new ArrayList<>();
-	// private List<Long> courses = new ArrayList<>();
-	private ArrayList<CourseDF> courses = new ArrayList<>();
-	private static DaoSchoolAbstract dataAccessObject;
-
-	// private boolean addCourseId(Long courseId) {
-	// return courses.add(courseId);
-	// }
-
-	private TeacherDF(String firstName) {
-		super();
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Construct
+	private TeacherDF(String firstName, DaoSchoolAbstract dataAccessObject) {
+		super(dataAccessObject);
 		super.setFirstName(firstName);
 	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	public static TeacherDF createTeacher(String firstName, DaoSchoolAbstract store) {
-		TeacherDF teacher = new TeacherDF(firstName);
-		if (dataAccessObject == null) {
-			dataAccessObject = store;
-		} else if (!dataAccessObject.getClass().equals(store.getClass())) {
-			dataAccessObject = store;
-		}
-		teachers.add(teacher);
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Static
+	private static final long serialVersionUID = -3548796163205043453L;
+	private static ArrayList<ITeacher> allTeachers = new ArrayList<>();
+
+	private static String generateNewName() {
+		String[] array = new String[] { "Leerer Abwesend", "Musikleerer", "Deuschleerer", "Verleerer", "Entlährer",
+				"Laubbläser", "Labersack", "Zutexter", "Volllaberer", "Berieseler", "Hintergrundrauschen",
+				"Disturbing Noise" };
+		int randomNum = 0 + (int) (Math.random() * array.length);
+		return array[randomNum];
+	}
+
+	private static TeacherDF createTeacher(String firstName, DaoSchoolAbstract dataAccessObject) {
+		TeacherDF teacher = new TeacherDF(firstName, dataAccessObject);
+		allTeachers.add(teacher);
 		return teacher;
 	}
 
-	public static ArrayList<TeacherDF> getTeachers() {
-		return teachers;
+	public static ITeacher createTeacher(boolean random, DaoSchoolAbstract dataAccessObject) {
+		String newName = TeacherDF.generateNewName();
+		TeacherDF newTeacher = null;
+		if (!random) {
+			newName = JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
+		}
+		TeacherDF.createTeacher(newName, dataAccessObject);
+		return newTeacher;
 	}
 
-	public void addCourse(CourseDF course) throws Exception {
+	public static ArrayList<ITeacher> getTeachers() {
+		return allTeachers;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Getter / Setter ITeacher
+	@Override
+	public void addCourse(ICourse course) throws Exception {
 		try {
 			courses.add(course);
 			course.setTeacher(this);
@@ -47,23 +70,10 @@ public class TeacherDF extends SchoolMember implements ITeacher, DaoSchoolInterf
 
 	}
 
-	public static void removeTeacher(TeacherDF teacher) {
-		teachers.remove(teacher);
-	}
-
-	// private void removeCourseId(long courseId) {
-	// for (Long course : courses) {
-	// if (course == courseId) {
-	// courses.remove(course);
-	// break;
-	// }
-	//
-	// }
-	// }
-
-	public void removeCourse(CourseDF course) {
+	@Override
+	public void removeCourse(ICourse course) {
 		course.removeTeacher();
-		for (CourseDF courses : this.courses) {
+		for (ICourse courses : this.courses) {
 			if (courses.equals(course)) {
 				this.courses.remove(course);
 				break;
@@ -71,65 +81,38 @@ public class TeacherDF extends SchoolMember implements ITeacher, DaoSchoolInterf
 
 		}
 	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	// public static void addTeacherToList(TeacherDF teacher) {
-	// teachers.add(teacher);
-	// }
-
-	// USED??????
-	// public static TeacherDF findTeacherById(long teacherId) {
-	// TeacherDF foundTeacher = null;
-	// for (TeacherDF teacher : teachers) {
-	// if (teacher.getSchoolMemberId() == teacherId) {
-	// foundTeacher = teacher;
-	// break;
-	// }
-	// }
-	// return foundTeacher;
-	// }
-
-	public static String generateNewName() {
-		String[] array = new String[] { "Leerer Abwesend", "Musikleerer", "Deuschleerer", "Verleerer", "Entlährer",
-				"Laubbläser", "Labersack", "Zutexter", "Volllaberer", "Berieseler", "Hintergrundrauschen", "Disturbing Noise" };
-		int randomNum = 0 + (int) (Math.random() * array.length);
-		return array[randomNum];
-	}
-
+	/////////////////////////////////////////////////////////////////////////////////////
+	// IDaoSchoolAbstract
 	@Override
 	public boolean saveElement() {
-		this.setSaved(true);
-		return this.dataAccessObject.saveElement(this);
+		return super.saveElement();
 	}
 
 	@Override
 	public boolean loadElement() {
-		this.setSaved(false);
-		return this.dataAccessObject.loadElement(this);
+		return super.loadElement();
 	}
 
 	@Override
 	public boolean deleteElement() {
-		teachers.remove(this);
-		return this.dataAccessObject.deleteElement(this);
+		boolean ret = super.deleteElement();
+		if (ret) {
+			TeacherDF.allTeachers.remove(this);
+		}
+		return ret;
 	}
 
 	@Override
 	public boolean saveAll() {
-		return this.dataAccessObject.saveAll();
+		return super.saveAll();
 	}
 
 	@Override
 	public boolean loadAll() {
-		return this.dataAccessObject.loadAll();
+		return super.loadAll();
 	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	private transient boolean saved = false;
-
-	public boolean isSaved() {
-		return saved;
-	}
-
-	public void setSaved(boolean saved) {
-		this.saved = saved;
-	}
 }

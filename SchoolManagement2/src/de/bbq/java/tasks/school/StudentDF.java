@@ -1,45 +1,74 @@
 package de.bbq.java.tasks.school;
 
 import java.util.ArrayList;
-import java.util.List;
+import javax.swing.JOptionPane;
 
-public class StudentDF extends SchoolMember implements IStudent, DaoSchoolInterface {
-	private static final long serialVersionUID = -8838146635169751075L;
+/**
+ * @author teilnehmer222
+ *
+ */
+public class StudentDF extends SchoolPersonAbstract implements IStudent {
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Class Properties
+	private transient ICourse course;
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	private static ArrayList<StudentDF> students = new ArrayList<>();
-	private CourseDF course;
-	private static DaoSchoolAbstract dataAccessObject;
-
-	private StudentDF(String firstName) {
-		super();
-
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Construct
+	private StudentDF(String firstName, DaoSchoolAbstract dataAccessObject) {
+		super(dataAccessObject);
 		super.setFirstName(firstName);
 	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	public static StudentDF createStudent(String firstName, DaoSchoolAbstract store) {
-		StudentDF student = new StudentDF(firstName);
-		if (dataAccessObject == null) {
-			dataAccessObject = store;
-		} else if (!dataAccessObject.getClass().equals(store.getClass())) {
-			dataAccessObject = store;
-		}
-		students.add(student);
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Static
+	private static final long serialVersionUID = -8838146635169751075L;
+	private static ArrayList<IStudent> allStudents = new ArrayList<>();
+
+	private static String generateNewName() {
+		String[] array = new String[] { "Depp", "Trottel", "Idiot", "Armleuchter", "Hirni", "Totalversager",
+				"Baumschulabbrecher", "Volltrottel", "Extremdepp", "Superidiot", "Dummbeutel", "Trottelkopf",
+				"Hirngesicht" };
+		int randomNum = 0 + (int) (Math.random() * array.length);
+		return array[randomNum];
+	}
+
+	private static StudentDF createStudent(String firstName, DaoSchoolAbstract dataAccessObject) {
+		StudentDF student = new StudentDF(firstName, dataAccessObject);
+		allStudents.add(student);
 		return student;
 	}
 
-	// public static boolean hasCourse(long studentId){
-	// boolean hasCourse = false;
-	// StudentDF student = findStudentById(studentId);
-	// if(student.getMyCourseId()!=-1)
-	// hasCourse = true;
-	// return hasCourse;
-	// }
-
-	public boolean hasCourse() {
-		return this.course != null;
+	public static StudentDF createStudent(boolean random, DaoSchoolAbstract dataAccessObject) {
+		String newName = StudentDF.generateNewName();
+		StudentDF newStudent = null;
+		if (!random) {
+			newName = JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
+		}
+		newStudent = StudentDF.createStudent(newName, dataAccessObject);
+		return newStudent;
 	}
 
-	public boolean hasCourse(CourseDF course) {
+	public static ArrayList<IStudent> getStudents() {
+		return allStudents;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Getter / Setter IStudent
+	@Override
+	public ICourse getCourse() {
+		return course;
+	}
+
+	@Override
+	public void setCourse(ICourse course) {
+		this.course = course;
+	}
+
+	@Override
+	public boolean hasCourse(ICourse course) {
 		if (course != null) {
 			return course.equals(this.course);
 		} else {
@@ -47,83 +76,42 @@ public class StudentDF extends SchoolMember implements IStudent, DaoSchoolInterf
 		}
 	}
 
-	public static ArrayList<StudentDF> getStudents() {
-		return students;
+	@Override
+	public boolean hasCourse() {
+		return this.course != null;
 	}
-	// public long getMyCourseId() {
-	// return myCourseId;
-	// }
-	//
-	// public void setMyCourseId(long myCourseId) {
-	// this.myCourseId = myCourseId;
-	// }
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	public CourseDF getCourse() {
-		return course;
-	}
-
-	public void setCourse(CourseDF course) {
-		this.course = course;
-	}
-
-	// public static void addStudentToList(StudentDF student) {
-	// students.add(student);
-	// }
-
-	// public static StudentDF findStudentById(long studentId) {
-	// StudentDF foundStudent = null;
-	// for (StudentDF student : students) {
-	// if (student.getSchoolMemberId() == studentId) {
-	// foundStudent = student;
-	// break;
-	// }
-	// }
-	// return foundStudent;
-	// }
-
-	public static String generateNewName() {
-		String[] array = new String[] { "Depp", "Trottel", "Idiot", "Armleuchter", "Hirni", "Totalversager",
-				"Baumschulabbrecher", "Volltrottel", "Extremdepp", "Superidiot", "Dummbeutel", "Trottelkopf", "Hirngesicht" };
-		int randomNum = 0 + (int) (Math.random() * array.length);
-		return array[randomNum];
-	}
-
+	/////////////////////////////////////////////////////////////////////////////////////
+	// IDaoSchoolAbstract
 	@Override
 	public boolean saveElement() {
-		this.setSaved(true);
-		return this.dataAccessObject.saveElement(this);
+		return super.saveElement();
 	}
 
 	@Override
 	public boolean loadElement() {
-		this.setSaved(false);
-		return this.dataAccessObject.loadElement(this);
-	}
-
-	@Override
-	public boolean saveAll() {
-		return this.dataAccessObject.saveAll();
-	}
-
-	@Override
-	public boolean loadAll() {
-
-		return this.dataAccessObject.loadAll();
+		return super.loadElement();
 	}
 
 	@Override
 	public boolean deleteElement() {
-		students.remove(this);
-		return this.dataAccessObject.deleteElement(this);
+		boolean ret = super.deleteElement();
+		if (ret) {
+			StudentDF.allStudents.remove(this);
+		}
+		return ret;
 	}
 
-	private transient boolean saved = false;
-
-	public boolean isSaved() {
-		return saved;
+	@Override
+	public boolean saveAll() {
+		return super.saveAll();
 	}
 
-	public void setSaved(boolean saved) {
-		this.saved = saved;
+	@Override
+	public boolean loadAll() {
+		return super.loadAll();
 	}
+	/////////////////////////////////////////////////////////////////////////////////////
+
 }

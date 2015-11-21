@@ -1,10 +1,7 @@
 package de.bbq.java.tasks.school;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 
@@ -18,32 +15,120 @@ import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 
+/**
+ * @author Thorsten2201
+ *
+ */
 public class EditFrame extends JFrame implements ActionListener {
-	ArrayList<Component> fields = new ArrayList<>();
-	JButton exit;
-	JTextField Nachname, Vorname;
-	JTextField Fach, Sprache;
-	JTextField Strasse, Stadt, PLZ, Land, Raum, Hausnummer;
-	JCheckBox Beamer;
-	CourseDF c;
-	TeacherDF t;
-	StudentDF s;
-	JDatePickerImpl Start, Geburtsdatum, Ende;
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Static
+	private static final long serialVersionUID = -7952586514775627163L;
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	private final int winLength = 400;
-	private final int winHight = 400;
-	private JButton save;
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Construct
+	private int winLength = 400;
+	private int winHight = 400;
 
+	private CourseDF courseDF;
+	private TeacherDF teacherDF;
+	private StudentDF studentDF;
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Controls
+	private JButton saveButton, exitButton;
+
+	private JTextField topicTextField, languageTextField;
+	private JCheckBox beamerCheckBox;
+	private JTextField lastNameTextField, firstNameTextField;
+	private JDatePickerImpl startTextField, birthDayTextField, endTextField;
+	private JTextField streetTextField, cityTextField, zipTextField, countryTextField, roomNumberTextField,
+			streetNumberTextField;
+			/////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// ActionListener
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == this.exitButton) {
+			this.dispose();
+		} else if (e.getSource() == this.saveButton) {
+			if (this.courseDF != null) {
+				ReadDataCourse();
+			} else if (this.teacherDF != null) {
+				ReadDataPerson(this.teacherDF);
+				ReadDataAdress(this.teacherDF.getAdress());
+
+			} else if (this.studentDF != null) {
+				ReadDataPerson(this.studentDF);
+				ReadDataAdress(this.studentDF.getAdress());
+			}
+			this.dispose();
+		}
+
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Write control[].value to Object
+	public void ReadDataPerson(SchoolPersonAbstract per) {
+		per.setFirstName(this.firstNameTextField.getText());
+		per.setLastName(this.lastNameTextField.getText());
+		try {
+			UtilDateModel model = (UtilDateModel) this.birthDayTextField.getModel();
+			per.setBirthDate(model.getValue());
+		} catch (Exception e2) {
+			per.setBirthDate(null);
+		}
+
+	}
+
+	public void ReadDataAdress(Address add) {
+		if (add != null) {
+			add.setStreetName(this.streetTextField.getText());
+			add.setCity(this.cityTextField.getText());
+			add.setZipCode(Integer.parseInt(this.zipTextField.getText()));
+			add.setCountry(this.countryTextField.getText());
+			add.setHouseNumber(this.streetNumberTextField.getText());
+		}
+	}
+
+	public void ReadDataCourse() {
+		this.courseDF.setTopic(this.topicTextField.getText());
+		try {
+			UtilDateModel model = (UtilDateModel) this.endTextField.getModel();
+			this.courseDF.setEndTime(model.getValue());
+		} catch (Exception e2) {
+			this.courseDF.setEndTime(new Date());
+		}
+		try {
+			UtilDateModel model = (UtilDateModel) this.startTextField.getModel();
+			this.courseDF.setStartTime(model.getValue());
+		} catch (Exception e2) {
+			this.courseDF.setStartTime(new Date());
+		}
+		this.courseDF.setLanguage(this.languageTextField.getText());
+		try {
+			this.courseDF.setRoomNumber(Integer.parseInt(this.roomNumberTextField.getText()));
+		} catch (Exception e2) {
+			this.courseDF.setRoomNumber(0);
+		}
+		courseDF.setNeedsBeamer(this.beamerCheckBox.isSelected());
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Construct
 	void Construct() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setLayout(null);
 		pack();
-		setSize(winLength, winHight);
+		setSize(this.winLength, this.winHight);
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
 
-	void Construct(Person pers) {
+	void Construct(SchoolPersonAbstract pers) {
 		JLabel label = new JLabel("Nachname:");
 		label.setBounds(5, 30, 100, 20);
 		add(label);
@@ -68,24 +153,24 @@ public class EditFrame extends JFrame implements ActionListener {
 		label = new JLabel("Land:");
 		label.setBounds(5, 210, 100, 20);
 		add(label);
+
 		// JTextField field = new JTextField();
 		// field.setBounds(110, 5, 200, 20);
 		// field.setName("Nachname:");
 		// add(field);
 		// fields.add(field);
-		Nachname = new JTextField();
-		Nachname.setBounds(110, 30, 200, 20);
-		Nachname.setName("Nachname:");
-		Nachname.setText(pers.getLastName());
-		add(Nachname);
-		fields.add(Nachname);
 
-		Vorname = new JTextField();
-		Vorname.setBounds(110, 55, 200, 20);
-		Vorname.setName("Vorname:");
-		Vorname.setText(pers.getFirstName());
-		add(Vorname);
-		fields.add(Vorname);
+		this.lastNameTextField = new JTextField();
+		this.lastNameTextField.setBounds(110, 30, 200, 20);
+		this.lastNameTextField.setName("Nachname:");
+		this.lastNameTextField.setText(pers.getLastName());
+		add(this.lastNameTextField);
+
+		this.firstNameTextField = new JTextField();
+		this.firstNameTextField.setBounds(110, 55, 200, 20);
+		this.firstNameTextField.setName("Vorname:");
+		this.firstNameTextField.setText(pers.getFirstName());
+		add(this.firstNameTextField);
 
 		UtilDateModel model = new UtilDateModel();
 		if (pers.getBirthDate() != null) {
@@ -98,61 +183,92 @@ public class EditFrame extends JFrame implements ActionListener {
 		p.put("text.month", "Monat");
 		p.put("text.year", "Jahr");
 		JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
-		this.Geburtsdatum = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-		Geburtsdatum.setBounds(110, 80, 200, 26);
-		add(Geburtsdatum);
-		fields.add(Geburtsdatum);
+		this.birthDayTextField = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+		this.birthDayTextField.setBounds(110, 80, 200, 26);
+		add(this.birthDayTextField);
 
-		Strasse = new JTextField();
-		Strasse.setBounds(110, 110, 200, 20);
-		Strasse.setName("Strasse:");
+		this.streetTextField = new JTextField();
+		this.streetTextField.setBounds(110, 110, 200, 20);
+		this.streetTextField.setName("Strasse:");
 		if (pers.getAdress() != null) {
-			Strasse.setText(pers.getAdress().getStreetName());
+			this.streetTextField.setText(pers.getAdress().getStreetName());
 		}
-		add(Strasse);
-		fields.add(Strasse);
+		add(this.streetTextField);
 
-		Hausnummer = new JTextField();
-		Hausnummer.setBounds(110, 135, 200, 20);
-		Hausnummer.setName("Hausnummer:");
+		this.streetNumberTextField = new JTextField();
+		this.streetNumberTextField.setBounds(110, 135, 200, 20);
+		this.streetNumberTextField.setName("Hausnummer:");
 		if (pers.getAdress() != null) {
-			Hausnummer.setText(pers.getAdress().getHouseNumber());
+			this.streetNumberTextField.setText(pers.getAdress().getHouseNumber());
 		}
-		add(Hausnummer);
-		fields.add(Hausnummer);
+		add(this.streetNumberTextField);
 
-		Stadt = new JTextField();
-		Stadt.setBounds(110, 160, 200, 20);
-		Stadt.setName("Stadt:");
+		this.cityTextField = new JTextField();
+		this.cityTextField.setBounds(110, 160, 200, 20);
+		this.cityTextField.setName("Stadt:");
 		if (pers.getAdress() != null) {
-			Stadt.setText(pers.getAdress().getCity());
+			this.cityTextField.setText(pers.getAdress().getCity());
 		}
-		add(Stadt);
-		fields.add(Stadt);
+		add(this.cityTextField);
 
-		PLZ = new JTextField();
-		PLZ.setBounds(110, 185, 200, 20);
-		PLZ.setName("PLZ:");
+		this.zipTextField = new JTextField();
+		this.zipTextField.setBounds(110, 185, 200, 20);
+		this.zipTextField.setName("PLZ:");
 		if (pers.getAdress() != null) {
-			PLZ.setText(Integer.toString(pers.getAdress().getZipCode()));
+			this.zipTextField.setText(Integer.toString(pers.getAdress().getZipCode()));
 		}
-		add(PLZ);
-		fields.add(PLZ);
+		add(this.zipTextField);
 
-		Land = new JTextField();
-		Land.setBounds(110, 210, 200, 20);
-		Land.setName("Land:");
+		this.countryTextField = new JTextField();
+		this.countryTextField.setBounds(110, 210, 200, 20);
+		this.countryTextField.setName("Land:");
 		if (pers.getAdress() != null) {
-			Land.setText(pers.getAdress().getCountry());
+			this.countryTextField.setText(pers.getAdress().getCountry());
 		}
-		add(Land);
-		fields.add(Land);
+		add(this.countryTextField);
 	}
 
-	EditFrame(CourseDF editItem) {
-		this.c = editItem;
+	EditFrame(ITeacher editItem) {
+		this.teacherDF = (TeacherDF) editItem;
+		setTitle("Leerer editieren");
+		Construct(this.teacherDF);
+
+		JLabel label = new JLabel(this.teacherDF.toString());
+		label.setBounds(110, 5, 100, 20);
+		add(label);
+
+		this.exitButton = SchoolLauncher.getButton("Abbrechen", 110, 235, 100, 20, this, "Abbrechen",
+				"Nichts wie raus hier, Leerer stinken...");
+		add(this.exitButton);
+		this.saveButton = SchoolLauncher.getButton("Speichern", 230, 235, 100, 20, this, "Speichern",
+				"Den Leerer fein abspeichern damit auch nichts verloren geht");
+		add(this.saveButton);
+		Construct();
+	}
+
+	EditFrame(IStudent editItem) {
+		this.studentDF = (StudentDF) editItem;
+		Construct(this.studentDF);
+		setTitle("Schüler editieren");
+
+		JLabel label = new JLabel(studentDF.toString());
+		label.setBounds(110, 5, 100, 20);
+		add(label);
+
+		this.exitButton = SchoolLauncher.getButton("Abbrechen", 110, 235, 100, 20, this, "Abbrechen",
+				"Nichts wie raus hier, Schüler nerven...");
+		add(this.exitButton);
+		this.saveButton = SchoolLauncher.getButton("Speichern", 230, 235, 100, 20, this, "Speichern",
+				"Schüler fein abspeichern damit er auch nichts über sich vergissst");
+		add(this.saveButton);
+
+		Construct();
+	}
+
+	EditFrame(ICourse editItem) {
+		this.courseDF = (CourseDF) editItem;
 		setTitle("Kurs editieren");
-		JLabel label = new JLabel(c.getCourseName());
+		JLabel label = new JLabel(this.courseDF.getCourseName());
 		label.setBounds(110, 5, 200, 20);
 		add(label);
 		label = new JLabel("Fach:");
@@ -179,12 +295,11 @@ public class EditFrame extends JFrame implements ActionListener {
 		// add(field);
 		// fields.add(field);
 
-		this.Fach = new JTextField();
-		Fach.setBounds(110, 30, 200, 20);
-		Fach.setName("Fach:");
-		Fach.setText(c.getTopic());
-		add(Fach);
-		fields.add(Fach);
+		this.topicTextField = new JTextField();
+		this.topicTextField.setBounds(110, 30, 200, 20);
+		this.topicTextField.setName("Fach:");
+		this.topicTextField.setText(this.courseDF.getTopic());
+		add(this.topicTextField);
 
 		// this.Start = new JTextField();
 		// Start.setBounds(110, 55, 200, 20);
@@ -196,8 +311,8 @@ public class EditFrame extends JFrame implements ActionListener {
 		// fields.add(Start);
 
 		UtilDateModel model = new UtilDateModel();
-		if (c.getSartTime() != null) {
-			model.setValue(c.getSartTime());
+		if (this.courseDF.getSartTime() != null) {
+			model.setValue(this.courseDF.getSartTime());
 		}
 		model.setSelected(true);
 		// Need this...
@@ -206,153 +321,51 @@ public class EditFrame extends JFrame implements ActionListener {
 		p.put("text.month", "Monat");
 		p.put("text.year", "Jahr");
 		JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
-		this.Start = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-		this.Start.setName("Start:");
-		Start.setBounds(110, 55, 200, 26);
-		add(Start);
-		fields.add(Start);
+		this.startTextField = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+		this.startTextField.setName("Start:");
+		this.startTextField.setBounds(110, 55, 200, 26);
+		add(this.startTextField);
 
 		model = new UtilDateModel();
-		if (c.getEndTime() != null) {
-			model.setValue(c.getEndTime());
+		if (this.courseDF.getEndTime() != null) {
+			model.setValue(this.courseDF.getEndTime());
 		}
 		model.setSelected(true);
 		JDatePanelImpl datePanelEnd = new JDatePanelImpl(model, p);
-		this.Ende = new JDatePickerImpl(datePanelEnd, new DateLabelFormatter());
-		Ende.setName("Ende:");
-		Ende.setBounds(110, 85, 200, 26);
-		add(Ende);
-		fields.add(Ende);
+		this.endTextField = new JDatePickerImpl(datePanelEnd, new DateLabelFormatter());
+		this.endTextField.setName("Ende:");
+		this.endTextField.setBounds(110, 85, 200, 26);
+		add(this.endTextField);
 
-		this.Sprache = new JTextField();
-		Sprache.setBounds(110, 120, 200, 20);
-		Sprache.setName("Sprache:");
-		Sprache.setText(c.getLanguage());
-		add(Sprache);
-		fields.add(Sprache);
+		this.languageTextField = new JTextField();
+		this.languageTextField.setBounds(110, 120, 200, 20);
+		this.languageTextField.setName("Sprache:");
+		this.languageTextField.setText(this.courseDF.getLanguage());
+		add(this.languageTextField);
 
-		this.Raum = new JTextField();
-		Raum.setBounds(110, 145, 200, 20);
-		Raum.setName("Raum:");
-		if (c.getRoomNumber() != null) {
-			Raum.setText(c.getRoomNumber().toString());
+		this.roomNumberTextField = new JTextField();
+		this.roomNumberTextField.setBounds(110, 145, 200, 20);
+		this.roomNumberTextField.setName("Raum:");
+		if (this.courseDF.getRoomNumber() != null) {
+			this.roomNumberTextField.setText(this.courseDF.getRoomNumber().toString());
 		}
-		add(Raum);
-		fields.add(Raum);
+		add(this.roomNumberTextField);
 
-		this.Beamer = new JCheckBox();
-		Beamer.setBounds(110, 170, 200, 20);
-		Beamer.setName("Beamer:");
-		Beamer.setSelected((boolean) c.getNeedsBeamer());
-		add(Beamer);
-		fields.add(Beamer);
+		this.beamerCheckBox = new JCheckBox();
+		this.beamerCheckBox.setBounds(110, 170, 200, 20);
+		this.beamerCheckBox.setName("Beamer:");
+		this.beamerCheckBox.setSelected((boolean) this.courseDF.getNeedsBeamer());
+		add(this.beamerCheckBox);
 
-		exit = SchoolLauncher.getButton("Abbrechen", 110, 195, 100, 20, this, "Abbrechen", "Nichts wie raus hier...");
-		add(exit);
+		this.exitButton = SchoolLauncher.getButton("Abbrechen", 110, 195, 100, 20, this, "Abbrechen",
+				"Nichts wie raus hier, Kurse sind anstrengend...");
+		add(this.exitButton);
 
-		save = SchoolLauncher.getButton("Speichern", 230, 195, 100, 20, this, "Speichern",
-				"Alles fein abspeichern damit auch nichts verloren geht");
-		add(save);
+		this.saveButton = SchoolLauncher.getButton("Speichern", 230, 195, 100, 20, this, "Speichern",
+				"Kurs fein abspeichern damit er auch nicht verloren geht");
+		add(this.saveButton);
 		Construct();
 	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	EditFrame(TeacherDF editItem) {
-		this.t = editItem;
-		setTitle("Leerer editieren");
-		Construct(editItem);
-
-		JLabel label = new JLabel(t.toString());
-		label.setBounds(110, 5, 100, 20);
-		add(label);
-
-		exit = SchoolLauncher.getButton("Abbrechen", 110, 235, 100, 20, this, "Abbrechen", "Nichts wie raus hier...");
-		add(exit);
-		save = SchoolLauncher.getButton("Speichern", 230, 235, 100, 20, this, "Speichern",
-				"Alles fein abspeichern damit auch nichts verloren geht");
-		add(save);
-		Construct();
-	}
-
-	EditFrame(StudentDF editItem) {
-		this.s = editItem;
-		Construct(editItem);
-		setTitle("Schüler editieren");
-
-		JLabel label = new JLabel(s.toString());
-		label.setBounds(110, 5, 100, 20);
-		add(label);
-
-		exit = SchoolLauncher.getButton("Abbrechen", 110, 235, 100, 20, this, "Abbrechen", "Nichts wie raus hier...");
-		add(exit);
-		save = SchoolLauncher.getButton("Speichern", 230, 235, 100, 20, this, "Speichern",
-				"Alles fein abspeichern damit auch nichts verloren geht");
-		add(save);
-
-		Construct();
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == exit) {
-			this.dispose();
-		} else if (e.getSource() == save) {
-			if (c != null) {
-				ReadDataCourse();
-			} else if (t != null) {
-				ReadDataPerson(this.t);
-				ReadDataAdress(this.t.getAdress());
-
-			} else if (s != null) {
-				ReadDataPerson(this.s);
-				ReadDataAdress(this.s.getAdress());
-			}
-			this.dispose();
-		}
-
-	}
-
-	public void ReadDataPerson(Person per) {
-		per.setFirstName(Vorname.getText());
-		per.setLastName(Nachname.getText());
-		try {
-			UtilDateModel model = (UtilDateModel) Geburtsdatum.getModel();
-			per.setBirthDate(model.getValue());
-		} catch (Exception e2) {
-			per.setBirthDate(null);
-		}
-
-	}
-
-	public void ReadDataAdress(Adress add) {
-		if (add != null) {
-			add.setStreetName(Strasse.getText());
-			add.setCity(Stadt.getText());
-			add.setZipCode(Integer.parseInt(PLZ.getText()));
-			add.setCountry(Land.getText());
-			add.setHouseNumber(Hausnummer.getText());
-		}
-	}
-
-	public void ReadDataCourse() {
-		c.setTopic(Fach.getText());
-		try {
-			UtilDateModel model = (UtilDateModel) Ende.getModel();
-			c.setEndTime(model.getValue());
-		} catch (Exception e2) {
-			c.setEndTime(new Date());
-		}
-		try {
-			UtilDateModel model = (UtilDateModel) Start.getModel();
-			c.setStartTime(model.getValue());
-		} catch (Exception e2) {
-			c.setStartTime(new Date());
-		}
-		c.setLanguage(Sprache.getText());
-		try {
-			c.setRoomNumber(Integer.parseInt(Raum.getText()));
-		} catch (Exception e2) {
-			c.setRoomNumber(0);
-		}
-		c.setNeedsBeamer(this.Beamer.isSelected());
-	}
 }

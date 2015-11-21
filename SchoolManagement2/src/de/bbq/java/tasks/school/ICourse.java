@@ -2,21 +2,24 @@ package de.bbq.java.tasks.school;
 
 import java.util.ArrayList;
 
-public interface ICourse {
+/**
+ * @author Thorsten2201
+ *
+ */
+public interface ICourse extends IDaoSchool {
 	String toString();
-	boolean saved = false;
-	
-	void addStudent(StudentDF student);
 
-	void removeStudent(StudentDF student);
+	ITeacher getTeacher();
 
-	void setTeacher(TeacherDF t);
+	void setTeacher(ITeacher t);
 
-	TeacherDF getTeacher();
-
-	ArrayList<StudentDF> getStudents();
+	void removeTeacher();
 
 	boolean hasTeacher();
 
-	boolean deleteElement();
+	ArrayList<IStudent> getStudents();
+
+	void addStudent(IStudent student);
+
+	void removeStudent(IStudent student);
 }

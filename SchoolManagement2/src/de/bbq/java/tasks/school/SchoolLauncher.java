@@ -3,58 +3,69 @@ package de.bbq.java.tasks.school;
 import javax.swing.JTabbedPane;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JFrame;
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
+/**
+ * @author Thorsten2201
+ *
+ */
 public class SchoolLauncher extends JFrame {
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Class Properties
+	private static final long serialVersionUID = -2039718453107554584L;
 	private static final int winLength = 800;
 	private static final int winHight = 430;
+
 	private CoursePanel panel1;
 	private TeacherPanel panel2;
 	private StudentPanel panel3;
 
 	private static DaoSchoolJdbcMysql daoJdbc = new DaoSchoolJdbcMysql();
 	private static DaoSchoolFile daoFile = new DaoSchoolFile();
-	private static DaoSchoolAbstract dao = daoJdbc;
+	private static DaoSchoolAbstract daoAbstract = daoFile;
+	/////////////////////////////////////////////////////////////////////////////////////
 
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Construct
 	public static void main(String[] args) {
 		// frame.add(keyboardExample);
-		SchoolLauncher automat = new SchoolLauncher();
-		automat.setVisible(true);
+		SchoolLauncher launcher = new SchoolLauncher();
+		launcher.setVisible(true);
+	}
+
+	private SchoolLauncher() {
+		setTitle("School Management");
+		setSize(winLength, winHight);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLayout(null);
+		addControls();
 	}
 
 	private void addControls() {
-		dao = daoFile;
-		// dao = daoJdbc;
 		this.setLayout(new GridLayout(1, 1));
 
 		JTabbedPane tabbedPane = new JTabbedPane();
 		ImageIcon icon = createImageIcon("middle.gif");
 
-		panel1 = new CoursePanel(dao);// makeTextPanel("Hier sollen die Kurse
-										// aufgelistet werden");
+		panel1 = new CoursePanel(daoAbstract);
 		tabbedPane.addTab("Kurse", icon, panel1, "Kurse");
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
-		panel2 = new TeacherPanel(dao);// makeTextPanel("Hier sollen die Leerer
-										// aufgelistet werden");
+		panel2 = new TeacherPanel(daoAbstract);
 		tabbedPane.addTab("Leerer", icon, panel2, "Leerer");
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
-		panel3 = new StudentPanel(dao);// makeTextPanel("Hier sollen die Schüler
-										// aufgelistet werden");
+		panel3 = new StudentPanel(daoAbstract);
 		tabbedPane.addTab("Schüler", icon, panel3, "Schüler");
 		panel3.setPreferredSize(new Dimension(410, 50));
 		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
@@ -76,26 +87,15 @@ public class SchoolLauncher extends JFrame {
 					break;
 
 				}
-				// TODO Auto-generated method stub
-
 			}
 		});
-		// Add the tabbed pane to this panel.
 		add(tabbedPane);
-
-		// The following line enables to use scrolling tabs.
 		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	protected JComponent makeTextPanel(String text) {
-		JPanel panel = new JPanel(false);
-		JLabel filler = new JLabel(text);
-		filler.setHorizontalAlignment(JLabel.CENTER);
-		panel.setLayout(new GridLayout(1, 1));
-		panel.add(filler);
-		return panel;
-	}
-
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Static for Panels, etc.
 	/** Returns an ImageIcon, or null if the path was invalid. */
 	protected static ImageIcon createImageIcon(String path) {
 		java.net.URL imgURL = SchoolLauncher.class.getResource(path);
@@ -105,27 +105,6 @@ public class SchoolLauncher extends JFrame {
 			System.err.println("Couldn't find file: " + path);
 			return null;
 		}
-	}
-
-	/**
-	 * Create the GUI and show it. For thread safety, this method should be
-	 * invoked from the event dispatch thread.
-	 */
-	private static void createAndShowGUI() {
-		// Create and set up the window.
-
-		// Add content to the window.
-		JFrame frame = new SchoolLauncher();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle("School Example");
-
-		frame.setSize(winLength, winHight);
-		frame.pack();
-		frame.setLocationRelativeTo(null);
-
-		// Display the window.
-
-		frame.setVisible(true);
 	}
 
 	public static JButton getButton(String buName, int x, int y, int width, int height, ActionListener linr,
@@ -142,13 +121,35 @@ public class SchoolLauncher extends JFrame {
 		button.addActionListener(linr);
 		return button;
 	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	public SchoolLauncher() {
-		setTitle("School Management");
-		setSize(winLength, winHight);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLayout(null);
-		addControls();
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Class factories returning interfaces
+	public static ArrayList<ICourse> getCourseList() {
+		return CourseDF.getCourses();
 	}
+
+	public static ArrayList<ITeacher> getTeacherList() {
+		return TeacherDF.getTeachers();
+	}
+
+	public static ArrayList<IStudent> getStudentList() {
+		return StudentDF.getStudents();
+	}
+
+	public static ICourse getNewCourse(boolean random, DaoSchoolAbstract store) {
+		if (SchoolLauncher.getCourseList().size() > 1)
+			store = daoJdbc;
+		return CourseDF.createCourse(true, store);
+	}
+
+	public static ITeacher getNewTeacher(boolean random, DaoSchoolAbstract store) {
+		return TeacherDF.createTeacher(random, store);
+	}
+
+	public static IStudent getNewStudent(boolean random, DaoSchoolAbstract store) {
+		return StudentDF.createStudent(random, store);
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
+
 }

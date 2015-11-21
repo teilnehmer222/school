@@ -1,9 +1,7 @@
 package de.bbq.java.tasks.school;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -11,39 +9,165 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 public class StudentPanel extends JPanel implements ActionListener, ListSelectionListener {
-	private JButton addStudent, delStudent, addCourse, remCourse;
-	private JList studentsJList, coursePoolJList, courseSelectedJList;
-	private DefaultListModel<StudentDF> studentModel;
-	private DefaultListModel<CourseDF> coursePoolModel, courseSelectedModel;
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Static
+	private static final long serialVersionUID = 7573321200815259292L;
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Class Properties
 	private boolean refresh = true;
-	private StudentDF selectedStudent;
+	private IStudent selectedStudent;
+	private DaoSchoolAbstract daoSchoolAbstract;
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	private DaoSchoolAbstract store;
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Controls
+	private JButton addStudentButton, deleteStudentButton, addCourseButton, removeCourseButton;
+	private JList<IStudent> studentsJList;
+	private JList<ICourse> coursePoolJList, courseSelectedJList;
+	private DefaultListModel<IStudent> studentListModel;
+	private DefaultListModel<ICourse> coursePoolListModel, courseSelectedListModel;
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	public StudentPanel(DaoSchoolAbstract DaoStore) {
-		this.store = DaoStore;
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Class methods
+	public void refresh() {
+		int selIndex = studentsJList.getSelectedIndex();
+		this.refresh = true;
+		IStudent student = null;
+		for (int index = this.studentListModel.getSize(); index > 0; index--) {
+			try {
+				student = (IStudent) this.studentListModel.getElementAt(index - 1);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				JOptionPane.showMessageDialog(null, e.getMessage());
+			}
+
+			if (!SchoolLauncher.getCourseList().contains(student)) {
+				try {
+					this.studentListModel.remove(index - 1);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, e.getMessage());
+				}
+
+			}
+		}
+		for (IStudent p : SchoolLauncher.getStudentList()) {
+			this.studentListModel.addElement(p);
+		}
+		this.coursePoolListModel.clear();
+		this.courseSelectedListModel.clear();
+		if (this.selectedStudent != null) {
+			for (ICourse c : SchoolLauncher.getCourseList()) {
+				if (this.selectedStudent.hasCourse(c)) {
+					this.courseSelectedListModel.addElement(c);
+				} else {
+					this.coursePoolListModel.addElement(c);
+				}
+			}
+		}
+		if (selIndex < 0) {
+			// do Nothing
+		} else if (selIndex < this.studentListModel.getSize()) {
+			this.studentsJList.setSelectedIndex(selIndex);
+		} else {
+			this.studentsJList.setSelectedIndex(this.studentListModel.getSize() - 1);
+		}
+		this.refresh = false;
+		this.selectedStudent = (IStudent) this.studentsJList.getSelectedValue();
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// ListSelectionListener
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		if (!this.refresh) {
+			if (e.getSource() == this.studentsJList) {
+				IStudent selStudent = (IStudent) this.studentsJList.getSelectedValue();
+				if (selStudent != null) {
+					this.selectedStudent = selStudent;
+					refresh();
+				}
+			}
+		}
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// ActionListener
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		this.refresh = true;
+		if (arg0.getSource() == this.addStudentButton) {
+			this.selectedStudent = studentsJList.getSelectedValue();
+			SchoolLauncher.getNewStudent(true, this.daoSchoolAbstract);
+		} else if (arg0.getSource() == deleteStudentButton) {
+			if (this.selectedStudent == null || !SchoolLauncher.getStudentList().contains(this.selectedStudent)) {
+				studentsJList.setSelectedIndex(studentsJList.getSelectedIndex());
+				this.selectedStudent = (IStudent) studentsJList.getSelectedValue();
+			}
+			this.selectedStudent.deleteElement();
+			this.selectedStudent = null;
+		}
+		if (arg0.getSource() == this.addCourseButton) {
+			ICourse selectedCourse = (ICourse) this.coursePoolJList.getSelectedValue();
+			if (selectedCourse != null) {
+				if (this.selectedStudent != null) {
+					try {
+						selectedCourse.addStudent(this.selectedStudent);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						System.out.println(e.getMessage());
+					}
+				}
+			}
+		} else if (arg0.getSource() == this.removeCourseButton) {
+			ICourse selectedCourse = (ICourse) this.courseSelectedJList.getSelectedValue();
+			if (selectedCourse != null) {
+				if (this.selectedStudent != null) {
+					if (this.selectedStudent.hasCourse(selectedCourse)) {
+						try {
+							selectedCourse.removeStudent(this.selectedStudent);
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							System.out.println(e.getMessage());
+						}
+					}
+				}
+			}
+		}
+		this.refresh = false;
+		refresh();
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Construct
+	public StudentPanel(DaoSchoolAbstract daoSchoolAbstract) {
+		this.daoSchoolAbstract = daoSchoolAbstract;
 		this.setLayout(null); // new GridLayout(1, 1));
-		studentModel = new DefaultListModel<>();
-		studentsJList = new JList(studentModel); // data has type Object[]
-		this.add(studentsJList);
-		studentsJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		studentsJList.setLayoutOrientation(JList.VERTICAL);
-		studentsJList.setVisibleRowCount(-1);
-		studentsJList.addListSelectionListener(this);
-		studentsJList.addMouseListener(new MouseAdapter() {
+
+		this.studentListModel = new DefaultListModel<>();
+		this.studentsJList = new JList<IStudent>(this.studentListModel);
+		this.studentsJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		this.studentsJList.setLayoutOrientation(JList.VERTICAL);
+		this.studentsJList.setVisibleRowCount(-1);
+		this.studentsJList.addListSelectionListener(this);
+		this.studentsJList.addMouseListener(new MouseAdapter() {
+			@SuppressWarnings("rawtypes")
 			public void mouseClicked(MouseEvent evt) {
 				JList list = (JList) evt.getSource();
 				int index = -1;
@@ -55,190 +179,69 @@ public class StudentPanel extends JPanel implements ActionListener, ListSelectio
 					index = list.locationToIndex(evt.getPoint());
 				}
 				if (index >= 0) {
-					StudentDF editItem = studentModel.get(index);
-					new EditFrame(editItem);
+					new EditFrame(studentListModel.get(index));
 				}
 			}
 		});
-		studentsJList.setCellRenderer(new SchoolListCellRenderer());
 
-		JScrollPane pupScroller = new JScrollPane(studentsJList);
+		this.studentsJList.setCellRenderer(new SchoolListCellRenderer());
+		JScrollPane pupScroller = new JScrollPane(this.studentsJList);
 		pupScroller.setPreferredSize(new Dimension(206, 300));
-
 		pupScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		pupScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		pupScroller.setViewportBorder(new LineBorder(Color.BLACK));
+		this.add(studentsJList);
 
-		this.addStudent = SchoolLauncher.getButton("newPupil", 5, 5, 100, 20, this, "Hinzufügen", "Neuer Schüler");
-		this.add(this.addStudent);
+		this.addStudentButton = SchoolLauncher.getButton("newPupil", 5, 5, 100, 20, this, "Hinzufügen",
+				"Neuer Schüler");
+		this.add(this.addStudentButton);
 
 		// listScroller.getViewport().add(addCourse, null);
-		this.delStudent = SchoolLauncher.getButton("delPupil", 110, 5, 100, 20, this, "Löschen", "Schüler löschen");
-		this.add(this.delStudent);
+		this.deleteStudentButton = SchoolLauncher.getButton("delPupil", 110, 5, 100, 20, this, "Löschen",
+				"Schüler löschen");
+		this.add(this.deleteStudentButton);
 
 		pupScroller.setBounds(5, 30, 205, 300);
 		this.add(pupScroller);
 
-		this.addCourse = SchoolLauncher.getButton("addCourse", 235, 5, 205, 20, this, "Hinzufügen ->",
+		this.addCourseButton = SchoolLauncher.getButton("addCourse", 235, 5, 205, 20, this, "Hinzufügen ->",
 				"Kurs Hinzufügen");
-		this.add(this.addCourse);
+		this.add(this.addCourseButton);
 
-		this.remCourse = SchoolLauncher.getButton("remCourse", 470, 5, 205, 20, this, "<- Entfernen", "Kurs Entfernen");
-		this.add(this.remCourse);
+		this.removeCourseButton = SchoolLauncher.getButton("remCourse", 470, 5, 205, 20, this, "<- Entfernen",
+				"Kurs Entfernen");
+		this.add(this.removeCourseButton);
 
-		coursePoolModel = new DefaultListModel<>();
-		coursePoolJList = new JList(coursePoolModel); // data has type Object[]
-		this.add(coursePoolJList);
-		coursePoolJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		coursePoolJList.setLayoutOrientation(JList.VERTICAL);
-		coursePoolJList.setVisibleRowCount(-1);
+		this.coursePoolListModel = new DefaultListModel<>();
+		this.coursePoolJList = new JList<ICourse>(coursePoolListModel);
+		this.coursePoolJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		this.coursePoolJList.setLayoutOrientation(JList.VERTICAL);
+		this.coursePoolJList.setVisibleRowCount(-1);
 
-		JScrollPane poolScroller = new JScrollPane(coursePoolJList);
+		JScrollPane poolScroller = new JScrollPane(this.coursePoolJList);
 		poolScroller.setPreferredSize(new Dimension(206, 300));
-
 		poolScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		poolScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		poolScroller.setViewportBorder(new LineBorder(Color.BLACK));
-
 		poolScroller.setBounds(235, 30, 205, 300);
-		this.add(poolScroller);
+		this.add(coursePoolJList);
 
-		courseSelectedModel = new DefaultListModel<>();
-		courseSelectedJList = new JList(courseSelectedModel); // data has type
-		this.add(courseSelectedJList);
-		courseSelectedJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		courseSelectedJList.setLayoutOrientation(JList.VERTICAL);
-		courseSelectedJList.setVisibleRowCount(-1);
+		this.courseSelectedListModel = new DefaultListModel<>();
+		this.courseSelectedJList = new JList<ICourse>(this.courseSelectedListModel);
+		this.courseSelectedJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		this.courseSelectedJList.setLayoutOrientation(JList.VERTICAL);
+		this.courseSelectedJList.setVisibleRowCount(-1);
 
-		JScrollPane tookScroller = new JScrollPane(courseSelectedJList);
+		JScrollPane tookScroller = new JScrollPane(this.courseSelectedJList);
 		tookScroller.setPreferredSize(new Dimension(206, 300));
-
 		tookScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		tookScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		tookScroller.setViewportBorder(new LineBorder(Color.BLACK));
-
 		tookScroller.setBounds(470, 30, 205, 300);
-		this.add(tookScroller);
+		this.add(this.courseSelectedJList);
+
 		this.refresh = false;
 	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		this.refresh = true;
-		if (arg0.getSource() == addStudent) {
-			String newName = StudentDF.generateNewName();
-			// JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
-			try {
-				StudentDF s = StudentDF.createStudent(newName, store);
-				// StudentDF.addStudentToList(s);
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-			// pupilsJList.setSelectedIndex(index+1);
-			this.selectedStudent = (StudentDF) studentsJList.getSelectedValue();
-		} else if (arg0.getSource() == delStudent) {
-			if (this.selectedStudent == null || !StudentDF.getStudents().contains(this.selectedStudent)) {
-				studentsJList.setSelectedIndex(studentsJList.getSelectedIndex());
-				this.selectedStudent = (StudentDF) studentsJList.getSelectedValue();
-			}
-			StudentDF.getStudents().remove(this.selectedStudent);
-		}
-		if (arg0.getSource() == addCourse) {
-			CourseDF selectedCourse = (CourseDF) coursePoolJList.getSelectedValue();
-			if (selectedCourse != null) {
-				if (selectedStudent != null) {
-					try {
-						selectedCourse.addStudent(selectedStudent);
-						// School.addStudentToCourse(selectedStudent.getId(),
-						// selectedCourse.NURZUMSPEICHERN());
-						// Course.writeBack(selectedStudent);
-					} catch (Exception e) {
-						System.out.println(e.getMessage());
-					}
-				}
-			}
-		} else if (arg0.getSource() == remCourse) {
-			CourseDF selectedCourse = (CourseDF) courseSelectedJList.getSelectedValue();
-			if (selectedCourse != null) {
-				if (this.selectedStudent != null) {
-					// if (this.selectedStudent.getMyCourseId()
-					// ==selectedCourse.NURZUMSPEICHERN()) { //
-					// getCourseList().contains(selectedCourse))
-					if (this.selectedStudent.hasCourse(selectedCourse)) { // getCourseList().contains(selectedCourse))
-																			// {
-						try {
-							selectedCourse.removeStudent(selectedStudent);
-							// School.removeStudentFromCourse(selectedStudent.getId(),
-							// selectedCourse.NURZUMSPEICHERN());
-							// Course.writeBack(selectedStudent);
-						} catch (Exception e) {
-							System.out.println(e.getMessage());
-						}
-					}
-				}
-			}
-		}
-		this.refresh = false;
-		refresh();
-	}
-
-	public void refresh() {
-		int selIndex = studentsJList.getSelectedIndex();
-		this.refresh = true;
-		StudentDF student = null;
-		for (int index = this.studentModel.getSize(); index > 0; index--) {
-			try {
-				student = (StudentDF) this.studentModel.getElementAt(index - 1);
-			} catch (Exception e) {
-				JOptionPane.showMessageDialog(null, e.getMessage());
-			}
-
-			if (!CourseDF.getCourses().contains(student)) {
-				try {
-					this.studentModel.remove(index - 1);
-				} catch (Exception e) {
-					JOptionPane.showMessageDialog(null, e.getMessage());
-				}
-
-			}
-		}
-		for (StudentDF p : StudentDF.getStudents()) {
-			this.studentModel.addElement(p);
-		}
-		this.coursePoolModel.clear();
-		this.courseSelectedModel.clear();
-		if (this.selectedStudent != null) {
-			for (CourseDF c : CourseDF.getCourses()) {
-				// if (this.selectedStudent.getMyCourseId()
-				// !=c.NURZUMSPEICHERN()) {
-				if (this.selectedStudent.hasCourse(c)) {
-					courseSelectedModel.addElement(c);
-				} else {
-					coursePoolModel.addElement(c);
-				}
-			}
-		}
-		if (selIndex < 0) {
-			// do Nothing
-		} else if (selIndex < studentModel.getSize()) {
-			studentsJList.setSelectedIndex(selIndex);
-		} else {
-			studentsJList.setSelectedIndex(studentModel.getSize() - 1);
-		}
-		this.refresh = false;
-		this.selectedStudent = (StudentDF) studentsJList.getSelectedValue();
-	}
-
-	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		if (!this.refresh) {
-			if (e.getSource() == studentsJList) {
-				StudentDF selStudent = (StudentDF) studentsJList.getSelectedValue();
-				if (selStudent != null) {
-					this.selectedStudent = selStudent;
-					refresh();
-				}
-			}
-		}
-	}
 }

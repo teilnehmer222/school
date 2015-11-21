@@ -1,0 +1,16 @@
+package de.bbq.java.tasks.school;
+
+/**
+ * @author Thorsten2201
+ *
+ */
+public abstract class DaoSchoolJdbcAbstract extends DaoSchoolAbstract {
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Construct
+	protected DaoSchoolJdbcAbstract(EDaoSchool eDao) {
+		super(eDao);
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
+
+}

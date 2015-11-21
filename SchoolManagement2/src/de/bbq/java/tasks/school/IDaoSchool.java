@@ -1,8 +1,14 @@
 package de.bbq.java.tasks.school;
 
-import java.util.ArrayList;
+/**
+ * @author Thorsten2201
+ *
+ */
+public interface IDaoSchool {
+	boolean isSaved();
 
-public interface DaoSchoolInterface {
+	void setSaved(boolean saved);
+
 	boolean saveElement();
 
 	boolean loadElement();

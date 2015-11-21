@@ -2,42 +2,60 @@ package de.bbq.java.tasks.school;
 
 import java.util.ArrayList;
 
+/**
+ * @author Thorsten2201
+ *
+ */
 public abstract class DaoSchoolAbstract {
-	public abstract boolean saveElement(CourseDF course);
 
-	public abstract boolean saveElement(TeacherDF teacher);
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Class Properties
+	private EDaoSchool eDao = EDaoSchool.Abstract;
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	public abstract boolean saveElement(StudentDF student);
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Construct
+	protected DaoSchoolAbstract(EDaoSchool eDao) {
+		this.seteDao(eDao);
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	public abstract boolean loadElement(CourseDF course);
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Getter / Setter
+	public EDaoSchool getDaoType() {
+		return eDao;
+	}
 
-	public abstract boolean loadElement(TeacherDF teacher);
+	private void seteDao(EDaoSchool eDao) {
+		this.eDao = eDao;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	public abstract boolean loadElement(StudentDF student);
+	/////////////////////////////////////////////////////////////////////////////////////
+	// IDaoSchool
+	public abstract boolean saveElement(SchoolItemAbstract schoolItemAbstract);
 
-	public abstract boolean deleteElement(CourseDF course);
+	public abstract boolean loadElement(SchoolItemAbstract schoolItemAbstract);
 
-	public abstract boolean deleteElement(TeacherDF teacher);
+	public abstract boolean deleteElement(SchoolItemAbstract schoolItemAbstract);
 
-	public abstract boolean deleteElement(StudentDF student);
-
-	public static boolean saveAll() {
-		for (CourseDF c : CourseDF.getCourses()) {
+	public boolean saveAll() {
+		for (ICourse c : CourseDF.getCourses()) {
 			c.saveElement();
 			if (c.hasTeacher()) {
 				c.getTeacher().saveElement();
 			}
-			for (StudentDF s : c.getStudents()) {
+			for (IStudent s : SchoolLauncher.getStudentList()) {
 				s.saveElement();
 			}
 
 		}
-		for (TeacherDF t : TeacherDF.getTeachers()) {
-			if (!t.isSaved()) {
+		for (ITeacher t : SchoolLauncher.getTeacherList()) {
+			if (!(t.isSaved())) {
 				t.saveElement();
 			}
 		}
-		for (StudentDF s : StudentDF.getStudents()) {
+		for (IStudent s : SchoolLauncher.getStudentList()) {
 			if (!s.isSaved()) {
 				s.saveElement();
 			}
@@ -45,11 +63,13 @@ public abstract class DaoSchoolAbstract {
 		return true;
 	}
 
-	public static boolean loadAll() {
+	public boolean loadAll() {
 		ArrayList<CourseDF> MOCK = new ArrayList<>();
 		for (Object element : MOCK) {
 			((CourseDF) element).loadElement();
 		}
 		return false;
 	}
+	/////////////////////////////////////////////////////////////////////////////////////
+
 }

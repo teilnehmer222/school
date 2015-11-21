@@ -1,13 +1,17 @@
 package de.bbq.java.tasks.school;
 
-public interface IStudent {
+/**
+ * @author Thorsten2201
+ *
+ */
+public interface IStudent extends IDaoSchool {
 	String toString();
 
-	CourseDF getCourse();
+	ICourse getCourse();
 
-	void setCourse(CourseDF course);
+	void setCourse(ICourse course);
 
 	boolean hasCourse();
 
-	boolean hasCourse(CourseDF course);
+	boolean hasCourse(ICourse course);
 }
