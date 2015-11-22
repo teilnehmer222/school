@@ -14,13 +14,15 @@ import java.awt.GridLayout;
 //import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 
 /**
  * @author Thorsten2201
  *
  */
-public class SchoolLauncher extends JFrame {
+public class SchoolLauncher extends JFrame implements WindowListener {
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Class Properties
@@ -29,11 +31,12 @@ public class SchoolLauncher extends JFrame {
 	private static final int winHight = 430;
 	private static final int workStart = 7;
 	private static final int workEnd = 17;
+	private static ArrayList<FrameEdit> editFrames = new ArrayList<>();
 
 	private PanelCourse panel1;
 	private PanelTeacher panel2;
 	private PanelStudent panel3;
-
+	private static SchoolLauncher launcher;
 	private static EDaoSchool selectedDao = EDaoSchool.File;
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -45,12 +48,16 @@ public class SchoolLauncher extends JFrame {
 	// Construct
 	public static void main(String[] args) {
 		// frame.add(keyboardExample);
-		SchoolLauncher launcher = new SchoolLauncher();
+		launcher = new SchoolLauncher();
 		launcher.setVisible(true);
 	}
 
+	public static SchoolLauncher getInstance() {
+		return launcher;
+	}
+
 	private SchoolLauncher() {
-		//Image icon = Toolkit.getDefaultToolkit().getImage("form.gif");
+		// Image icon = Toolkit.getDefaultToolkit().getImage("form.gif");
 		setTitle("Schulverwaltung");
 		setSize(winLength, winHight);
 		setLocationRelativeTo(null);
@@ -170,6 +177,85 @@ public class SchoolLauncher extends JFrame {
 	public static IStudent getNewStudent(boolean random, EDaoSchool store) {
 		return Student.createStudent(random, store);
 	}
+
+	public void EditItem(SchoolItemAbstract editItem) {
+		FrameEdit edit = null;
+		boolean found = false;
+		if (editItem.isInEdit()) {
+			for (FrameEdit edited : editFrames) {
+				if (edited.hastItem(editItem)) {
+					edited.setVisible(true);
+					edited.toFront();
+					edited.repaint();
+					found = true;
+					System.out.println("reactivate");
+				}
+			}
+		}
+		if (!found) {
+			if (editItem.getClass() == Teacher.class) {
+				edit = new FrameEdit((ITeacher) editItem);
+			} else if (editItem.getClass() == Student.class) {
+				edit = new FrameEdit((IStudent) editItem);
+			} else if (editItem.getClass() == Course.class) {
+				edit = new FrameEdit((ICourse) editItem);
+			}
+		}
+		if (edit != null) {
+			editItem.setInEdit(true);
+
+			edit.addWindowListener(SchoolLauncher.getInstance());
+			System.out.println("opened");
+			editFrames.add(edit);
+		}
+	}
+
+	@Override
+	public void windowActivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosed(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosing(WindowEvent arg0) {
+		FrameEdit edit = (FrameEdit) arg0.getSource();
+		if (editFrames.contains(edit)) {
+			System.out.println("destory:" + edit.toString());
+			editFrames.remove(edit);
+			edit = null;
+		}
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowIconified(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowOpened(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////
 
 }

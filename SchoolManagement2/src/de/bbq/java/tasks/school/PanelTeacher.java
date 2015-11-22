@@ -255,7 +255,7 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 					index = list.locationToIndex(evt.getPoint());
 				}
 				if (index >= 0) {
-					new FrameEdit(teacherListModel.get(index));
+					SchoolLauncher.getInstance().EditItem((SchoolItemAbstract) teacherListModel.get(index));
 				}
 			}
 		});

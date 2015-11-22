@@ -206,7 +206,7 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 					index = list.locationToIndex(evt.getPoint());
 				}
 				if (index >= 0) {
-					new FrameEdit(courseListModel.get(index));
+					SchoolLauncher.getInstance().EditItem((SchoolItemAbstract) courseListModel.get(index));
 				}
 			}
 		});

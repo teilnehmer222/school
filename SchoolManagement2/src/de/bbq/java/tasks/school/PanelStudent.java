@@ -248,7 +248,7 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 					index = list.locationToIndex(evt.getPoint());
 				}
 				if (index >= 0) {
-					new FrameEdit(studentListModel.get(index));
+					SchoolLauncher.getInstance().EditItem((SchoolItemAbstract) studentListModel.get(index));
 				}
 			}
 		});
