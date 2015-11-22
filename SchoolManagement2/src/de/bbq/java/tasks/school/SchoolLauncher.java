@@ -1,6 +1,7 @@
 package de.bbq.java.tasks.school;
 
 import javax.swing.JTabbedPane;
+import javax.swing.border.EmptyBorder;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -9,6 +10,8 @@ import javax.swing.event.ChangeListener;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+//import java.awt.Image;
+//import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -47,7 +50,8 @@ public class SchoolLauncher extends JFrame {
 	}
 
 	private SchoolLauncher() {
-		setTitle("School Management");
+		//Image icon = Toolkit.getDefaultToolkit().getImage("form.gif");
+		setTitle("Schulverwaltung");
 		setSize(winLength, winHight);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,18 +63,21 @@ public class SchoolLauncher extends JFrame {
 		this.setLayout(new GridLayout(1, 1));
 
 		JTabbedPane tabbedPane = new JTabbedPane();
-		ImageIcon icon = createImageIcon("middle.gif");
+		tabbedPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		ImageIcon icon = createImageIcon("course.png");
 
 		panel1 = new PanelCourse();
-		tabbedPane.addTab("Kurse", icon, panel1, "Kurse");
+		tabbedPane.addTab("Kurse", icon, panel1, "Kurse verwalten");
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
+		icon = createImageIcon("teacher.png");
 		panel2 = new PanelTeacher();
-		tabbedPane.addTab("Leerer", icon, panel2, "Leerer");
+		tabbedPane.addTab("Leerer", icon, panel2, "Leerer den Kursen zuweisen");
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
+		icon = createImageIcon("student.png");
 		panel3 = new PanelStudent();
-		tabbedPane.addTab("Schüler", icon, panel3, "Schüler");
+		tabbedPane.addTab("Schüler", icon, panel3, "Schüler den Kursen zuweisen");
 		panel3.setPreferredSize(new Dimension(410, 50));
 		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
 
@@ -95,6 +102,7 @@ public class SchoolLauncher extends JFrame {
 		});
 		add(tabbedPane);
 		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+		panel1.refresh();
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -106,7 +114,7 @@ public class SchoolLauncher extends JFrame {
 		if (imgURL != null) {
 			return new ImageIcon(imgURL);
 		} else {
-			System.err.println("Couldn't find file: " + path);
+			System.err.println("Datei nicht gefunden: " + path);
 			return null;
 		}
 	}

@@ -18,15 +18,16 @@ public abstract class SchoolItemAbstract implements Serializable {
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
-	public SchoolItemAbstract(EDaoSchool eDataAccess) throws Exception{
+	public SchoolItemAbstract(EDaoSchool eDataAccess) throws Exception {
 		id = SchoolItemAbstract.highestMemberId++;
 		DaoSchoolAbstract accessObject = null;
 		try {
-			accessObject = DaoSchoolAbstract.getDaoSchool(eDataAccess);			
+			accessObject = DaoSchoolAbstract.getDaoSchool(eDataAccess);
 		} catch (Exception e) {
 			throw e;
 		}
-		if (accessObject == null) throw new Exception("Datenzugriffs-Objekt \"" + eDataAccess.name() + "\2 nicht gefunden.");
+		if (accessObject == null)
+			throw new Exception("Datenzugriffs-Objekt \"" + eDataAccess.name() + "\2 nicht gefunden.");
 
 		if (dataAccessObject != null && accessObject != null) {
 			if (!dataAccessObject.getClass().equals(accessObject.getClass())) {

@@ -88,7 +88,7 @@ public class FrameEdit extends JFrame implements ActionListener {
 			cal.set(Calendar.MILLISECOND, 0);
 		} catch (Exception e2) {
 			per.setBirthDate(null);
-		}		
+		}
 		per.setBirthDate(cal.getTime());
 	}
 
@@ -97,9 +97,9 @@ public class FrameEdit extends JFrame implements ActionListener {
 			add.setStreetName(this.streetTextField.getText());
 			add.setCity(this.cityTextField.getText());
 			try {
-				add.setZipCode(Integer.parseInt(this.zipTextField.getText()));			
+				add.setZipCode(Integer.parseInt(this.zipTextField.getText()));
 			} catch (Exception e) {
-				//TODO
+				// TODO
 				System.out.println(e.getStackTrace());
 			}
 			add.setCountry(this.countryTextField.getText());
@@ -134,7 +134,7 @@ public class FrameEdit extends JFrame implements ActionListener {
 			cal.set(Calendar.MILLISECOND, 0);
 		} catch (Exception e2) {
 			cal.setTime(new Date());
-			cal.set(Calendar.HOUR_OF_DAY,  0);
+			cal.set(Calendar.HOUR_OF_DAY, 0);
 			cal.set(Calendar.MINUTE, 0);
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
@@ -145,7 +145,7 @@ public class FrameEdit extends JFrame implements ActionListener {
 		courseDF.setNeedsBeamer(this.beamerCheckBox.isSelected());
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
 	void Construct() {

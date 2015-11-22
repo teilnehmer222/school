@@ -27,10 +27,10 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 	private static ArrayList<ITeacher> allTeachers = new ArrayList<>();
 
 	private static String generateNewName() {
-		String[] array = new String[] { "LeeGeistig Abwesender", "Musikleerer", "Deuschleerer", "Verleerer", "Entlährer",
+		String[] array = new String[] { "Geistig Abwesender", "Musikleerer", "Deuschleerer", "Verleerer", "Entlährer",
 				"Laubbläser", "Labersack", "Zutexter", "Volllaberer", "Berieseler", "Hintergrundrauschen",
-				"Verstörendes Geräusch", "Arschkopf", "Dildogesicht", "Zwerg Nase", "Halodri",
-				"Birkenstockdepp", "Fotzenkopf","Hirschgesicht" };
+				"Verstörendes Geräusch", "Arschkopf", "Dildogesicht", "Zwerg Nase", "Halodri", "Birkenstockdepp",
+				"Fotzenkopf", "Hirschgesicht", "Althippy" };
 		int randomNum = 0 + (int) (Math.random() * array.length);
 		return array[randomNum];
 	}

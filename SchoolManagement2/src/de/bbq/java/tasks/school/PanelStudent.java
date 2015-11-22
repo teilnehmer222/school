@@ -1,7 +1,9 @@
 package de.bbq.java.tasks.school;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -14,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -217,7 +220,14 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
 	public PanelStudent() {
-		this.setLayout(null); // new GridLayout(1, 1));
+		// this.setLayout(null); // new GridLayout(1, 1));
+		this.setLayout(new BorderLayout(5, 5));
+		JPanel panelCreate = new JPanel(new GridLayout(1, 2, 5, 5));
+		setBorder(new EmptyBorder(5, 5, 5, 5));
+		JPanel panelTop = new JPanel(new GridLayout(1, 3, 10, 5));
+		JPanel panelBottom = new JPanel(new GridLayout(1, 3, 10, 10));
+		panelTop.add(panelCreate);
+		this.add(panelTop, BorderLayout.NORTH);
 
 		this.studentListModel = new DefaultListModel<>();
 		this.studentsJList = new JList<IStudent>(this.studentListModel);
@@ -250,24 +260,27 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 		pupScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		pupScroller.setViewportBorder(new LineBorder(Color.BLACK));
 		pupScroller.setBounds(5, 30, 205, 300);
-		this.add(pupScroller);
+		// this.add(pupScroller);
+		panelBottom.add(pupScroller);
 
 		this.addStudentButton = SchoolLauncher.getButton("newPupil", 5, 5, 100, 20, this, "Hinzufügen",
 				"Neuer Schüler");
-		this.add(this.addStudentButton);
-
-		// listScroller.getViewport().add(addCourse, null);
 		this.deleteStudentButton = SchoolLauncher.getButton("delPupil", 110, 5, 100, 20, this, "Löschen",
 				"Schüler löschen");
-		this.add(this.deleteStudentButton);
+		// this.add(this.deleteStudentButton);
+		// this.add(this.addStudentButton);
+		panelCreate.add(this.addStudentButton);
+		panelCreate.add(this.deleteStudentButton);
 
 		this.addCourseButton = SchoolLauncher.getButton("addCourse", 235, 5, 205, 20, this, "Hinzufügen ->",
 				"Kurs Hinzufügen");
-		this.add(this.addCourseButton);
+		// this.add(this.addCourseButton);
+		panelTop.add(this.addCourseButton);
 
 		this.removeCourseButton = SchoolLauncher.getButton("remCourse", 470, 5, 205, 20, this, "<- Entfernen",
 				"Kurs Entfernen");
-		this.add(this.removeCourseButton);
+		// this.add(this.removeCourseButton);
+		panelTop.add(this.removeCourseButton);
 
 		this.coursePoolListModel = new DefaultListModel<>();
 		this.coursePoolJList = new JList<ICourse>(coursePoolListModel);
@@ -281,7 +294,7 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 		poolScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		poolScroller.setViewportBorder(new LineBorder(Color.BLACK));
 		poolScroller.setBounds(235, 30, 205, 300);
-		this.add(poolScroller);
+		// this.add(poolScroller);
 
 		this.courseSelectedListModel = new DefaultListModel<>();
 		this.courseSelectedJList = new JList<ICourse>(this.courseSelectedListModel);
@@ -295,8 +308,10 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 		tookScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		tookScroller.setViewportBorder(new LineBorder(Color.BLACK));
 		tookScroller.setBounds(470, 30, 205, 300);
-		this.add(tookScroller);
-
+		// this.add(tookScroller);
+		panelBottom.add(poolScroller);
+		panelBottom.add(tookScroller);
+		this.add(panelBottom, BorderLayout.CENTER);
 		this.refresh = false;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////

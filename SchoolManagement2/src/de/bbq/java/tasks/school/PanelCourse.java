@@ -1,7 +1,8 @@
 package de.bbq.java.tasks.school;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -10,12 +11,14 @@ import java.awt.event.MouseEvent;
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -167,9 +170,23 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
 	public PanelCourse() {
-		//this.daoSchoolAbstract = daoSchoolAbstract;
-		this.setLayout(null); // new GridLayout(1, 1));
+		// this.daoSchoolAbstract = daoSchoolAbstract;
+		// this.setLayout(null); // new GridLayout(1, 1));
+		this.setLayout(new BorderLayout(5, 5));
+		JPanel panelCreate = new JPanel(new GridLayout(1, 2, 5, 5));
+		JPanel panelTeacher = new JPanel(new GridLayout(1, 1, 5, 5));
+		JPanel panelLoadSave = new JPanel(new GridLayout(1, 2, 5, 5));
+		setBorder(new EmptyBorder(5, 5, 5, 5));
 
+		JLabel previewJList = new JLabel("");
+
+		JPanel panelTop = new JPanel(new GridLayout(1, 3, 10, 5));
+		panelTop.add(panelCreate);
+		panelTop.add(panelTeacher);
+		panelTop.add(panelLoadSave);
+		this.add(panelTop, BorderLayout.NORTH);
+
+		JPanel panelBottom = new JPanel(new GridLayout(1, 3, 10, 10));
 		this.courseListModel = new DefaultListModel<ICourse>();
 		this.coursesJList = new JList<ICourse>(this.courseListModel);
 		this.coursesJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
@@ -196,33 +213,33 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 
 		this.coursesJList.setCellRenderer(new SchoolListCellRenderer());
 		JScrollPane coursScroller = new JScrollPane(this.coursesJList);
-		coursScroller.setPreferredSize(new Dimension(206, 300));
-		coursScroller.setBounds(5, 30, 205, 300);
+		// coursScroller.setPreferredSize(new Dimension(206, 300));
+		coursScroller.setBounds(5, 30, 265, 300);
 		coursScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		coursScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		coursScroller.setViewportBorder(new LineBorder(Color.BLACK));
-		this.add(coursScroller);
+		// this.add(coursScroller);
+		panelBottom.add(coursScroller);
+		this.addCourseButton = SchoolLauncher.getButton("newCourse", 5, 5, 130, 20, this, "Neuer Kurs", "Neuer Kurs");
 
-		this.addCourseButton = SchoolLauncher.getButton("newCourse", 5, 5, 100, 20, this, "Neuer Kurs", "Neuer Kurs");
-		this.add(this.addCourseButton);
-
-		this.deleteCourseButton = SchoolLauncher.getButton("delCourse", 110, 5, 100, 20, this, "Löschen",
+		this.deleteCourseButton = SchoolLauncher.getButton("delCourse", 110, 5, 130, 20, this, "Löschen",
 				"Kurs löschen");
-		this.add(this.deleteCourseButton);
+		panelCreate.add(this.addCourseButton);
+		panelCreate.add(this.deleteCourseButton);
 
 		this.saveAllButton = SchoolLauncher.getButton("saveAll", 450, 5, 130, 20, this, "Alles speichern",
 				"Kurse, Leerer und Schüler speichern");
-		this.add(this.saveAllButton);
-
-		this.loadAllButton = SchoolLauncher.getButton("loadAll", 590, 5, 120, 20, this, "Alles laden",
+		this.loadAllButton = SchoolLauncher.getButton("loadAll", 590, 5, 130, 20, this, "Alles laden",
 				"Kurse, Leerer und Schüler laden");
-		this.add(this.loadAllButton);
+		panelLoadSave.add(this.saveAllButton);
+		panelLoadSave.add(this.loadAllButton);
 
 		this.teacherTextField = new JTextField();
-		this.teacherTextField.setBounds(235, 5, 205, 20);
+		this.teacherTextField.setBounds(235, 5, 265, 20);
 		this.teacherTextField.setText("");
 		this.teacherTextField.setEditable(false);
-		this.add(this.teacherTextField);
+		panelTeacher.add(this.teacherTextField);
+		// this.add(panelTop);
 
 		this.studentListModel = new DefaultListModel<IStudent>();
 		this.studentsJList = new JList<IStudent>(this.studentListModel);
@@ -232,13 +249,16 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		this.studentsJList.addListSelectionListener(this);
 
 		JScrollPane pupScroller = new JScrollPane(this.studentsJList);
-		pupScroller.setPreferredSize(new Dimension(206, 300));
+		// pupScroller.setPreferredSize(new Dimension(206, 300));
 		pupScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		pupScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		pupScroller.setViewportBorder(new LineBorder(Color.BLACK));
-		pupScroller.setBounds(235, 30, 205, 300);
-		this.add(pupScroller);
-
+		pupScroller.setBounds(235, 30, 265, 300);
+		// this.add(pupScroller);
+		panelBottom.add(pupScroller);
+		// this.add(previewJList);
+		panelBottom.add(previewJList);
+		this.add(panelBottom, BorderLayout.CENTER);
 		this.refresh = false;
 	}
 
