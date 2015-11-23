@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Hashtable;
 
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
@@ -16,10 +17,13 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -27,7 +31,7 @@ import javax.swing.event.ListSelectionListener;
  * @author Thorsten2201
  *
  */
-public class PanelCourse extends JPanel implements ActionListener, ListSelectionListener {
+public class PanelCourse extends JPanel implements ActionListener, ListSelectionListener, ChangeListener {
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Static
 	private static final long serialVersionUID = -7720278844639602571L;
@@ -44,7 +48,7 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 	private JList<ICourse> coursesJList;
 	private JList<IStudent> studentsJList;
 	private JTextField teacherTextField;
-
+	private JSlider dataBase;
 	private DefaultListModel<ICourse> courseListModel;
 	private DefaultListModel<IStudent> studentListModel;
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -115,8 +119,25 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		}
 		this.studentListModel.clear();
 		if (selectedCourse != null) {
-			for (IStudent student : selectedCourse.getStudents()) {
-				this.studentListModel.addElement(student);
+			if (selectedCourse.hasStudents()) {
+				for (IStudent student : selectedCourse.getStudents()) {
+					this.studentListModel.addElement(student);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent arg0) {
+		if (arg0.getSource() == dataBase) {
+			if (dataBase.getValue() == 0) {
+				if (!SchoolLauncher.getSelectedDao().equals(EDaoSchool.FILE)) {
+					SchoolLauncher.setSelectedDao(EDaoSchool.FILE);
+				}
+			} else if (dataBase.getValue() == 1) {
+				if (!SchoolLauncher.getSelectedDao().equals(EDaoSchool.JDBC_MYSQL)) {
+					SchoolLauncher.setSelectedDao(EDaoSchool.JDBC_MYSQL);
+				}
 			}
 		}
 	}
@@ -129,7 +150,7 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		this.refresh = true;
 		int index = this.coursesJList.getSelectedIndex();
 		if (arg0.getSource() == addCourseButton) {
-			SchoolLauncher.getNewCourse(true, SchoolLauncher.getSelectedDao());
+			SchoolLauncher.getNewCourse(true);
 			index = this.coursesJList.getModel().getSize();
 		} else if (arg0.getSource() == deleteCourseButton) {
 			ICourse selected = this.coursesJList.getSelectedValue();
@@ -149,13 +170,7 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 			}
 
 		} else if (arg0.getSource() == loadAllButton) {
-			if (!SchoolLauncher.getCourseList().isEmpty()) {
-				SchoolLauncher.getCourseList().get(0).loadAll();
-			} else if (!SchoolLauncher.getTeacherList().isEmpty()) {
-				SchoolLauncher.getTeacherList().get(0).loadAll();
-			} else if (!SchoolLauncher.getStudentList().isEmpty()) {
-				SchoolLauncher.getStudentList().get(0).loadAll();
-			}
+			SchoolLauncher.loadAll();
 		}
 		this.refresh = false;
 		refresh();
@@ -178,7 +193,7 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		JPanel panelLoadSave = new JPanel(new GridLayout(1, 2, 5, 5));
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 
-		JLabel previewJList = new JLabel("");
+		// JLabel spacer = new JLabel("");
 
 		JPanel panelTop = new JPanel(new GridLayout(1, 3, 10, 5));
 		panelTop.add(panelCreate);
@@ -210,7 +225,6 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 				}
 			}
 		});
-
 		this.coursesJList.setCellRenderer(new SchoolListCellRenderer());
 		JScrollPane coursScroller = new JScrollPane(this.coursesJList);
 		// coursScroller.setPreferredSize(new Dimension(206, 300));
@@ -220,6 +234,28 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		coursScroller.setViewportBorder(new LineBorder(Color.BLACK));
 		// this.add(coursScroller);
 		panelBottom.add(coursScroller);
+
+		this.dataBase = new JSlider();
+		this.dataBase.setMinimum(0);
+		this.dataBase.setMaximum(1);
+		this.dataBase.setMajorTickSpacing(1);
+		this.dataBase.setMinorTickSpacing(1);
+		this.dataBase.createStandardLabels(1);
+		this.dataBase.setPaintTicks(true);
+		this.dataBase.setPaintLabels(true);
+		this.dataBase.setValue(0);
+		Hashtable<Integer, JLabel> ht = new Hashtable<Integer, JLabel>();
+
+		JLabel label = new JLabel("Filesystem");
+		ht.put(0, label);
+		label = new JLabel("Jdbc MySql");
+		ht.put(1, label);
+		this.dataBase.setLabelTable(ht);
+		this.dataBase.setPaintLabels(true);
+		// this.dataBase.setInverted(true);
+		this.dataBase.addChangeListener(this);
+		this.dataBase.setBounds(5, 30, 130, 20);
+
 		this.addCourseButton = SchoolLauncher.getButton("newCourse", 5, 5, 130, 20, this, "Neuer Kurs", "Neuer Kurs");
 
 		this.deleteCourseButton = SchoolLauncher.getButton("delCourse", 110, 5, 130, 20, this, "Löschen",
@@ -256,8 +292,10 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		pupScroller.setBounds(235, 30, 265, 300);
 		// this.add(pupScroller);
 		panelBottom.add(pupScroller);
-		// this.add(previewJList);
-		panelBottom.add(previewJList);
+
+		// panelBottom.add(previewJList);
+		panelBottom.add(this.dataBase);
+
 		this.add(panelBottom, BorderLayout.CENTER);
 		this.refresh = false;
 	}
@@ -270,6 +308,7 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 			super.setSelectionInterval(-1, -1);
 		}
 	}
+
 	/////////////////////////////////////////////////////////////////////////////////////
 
 }

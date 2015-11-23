@@ -150,7 +150,7 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 		int indexPool = this.coursePoolJList.getSelectedIndex();
 		int indexSel = this.courseSelectedJList.getSelectedIndex();
 		if (arg0.getSource() == this.addTeacherButton) {
-			SchoolLauncher.getNewTeacher(true, SchoolLauncher.getSelectedDao());
+			SchoolLauncher.getNewTeacher(true);
 			index = this.teachersJList.getModel().getSize();
 		} else if (arg0.getSource() == this.deleteTeacherButton) {
 			if (!SchoolLauncher.getTeacherList().contains(this.selectedTeacher)) {

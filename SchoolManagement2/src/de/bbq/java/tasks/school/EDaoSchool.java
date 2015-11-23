@@ -5,7 +5,7 @@ package de.bbq.java.tasks.school;
  *
  */
 public enum EDaoSchool {
-	Abstract(0), File(1), Jdbc(2), JdbcMySql(3);
+	ABSTACT(0), FILE(1), JDBC(2), JDBC_MYSQL(3);
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Class Properties

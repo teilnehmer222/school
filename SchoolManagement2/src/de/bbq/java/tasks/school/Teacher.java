@@ -25,7 +25,10 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 	// Static
 	private static final long serialVersionUID = -3548796163205043453L;
 	private static ArrayList<ITeacher> allTeachers = new ArrayList<>();
-
+	public static boolean load(Teacher teacher) {
+		allTeachers.add(teacher);
+		return true;
+	} 
 	private static String generateNewName() {
 		String[] array = new String[] { "Geistig Abwesender", "Musikleerer", "Deuschleerer", "Verleerer", "Entlährer",
 				"Laubbläser", "Labersack", "Zutexter", "Volllaberer", "Berieseler", "Hintergrundrauschen",
@@ -107,6 +110,7 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 		boolean ret = super.deleteElement();
 		if (ret) {
 			Teacher.allTeachers.remove(this);
+			Course.teacherDeleted(this);
 		}
 		return ret;
 	}

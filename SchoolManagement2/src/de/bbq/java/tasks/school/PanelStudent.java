@@ -146,7 +146,7 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 		int indexPool = this.coursePoolJList.getSelectedIndex();
 		int indexSel = this.courseSelectedJList.getSelectedIndex();
 		if (arg0.getSource() == this.addStudentButton) {
-			SchoolLauncher.getNewStudent(true, SchoolLauncher.getSelectedDao());
+			SchoolLauncher.getNewStudent(true);
 			index = this.studentsJList.getModel().getSize();
 		} else if (arg0.getSource() == deleteStudentButton) {
 			if (this.selectedStudent == null || !SchoolLauncher.getStudentList().contains(this.selectedStudent)) {

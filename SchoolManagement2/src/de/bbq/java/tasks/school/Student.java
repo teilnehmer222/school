@@ -25,7 +25,10 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 	// Static
 	private static final long serialVersionUID = -8838146635169751075L;
 	private static ArrayList<IStudent> allStudents = new ArrayList<>();
-
+	public static boolean load(Student student) {
+		allStudents.add(student);
+		return true;
+	} 
 	private static String generateNewName() {
 		String[] array = new String[] { "Depp", "Trottel", "Idiot", "Armleuchter", "Hirni", "Totalversager",
 				"Baumschulabbrecher", "Volldepp", "Volltrottel", "Extremdepp", "Superidiot", "Dummbeutel",
@@ -105,6 +108,7 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 		boolean ret = super.deleteElement();
 		if (ret) {
 			Student.allStudents.remove(this);
+			Course.studentDeleted(this);
 		}
 		return ret;
 	}

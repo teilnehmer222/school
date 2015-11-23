@@ -428,7 +428,7 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		this.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
 
 		this.winWidth = 343;
-		this.winHight = 268;
+		this.winHight = 269;
 
 		Construct();
 

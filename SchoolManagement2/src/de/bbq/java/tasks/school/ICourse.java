@@ -7,6 +7,8 @@ import java.util.ArrayList;
  *
  */
 public interface ICourse extends IDaoSchool {
+	boolean hasStudents();
+
 	String toString();
 
 	ITeacher getTeacher();

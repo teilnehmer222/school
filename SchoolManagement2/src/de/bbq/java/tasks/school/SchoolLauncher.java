@@ -37,11 +37,15 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 	private PanelTeacher panel2;
 	private PanelStudent panel3;
 	private static SchoolLauncher launcher;
-	private static EDaoSchool selectedDao = EDaoSchool.File;
+	private static EDaoSchool selectedDao = EDaoSchool.FILE;
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	public static EDaoSchool getSelectedDao() {
 		return selectedDao;
+	}
+
+	public static void setSelectedDao(EDaoSchool selectedDao) {
+		SchoolLauncher.selectedDao = selectedDao;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -164,18 +168,16 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 		return Student.getStudents();
 	}
 
-	public static ICourse getNewCourse(boolean random, EDaoSchool store) {
-		if (SchoolLauncher.getCourseList().size() > 1)
-			store = EDaoSchool.JdbcMySql;
-		return Course.createCourse(true, store);
+	public static ICourse getNewCourse(boolean random) {
+		return Course.createCourse(true, selectedDao);
 	}
 
-	public static ITeacher getNewTeacher(boolean random, EDaoSchool store) {
-		return Teacher.createTeacher(random, store);
+	public static ITeacher getNewTeacher(boolean random) {
+		return Teacher.createTeacher(random, selectedDao);
 	}
 
-	public static IStudent getNewStudent(boolean random, EDaoSchool store) {
-		return Student.createStudent(random, store);
+	public static IStudent getNewStudent(boolean random) {
+		return Student.createStudent(random, selectedDao);
 	}
 
 	public void EditItem(SchoolItemAbstract editItem) {
@@ -254,6 +256,18 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 	public void windowOpened(WindowEvent arg0) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@SuppressWarnings("incomplete-switch")
+	public static void loadAll() {
+		switch (selectedDao) {
+		case FILE: 
+			//Dirty
+			DaoSchoolFile.getDaoSchool(selectedDao).loadAll();
+			break;
+		case JDBC_MYSQL:
+			break;
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////

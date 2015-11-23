@@ -11,7 +11,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
 	public DaoSchoolJdbcMysql() {
-		super(EDaoSchool.JdbcMySql);
+		super(EDaoSchool.JDBC_MYSQL);
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -85,6 +85,12 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 		}
 		return true;
 	}
+
+	@Override
+	public boolean loadAll() {
+		return false;
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////
 
 }

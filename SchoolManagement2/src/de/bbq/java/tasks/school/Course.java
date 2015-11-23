@@ -61,7 +61,11 @@ public class Course extends SchoolItemAbstract implements ICourse {
 		}
 		return course;
 	};
-
+	public static boolean load(Course course) {
+		allCourses.add(course);
+		return true;
+	} 
+	
 	public static ICourse createCourse(boolean random, EDaoSchool store) {
 		String newName = Course.generateNewName();
 		Course newCourse = null;
@@ -125,6 +129,14 @@ public class Course extends SchoolItemAbstract implements ICourse {
 			this.students.remove(student);
 		}
 		student.setCourse(null);
+	}
+
+	@Override
+	public boolean hasStudents() {
+		if (this.students == null) {
+			this.students = new ArrayList<>();
+		}
+		return (this.students.size() > 0);
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -226,5 +238,31 @@ public class Course extends SchoolItemAbstract implements ICourse {
 		return super.loadAll();
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
+
+	public static void studentDeleted(IStudent student) {
+		for (ICourse c : allCourses) {
+			if (c.hasStudents()) {
+				//Exception in thread "AWT-EventQueue-0" java.util.ConcurrentModificationException
+				for (int index = 0;index < c.getStudents().size();index++) {
+					IStudent s = c.getStudents().get(index);
+					if (s != null) {
+						if (s.equals(student)) {
+							c.removeStudent(s);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public static void teacherDeleted(ITeacher teacher) {
+		for (ICourse c : allCourses) {
+			if (c.getTeacher() != null) {
+				if (c.getTeacher().equals(teacher)) {
+					c.removeTeacher();
+				}
+			}
+		}
+	}
 
 }

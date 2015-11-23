@@ -12,6 +12,7 @@ public abstract class SchoolItemAbstract implements Serializable {
 	// Class Properties
 	protected transient long id;
 	private transient boolean isInEdit;
+	private transient boolean isLastObject;
 	private transient boolean saved;
 	protected static DaoSchoolAbstract dataAccessObject;
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -89,6 +90,14 @@ public abstract class SchoolItemAbstract implements Serializable {
 	protected boolean loadAll() {
 		return dataAccessObject.loadAll();
 	}
+	protected boolean isLast() {
+		return this.isLastObject;
+	}
+	public void setLast(boolean isLast) {
+		this.isLastObject = isLast;
+	}
 	/////////////////////////////////////////////////////////////////////////////////////
+
+
 
 }
