@@ -28,12 +28,15 @@ public abstract class DaoSchoolAbstract {
 		this.eDao = eDao;
 	}
 
+	private static DaoSchoolFile daoFile = new DaoSchoolFile();
+	private static DaoSchoolJdbcMysql daoJdbcMysql = new DaoSchoolJdbcMysql();
+
 	public static DaoSchoolAbstract getDaoSchool(EDaoSchool eDao) {
 		switch (eDao) {
 		case FILE:
-			return new DaoSchoolFile();
+			return daoFile;
 		case JDBC_MYSQL:
-			return new DaoSchoolJdbcMysql();
+			return daoJdbcMysql;
 		default:
 			return null;
 		}
@@ -94,20 +97,22 @@ public abstract class DaoSchoolAbstract {
 	}
 
 	public boolean saveAll() {
+		boolean ret = false;
 		for (int index = 0; index < Course.getCourses().size(); index++) {
 			ICourse c = Course.getCourses().get(index);
 			if (!unsavedTeacher((SchoolItemAbstract) c) && !unsavedCourse((SchoolItemAbstract) c)
 					&& !unsavedStudent((SchoolItemAbstract) c)) {
 				((SchoolItemAbstract) c).setLast(true);
 			}
-			c.saveElement();
+			ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao()).saveElement((SchoolItemAbstract) c);
 			if (c.hasTeacher()) {
 				if (!unsavedTeacher((SchoolItemAbstract) c.getTeacher())
 						&& !unsavedCourse((SchoolItemAbstract) c.getTeacher())
 						&& !unsavedStudent((SchoolItemAbstract) c.getTeacher())) {
 					((SchoolItemAbstract) c.getTeacher()).setLast(true);
 				}
-				c.getTeacher().saveElement();
+				ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao())
+						.saveElement((SchoolItemAbstract) c.getTeacher());
 			}
 			if (c.hasStudents()) {
 				for (IStudent s : c.getStudents()) {
@@ -115,28 +120,31 @@ public abstract class DaoSchoolAbstract {
 							&& !unsavedStudent((SchoolItemAbstract) s)) {
 						((SchoolItemAbstract) s).setLast(true);
 					}
-					s.saveElement();
+					ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao())
+							.saveElement((SchoolItemAbstract) s);
 				}
 			}
 		}
 		for (ITeacher t : SchoolLauncher.getTeacherList()) {
-			if (!(t.isSaved())) {
+			if (!(((SchoolItemAbstract) t).isSaved())) {
 				if (!unsavedTeacher((SchoolItemAbstract) t) && !unsavedStudent((SchoolItemAbstract) t)) {
 					((SchoolItemAbstract) t).setLast(true);
 				}
-				t.saveElement();
+				ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao())
+						.saveElement((SchoolItemAbstract) t);
 			}
 		}
 		for (IStudent s : SchoolLauncher.getStudentList()) {
-			if (!s.isSaved()) {
+			if (!((SchoolItemAbstract) s).isSaved()) {
 				if (!unsavedStudent((SchoolItemAbstract) s)) {
 					((SchoolItemAbstract) s).setLast(true);
 				}
-				s.saveElement();
+				ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao())
+						.saveElement((SchoolItemAbstract) s);
 			}
 		}
 		unset();
-		return true;
+		return ret;
 	}
 
 	public abstract boolean loadAll();

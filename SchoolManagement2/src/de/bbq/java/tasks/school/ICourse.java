@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * @author Thorsten2201
  *
  */
-public interface ICourse extends IDaoSchool {
+public interface ICourse { // extends IDaoSchool {
 	boolean hasStudents();
 
 	String toString();

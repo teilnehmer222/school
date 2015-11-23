@@ -4,7 +4,7 @@ package de.bbq.java.tasks.school;
  * @author Thorsten2201
  *
  */
-public interface IStudent extends IDaoSchool {
+public interface IStudent { //extends IDaoSchool {
 	String toString();
 
 	ICourse getCourse();
@@ -14,4 +14,6 @@ public interface IStudent extends IDaoSchool {
 	boolean hasCourse();
 
 	boolean hasCourse(ICourse course);
+
+	void removeCourse();
 }

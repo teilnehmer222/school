@@ -56,7 +56,6 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 			try {
 				cindex = this.teacherListModel.getElementAt(index - 1);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				JOptionPane.showMessageDialog(null, e.getMessage());
 			}
 
@@ -64,7 +63,6 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 				try {
 					this.teacherListModel.remove(index - 1);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					JOptionPane.showMessageDialog(null, e.getMessage());
 				}
 
@@ -158,7 +156,7 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 				this.selectedTeacher = this.teachersJList.getSelectedValue();
 			}
 			if (this.selectedTeacher != null) {
-				this.selectedTeacher.deleteElement();
+				SchoolLauncher.deleteElement((SchoolItemAbstract) this.selectedTeacher);
 				this.selectedTeacher = null;
 			}
 			if (index >= this.teachersJList.getModel().getSize() - 1) {
@@ -178,13 +176,13 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 									indexPool--;
 								}
 							} catch (Exception e) {
-								// TODO Auto-generated catch block
+								JOptionPane.showMessageDialog(null, e.getMessage());
 								e.printStackTrace();
 							}
 						}
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						System.out.println(e.getMessage());
+						JOptionPane.showMessageDialog(null, e.getMessage());
+						e.printStackTrace();
 					}
 				}
 			}
@@ -201,8 +199,8 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 							indexPool = 0;
 						}
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						System.out.println(e.getMessage());
+						JOptionPane.showMessageDialog(null, e.getMessage());
+						e.printStackTrace();
 					}
 				}
 			}
@@ -255,7 +253,7 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 					index = list.locationToIndex(evt.getPoint());
 				}
 				if (index >= 0) {
-					SchoolLauncher.getInstance().EditItem((SchoolItemAbstract) teacherListModel.get(index));
+					SchoolLauncher.getInstance().editItem((SchoolItemAbstract) teacherListModel.get(index));
 				}
 			}
 		});

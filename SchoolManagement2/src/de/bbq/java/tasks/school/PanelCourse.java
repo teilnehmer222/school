@@ -62,7 +62,6 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 			try {
 				cindex = this.courseListModel.getElementAt(index - 1);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				JOptionPane.showMessageDialog(null, e.getMessage());
 			}
 
@@ -70,7 +69,6 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 				try {
 					this.courseListModel.remove(index - 1);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					JOptionPane.showMessageDialog(null, e.getMessage());
 				}
 
@@ -155,22 +153,21 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		} else if (arg0.getSource() == deleteCourseButton) {
 			ICourse selected = this.coursesJList.getSelectedValue();
 			if (selected != null) {
-				selected.deleteElement();
+				SchoolLauncher.deleteElement((SchoolItemAbstract) selected);
 			}
 			if (index >= this.coursesJList.getModel().getSize() - 1) {
 				index--;
 			}
 		} else if (arg0.getSource() == saveAllButton) {
-			if (!SchoolLauncher.getCourseList().isEmpty()) {
-				SchoolLauncher.getCourseList().get(0).saveAll();
-			} else if (!SchoolLauncher.getTeacherList().isEmpty()) {
-				SchoolLauncher.getTeacherList().get(0).saveAll();
-			} else if (!SchoolLauncher.getStudentList().isEmpty()) {
-				SchoolLauncher.getStudentList().get(0).saveAll();
-			}
-
+			// if (!SchoolLauncher.getCourseList().isEmpty()) {
+			DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao()).saveAll();
+			// } else if (!SchoolLauncher.getTeacherList().isEmpty()) {
+			// SchoolLauncher.getTeacherList().get(0).saveAll();
+			// } else if (!SchoolLauncher.getStudentList().isEmpty()) {
+			// SchoolLauncher.getStudentList().get(0).saveAll();
+			// }
 		} else if (arg0.getSource() == loadAllButton) {
-			SchoolLauncher.loadAll();
+			DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao()).loadAll();
 		}
 		this.refresh = false;
 		refresh();
@@ -221,7 +218,7 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 					index = list.locationToIndex(evt.getPoint());
 				}
 				if (index >= 0) {
-					SchoolLauncher.getInstance().EditItem((SchoolItemAbstract) courseListModel.get(index));
+					SchoolLauncher.getInstance().editItem((SchoolItemAbstract) courseListModel.get(index));
 				}
 			}
 		});
@@ -308,7 +305,6 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 			super.setSelectionInterval(-1, -1);
 		}
 	}
-
 	/////////////////////////////////////////////////////////////////////////////////////
 
 }

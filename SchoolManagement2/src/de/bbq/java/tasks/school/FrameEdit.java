@@ -104,8 +104,8 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 			try {
 				add.setZipCode(Integer.parseInt(this.zipTextField.getText()));
 			} catch (Exception e) {
-				// TODO
-				System.out.println(e.getStackTrace());
+				JOptionPane.showMessageDialog(null, e.getMessage());
+				e.printStackTrace();
 			}
 			add.setCountry(this.countryTextField.getText());
 			add.setHouseNumber(this.streetNumberTextField.getText());
@@ -210,7 +210,7 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		this.teacherDF = (Teacher) editItem;
 		setTitle("Leerer editieren");
 		SpringLayout layout = new SpringLayout();
-		setupSpringLayout(this.teacherDF.toString(), 20, layout);
+		setupSpringLayout(this.teacherDF.getId() + " " + this.teacherDF.toString(), 20, layout);
 
 		JPanel labels = new JPanel();
 		labels.setLayout(new BoxLayout(labels, BoxLayout.Y_AXIS));
@@ -265,7 +265,7 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		this.studentDF = (Student) editItem;
 		setTitle("Schüler editieren");
 		SpringLayout layout = new SpringLayout();
-		setupSpringLayout(this.studentDF.toString(), 20, layout);
+		setupSpringLayout(this.studentDF.getId() + " " + this.studentDF.toString(), 20, layout);
 
 		JPanel labels = new JPanel();
 		labels.setLayout(new BoxLayout(labels, BoxLayout.Y_AXIS));
@@ -321,7 +321,7 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		setTitle("Kurs editieren");
 
 		SpringLayout layout = new SpringLayout();
-		setupSpringLayout(this.courseDF.toString(), 20, layout);
+		setupSpringLayout(this.courseDF.getId() + " " + this.courseDF.toString(), 20, layout);
 		JPanel labels = new JPanel();
 		labels.setLayout(new BoxLayout(labels, BoxLayout.Y_AXIS));
 		labels.setPreferredSize(new Dimension(labelWidth, 10));

@@ -72,32 +72,4 @@ public class Address extends SchoolItemAbstract implements Serializable {
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// SchoolItemAbstract
-	@Override
-	public boolean saveElement() {
-		return super.saveElement();
-	}
-
-	@Override
-	public boolean loadElement() {
-		return super.loadElement();
-	}
-
-	@Override
-	public boolean deleteElement() {
-		return super.deleteElement();
-	}
-
-	@Override
-	public boolean saveAll() {
-		return false;
-	}
-
-	@Override
-	public boolean loadAll() {
-		return false;
-	}
-	/////////////////////////////////////////////////////////////////////////////////////
-
 }

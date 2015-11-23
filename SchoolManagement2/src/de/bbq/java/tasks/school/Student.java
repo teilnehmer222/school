@@ -25,10 +25,13 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 	// Static
 	private static final long serialVersionUID = -8838146635169751075L;
 	private static ArrayList<IStudent> allStudents = new ArrayList<>();
+
 	public static boolean load(Student student) {
+		student.id = SchoolItemAbstract.getNewId();
 		allStudents.add(student);
 		return true;
-	} 
+	}
+
 	private static String generateNewName() {
 		String[] array = new String[] { "Depp", "Trottel", "Idiot", "Armleuchter", "Hirni", "Totalversager",
 				"Baumschulabbrecher", "Volldepp", "Volltrottel", "Extremdepp", "Superidiot", "Dummbeutel",
@@ -43,7 +46,7 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 			student = new Student(firstName, eDataAccess);
 			allStudents.add(student);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, e.getMessage());
 			e.printStackTrace();
 		}
 		return student;
@@ -62,6 +65,12 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 	public static ArrayList<IStudent> getStudents() {
 		return allStudents;
 	}
+
+	public static void studentDeleted(IStudent student) {
+		if (allStudents.contains(student)) {
+			allStudents.remove(student);
+		}
+	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -77,6 +86,11 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 	}
 
 	@Override
+	public void removeCourse() {
+		this.course = null;
+	}
+	
+	@Override
 	public boolean hasCourse(ICourse course) {
 		if (course != null) {
 			return course.equals(this.course);
@@ -88,39 +102,6 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 	@Override
 	public boolean hasCourse() {
 		return this.course != null;
-	}
-	/////////////////////////////////////////////////////////////////////////////////////
-
-	/////////////////////////////////////////////////////////////////////////////////////
-	// IDaoSchoolAbstract
-	@Override
-	public boolean saveElement() {
-		return super.saveElement();
-	}
-
-	@Override
-	public boolean loadElement() {
-		return super.loadElement();
-	}
-
-	@Override
-	public boolean deleteElement() {
-		boolean ret = super.deleteElement();
-		if (ret) {
-			Student.allStudents.remove(this);
-			Course.studentDeleted(this);
-		}
-		return ret;
-	}
-
-	@Override
-	public boolean saveAll() {
-		return super.saveAll();
-	}
-
-	@Override
-	public boolean loadAll() {
-		return super.loadAll();
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 

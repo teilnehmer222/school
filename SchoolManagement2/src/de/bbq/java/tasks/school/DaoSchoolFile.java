@@ -21,6 +21,7 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 	private File safeFile;
 	private boolean occupied = false;
 	String out = "";
+	int cc, ct, cs, ca;
 	private ObjectOutputStream oos;
 	private ObjectInputStream ois;
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -56,50 +57,58 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 	@Override
 	public boolean saveElement(SchoolItemAbstract schoolItemAbstract) {
 		boolean ret = false;
+		boolean deleted = false;
 		if (!this.occupied) {
 			this.occupied = true;
 			out = "";
+			cc = ct = cs = ca = 0;
 			ret = true;
 			if (this.safeFile == null) {
 				chooseFile(true);
 			}
 			if (this.safeFile != null) {
 				try {
-					oos = new ObjectOutputStream(new FileOutputStream(this.safeFile));
+					oos = new ObjectOutputStream(new FileOutputStream(this.safeFile, false));
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, e.getMessage());
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, e.getMessage());
 					e.printStackTrace();
 				}
 			}
 		}
 		if (schoolItemAbstract instanceof ICourse) {
-			out += this.getClass().getName() + ".saveElement(CourseDF " + schoolItemAbstract.toString() + ")\r\n";
+			cc++;
 		} else if (schoolItemAbstract instanceof ITeacher) {
-			out += this.getClass().getName() + ".saveElement(TeacherDF " + schoolItemAbstract.toString() + ")\r\n";
+			ct++;
 		} else if (schoolItemAbstract instanceof IStudent) {
-			out += this.getClass().getName() + ".saveElement(StudentDF " + schoolItemAbstract.toString() + ")\r\n";
+			cs++;
 		} else if (schoolItemAbstract instanceof Address) {
-			out += this.getClass().getName() + ".saveElement(Address " + schoolItemAbstract.toString() + ")\r\n";
+			ca++;
 		}
 		try {
 			oos.writeObject(schoolItemAbstract);
 			schoolItemAbstract.setSaved(true);
+			ret = true;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, e.getMessage());
 			e.printStackTrace();
+			ret = false;
 		}
 		if (schoolItemAbstract.isLast()) {
 			this.occupied = false;
-			ret = true;
-			JOptionPane.showMessageDialog(null, "Ready!\r\n\r\n" + out);
+			out += "In Datei gekotzt: " + cc + " mal Dummgelaber, " + ct + " Labertaschen und " + cs + " Hohlköpfe.";
+			if (deleted) {
+				out += "\r\nVorhandene Datei gelöscht.";
+			}
+			JOptionPane.showMessageDialog(null, "Dreck fertig!\r\n\r\n" + out);
 			try {
 				oos.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				JOptionPane.showMessageDialog(null, e.getMessage());
 				e.printStackTrace();
+				ret = false;
 			}
 			this.safeFile = null;
 		}
@@ -108,21 +117,49 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 
 	@Override
 	public boolean loadElement(SchoolItemAbstract schoolItemAbstract) {
+		if (schoolItemAbstract instanceof Student) {
+			Student.load((Student) schoolItemAbstract);
+			System.out.println(((Student) schoolItemAbstract).toString());
+			cs++;
+		}
+		if (schoolItemAbstract instanceof Teacher) {
+			Teacher.load((Teacher) schoolItemAbstract);
+			System.out.println(((Teacher) schoolItemAbstract).toString());
+			ct++;
+		}
+		if (schoolItemAbstract instanceof Course) {
+			Course course = (Course) schoolItemAbstract;
+			System.out.println(course.toString());
+			Course.load(course);
+			cc++;
+			// if (course.hasTeacher()) {
+			// Teacher.load((Teacher) course.getTeacher());
+			// ct++;
+			// }
+			if (course.hasStudents()) {
+				for (int index = 0; index < course.getStudents().size(); index++) {
+					course.getStudents().get(index).setCourse(course);
+					// Student.load((Student) course.getStudents().get(index));
+					// cs++;
+				}
+			}
+		}
 		return true;
 	}
 
 	@Override
 	public boolean loadAll() {
 		boolean ret = false;
+		cc = ct = cs = ca = 0;
 		chooseFile(false);
 		if (this.safeFile != null) {
 			try {
 				ois = new ObjectInputStream(new FileInputStream(this.safeFile));
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
+				JOptionPane.showMessageDialog(null, e.getMessage());
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				JOptionPane.showMessageDialog(null, e.getMessage());
 				e.printStackTrace();
 			}
 			if (this.ois != null) {
@@ -130,33 +167,47 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 				try {
 					read = ois.readObject();
 				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, e.getMessage());
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					// We're done
+					read = null;
 				}
-				if (read != null) {
-					if (read instanceof Student) {
-						Student.load((Student) read);
+				ret = true;
+
+				while (read != null) {
+					ret &= this.loadElement((SchoolItemAbstract) read);
+					read = null;
+					try {
+						read = ois.readObject();
+					} catch (ClassNotFoundException e) {
+						JOptionPane.showMessageDialog(null, e.getMessage());
+						e.printStackTrace();
+						ret = false;
+					} catch (IOException e) {
+						// We're done
 					}
-					if (read instanceof Teacher) {
-						Teacher.load((Teacher) read);
-					}
-					if (read instanceof Course) {
-						Course.load((Course) read);
-					}
+				}
+				out = "Aus Datei gelutscht: " + cc + " mal Dummgelaber, " + ct + " Labertaschen und " + cs
+						+ " Hohlköpfe.";
+				JOptionPane.showMessageDialog(null, "Dreck fertig!\r\n\r\n" + out);
+				try {
+					ois.close();
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(null, e.getMessage());
+					e.printStackTrace();
+					ret = false;
 				}
 			}
 		}
+		SchoolLauncher.setSelectedDao(EDaoSchool.FILE);
 		this.safeFile = null;
 		return ret;
 	}
+
 	@Override
 	public boolean deleteElement(SchoolItemAbstract schoolItemAbstract) {
 		return true;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
-
-
 }

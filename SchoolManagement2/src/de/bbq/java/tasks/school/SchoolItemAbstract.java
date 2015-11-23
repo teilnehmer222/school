@@ -19,6 +19,10 @@ public abstract class SchoolItemAbstract implements Serializable {
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
+	protected static long getNewId() {
+		return SchoolItemAbstract.highestMemberId++;
+	}
+
 	public SchoolItemAbstract(EDaoSchool eDataAccess) throws Exception {
 		id = SchoolItemAbstract.highestMemberId++;
 		DaoSchoolAbstract accessObject = null;
@@ -67,37 +71,14 @@ public abstract class SchoolItemAbstract implements Serializable {
 	public void setSaved(boolean saved) {
 		this.saved = saved;
 	}
-	/////////////////////////////////////////////////////////////////////////////////////
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// IDaoSchool helper
-	protected boolean saveElement() {
-		return dataAccessObject.saveElement(this);
-	}
-
-	protected boolean loadElement() {
-		return dataAccessObject.loadElement(this);
-	}
-
-	protected boolean deleteElement() {
-		return dataAccessObject.deleteElement(this);
-	}
-
-	protected boolean saveAll() {
-		return dataAccessObject.saveAll();
-	}
-
-	protected boolean loadAll() {
-		return dataAccessObject.loadAll();
-	}
 	protected boolean isLast() {
 		return this.isLastObject;
 	}
+
 	public void setLast(boolean isLast) {
 		this.isLastObject = isLast;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
-
-
 
 }

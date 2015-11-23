@@ -46,6 +46,9 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 
 	public static void setSelectedDao(EDaoSchool selectedDao) {
 		SchoolLauncher.selectedDao = selectedDao;
+		Course.dataAccessObject = DaoSchoolAbstract.getDaoSchool(selectedDao);
+		Teacher.dataAccessObject = DaoSchoolAbstract.getDaoSchool(selectedDao);
+		Student.dataAccessObject = DaoSchoolAbstract.getDaoSchool(selectedDao);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +183,7 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 		return Student.createStudent(random, selectedDao);
 	}
 
-	public void EditItem(SchoolItemAbstract editItem) {
+	public void editItem(SchoolItemAbstract editItem) {
 		FrameEdit edit = null;
 		boolean found = false;
 		if (editItem.isInEdit()) {
@@ -210,6 +213,25 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 			System.out.println("opened");
 			editFrames.add(edit);
 		}
+	}
+
+	public static boolean deleteElement(SchoolItemAbstract editItem) {
+		boolean ret = DaoSchoolAbstract.getDaoSchool(selectedDao).deleteElement(editItem);
+		if (ret) {
+			if (editItem instanceof ICourse) {
+				Course.courseDeleted((ICourse) editItem);
+			} else if (editItem instanceof ITeacher) {
+				Teacher.teacherDeleted(editItem);
+				Course.teacherDeleted((ITeacher) editItem);
+			} else if (editItem instanceof IStudent) {
+				Student.studentDeleted((IStudent) editItem);
+				Course.studentDeleted((IStudent) editItem);
+			} else if (editItem instanceof Address) {
+				//
+			}
+
+		}
+		return ret;
 	}
 
 	@Override
@@ -256,18 +278,6 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 	public void windowOpened(WindowEvent arg0) {
 		// TODO Auto-generated method stub
 
-	}
-
-	@SuppressWarnings("incomplete-switch")
-	public static void loadAll() {
-		switch (selectedDao) {
-		case FILE: 
-			//Dirty
-			DaoSchoolFile.getDaoSchool(selectedDao).loadAll();
-			break;
-		case JDBC_MYSQL:
-			break;
-		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////

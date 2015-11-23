@@ -25,10 +25,13 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 	// Static
 	private static final long serialVersionUID = -3548796163205043453L;
 	private static ArrayList<ITeacher> allTeachers = new ArrayList<>();
+
 	public static boolean load(Teacher teacher) {
 		allTeachers.add(teacher);
+		teacher.id = SchoolItemAbstract.getNewId();
 		return true;
-	} 
+	}
+
 	private static String generateNewName() {
 		String[] array = new String[] { "Geistig Abwesender", "Musikleerer", "Deuschleerer", "Verleerer", "Entlährer",
 				"Laubbläser", "Labersack", "Zutexter", "Volllaberer", "Berieseler", "Hintergrundrauschen",
@@ -44,7 +47,7 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 			teacher = new Teacher(firstName, eDataAccess);
 			allTeachers.add(teacher);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, e.getMessage());
 			e.printStackTrace();
 		}
 		return teacher;
@@ -63,6 +66,12 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 	public static ArrayList<ITeacher> getTeachers() {
 		return allTeachers;
 	}
+
+	public static void teacherDeleted(SchoolItemAbstract editItem) {
+		if (allTeachers.contains(editItem)) {
+			allTeachers.remove(editItem);
+		}
+	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -77,7 +86,6 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 		} catch (Exception e) {
 			throw e;
 		}
-
 	}
 
 	@Override
@@ -90,39 +98,6 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 			}
 
 		}
-	}
-	/////////////////////////////////////////////////////////////////////////////////////
-
-	/////////////////////////////////////////////////////////////////////////////////////
-	// IDaoSchoolAbstract
-	@Override
-	public boolean saveElement() {
-		return super.saveElement();
-	}
-
-	@Override
-	public boolean loadElement() {
-		return super.loadElement();
-	}
-
-	@Override
-	public boolean deleteElement() {
-		boolean ret = super.deleteElement();
-		if (ret) {
-			Teacher.allTeachers.remove(this);
-			Course.teacherDeleted(this);
-		}
-		return ret;
-	}
-
-	@Override
-	public boolean saveAll() {
-		return super.saveAll();
-	}
-
-	@Override
-	public boolean loadAll() {
-		return super.loadAll();
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 

@@ -52,7 +52,6 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 			try {
 				student = (IStudent) this.studentListModel.getElementAt(index - 1);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				JOptionPane.showMessageDialog(null, e.getMessage());
 			}
 
@@ -60,7 +59,6 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 				try {
 					this.studentListModel.remove(index - 1);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					JOptionPane.showMessageDialog(null, e.getMessage());
 				}
 
@@ -154,7 +152,7 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 				this.selectedStudent = this.studentsJList.getSelectedValue();
 			}
 			if (this.selectedStudent != null) {
-				this.selectedStudent.deleteElement();
+				SchoolLauncher.deleteElement((SchoolItemAbstract) selectedStudent);
 				this.selectedStudent = null;
 			}
 			if (index >= this.studentsJList.getModel().getSize() - 1) {
@@ -174,8 +172,8 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 							index = 0;
 						}
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						System.out.println(e.getMessage());
+						JOptionPane.showMessageDialog(null, e.getMessage());
+						e.printStackTrace();
 					}
 				}
 			}
@@ -193,8 +191,8 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 								indexPool = 0;
 							}
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							System.out.println(e.getMessage());
+							JOptionPane.showMessageDialog(null, e.getMessage());
+							e.printStackTrace();
 						}
 					}
 				}
@@ -248,7 +246,7 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 					index = list.locationToIndex(evt.getPoint());
 				}
 				if (index >= 0) {
-					SchoolLauncher.getInstance().EditItem((SchoolItemAbstract) studentListModel.get(index));
+					SchoolLauncher.getInstance().editItem((SchoolItemAbstract) studentListModel.get(index));
 				}
 			}
 		});

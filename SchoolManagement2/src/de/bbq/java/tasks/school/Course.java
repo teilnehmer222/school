@@ -12,8 +12,8 @@ public class Course extends SchoolItemAbstract implements ICourse {
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Class Properties
-	private transient ITeacher teacher;
-	private transient ArrayList<IStudent> students = new ArrayList<>();
+	private ITeacher teacher;
+	private ArrayList<IStudent> students = new ArrayList<>();
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -56,16 +56,18 @@ public class Course extends SchoolItemAbstract implements ICourse {
 		try {
 			course = new Course(courseName, store);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, e.getMessage());
 			e.printStackTrace();
 		}
 		return course;
 	};
+
 	public static boolean load(Course course) {
 		allCourses.add(course);
+		course.id = SchoolItemAbstract.getNewId();
 		return true;
-	} 
-	
+	}
+
 	public static ICourse createCourse(boolean random, EDaoSchool store) {
 		String newName = Course.generateNewName();
 		Course newCourse = null;
@@ -79,6 +81,39 @@ public class Course extends SchoolItemAbstract implements ICourse {
 	public static ArrayList<ICourse> getCourses() {
 		return allCourses;
 	}
+
+
+	public static void courseDeleted(ICourse course) {
+		allCourses.remove(course);
+	}
+	
+	public static void studentDeleted(IStudent student) {
+		for (ICourse c : allCourses) {
+			if (c.hasStudents()) {
+				// Exception in thread "AWT-EventQueue-0"
+				// java.util.ConcurrentModificationException
+				for (int index = 0; index < c.getStudents().size(); index++) {
+					IStudent s = c.getStudents().get(index);
+					if (s != null) {
+						if (s.equals(student)) {
+							c.removeStudent(s);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public static void teacherDeleted(ITeacher teacher) {
+		for (ICourse c : allCourses) {
+			if (c.getTeacher() != null) {
+				if (c.getTeacher().equals(teacher)) {
+					c.removeTeacher();
+				}
+			}
+		}
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -128,7 +163,7 @@ public class Course extends SchoolItemAbstract implements ICourse {
 		if (this.students.contains(student)) {
 			this.students.remove(student);
 		}
-		student.setCourse(null);
+		student.removeCourse();
 	}
 
 	@Override
@@ -206,63 +241,5 @@ public class Course extends SchoolItemAbstract implements ICourse {
 		this.needsBeamer = needsBeamer;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
-
-	/////////////////////////////////////////////////////////////////////////////////////
-	// IDaoSchoolAbstract
-	@Override
-	public boolean saveElement() {
-		return super.saveElement();
-	}
-
-	@Override
-	public boolean loadElement() {
-		return super.loadElement();
-	}
-
-	@Override
-	public boolean deleteElement() {
-		boolean ret = super.deleteElement();
-		if (ret) {
-			Course.allCourses.remove(this);
-		}
-		return ret;
-	}
-
-	@Override
-	public boolean saveAll() {
-		return super.saveAll();
-	}
-
-	@Override
-	public boolean loadAll() {
-		return super.loadAll();
-	}
-	/////////////////////////////////////////////////////////////////////////////////////
-
-	public static void studentDeleted(IStudent student) {
-		for (ICourse c : allCourses) {
-			if (c.hasStudents()) {
-				//Exception in thread "AWT-EventQueue-0" java.util.ConcurrentModificationException
-				for (int index = 0;index < c.getStudents().size();index++) {
-					IStudent s = c.getStudents().get(index);
-					if (s != null) {
-						if (s.equals(student)) {
-							c.removeStudent(s);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	public static void teacherDeleted(ITeacher teacher) {
-		for (ICourse c : allCourses) {
-			if (c.getTeacher() != null) {
-				if (c.getTeacher().equals(teacher)) {
-					c.removeTeacher();
-				}
-			}
-		}
-	}
 
 }
