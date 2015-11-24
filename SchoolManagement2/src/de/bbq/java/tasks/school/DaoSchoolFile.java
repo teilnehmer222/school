@@ -136,13 +136,13 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 			// Teacher.load((Teacher) course.getTeacher());
 			// ct++;
 			// }
-			if (course.hasStudents()) {
-				for (int index = 0; index < course.getStudents().size(); index++) {
-					course.getStudents().get(index).setCourse(course);
-					// Student.load((Student) course.getStudents().get(index));
-					// cs++;
-				}
-			}
+//			if (course.hasStudents()) {
+//				for (int index = 0; index < course.getStudents().size(); index++) {
+////					course.getStudents().get(index).setCourse(course);
+//					// Student.load((Student) course.getStudents().get(index));
+//					// cs++;
+//				}
+//			}
 		}
 		return true;
 	}

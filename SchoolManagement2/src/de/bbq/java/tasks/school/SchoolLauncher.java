@@ -31,13 +31,13 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 	private static final int winHight = 430;
 	private static final int workStart = 7;
 	private static final int workEnd = 17;
+	private static EDaoSchool selectedDao = EDaoSchool.FILE;
+	private static SchoolLauncher launcher;
 	private static ArrayList<FrameEdit> editFrames = new ArrayList<>();
 
 	private PanelCourse panel1;
 	private PanelTeacher panel2;
 	private PanelStudent panel3;
-	private static SchoolLauncher launcher;
-	private static EDaoSchool selectedDao = EDaoSchool.FILE;
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	public static EDaoSchool getSelectedDao() {
@@ -279,7 +279,6 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 		// TODO Auto-generated method stub
 
 	}
-
 	/////////////////////////////////////////////////////////////////////////////////////
 
 }

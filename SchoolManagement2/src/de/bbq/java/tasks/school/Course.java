@@ -113,7 +113,6 @@ public class Course extends SchoolItemAbstract implements ICourse {
 			}
 		}
 	}
-
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -155,7 +154,7 @@ public class Course extends SchoolItemAbstract implements ICourse {
 			ICourse oldCourse = student.getCourse();
 			oldCourse.removeStudent(student);
 		}
-		student.setCourse(this);
+//		student.setCourse(this);
 	}
 
 	@Override
@@ -163,7 +162,7 @@ public class Course extends SchoolItemAbstract implements ICourse {
 		if (this.students.contains(student)) {
 			this.students.remove(student);
 		}
-		student.removeCourse();
+//		student.removeCourse();
 	}
 
 	@Override

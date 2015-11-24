@@ -9,11 +9,11 @@ public interface IStudent { //extends IDaoSchool {
 
 	ICourse getCourse();
 
-	void setCourse(ICourse course);
+//	void setCourse(ICourse course);
 
 	boolean hasCourse();
 
 	boolean hasCourse(ICourse course);
 
-	void removeCourse();
+//	void removeCourse();
 }
