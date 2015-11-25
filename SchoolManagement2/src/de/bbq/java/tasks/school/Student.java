@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 public class Student extends SchoolPersonAbstract implements IStudent {
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Class Properties
-//	private transient ICourse course;
+	// private transient ICourse course;
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -78,23 +78,23 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 	@Override
 	public ICourse getCourse() {
 		for (ICourse c : Course.getCourses()) {
-			if (c.equals(this)) {
+			if (c.hasStudent(this)) {
 				return c;
 			}
 		}
 		return null;
 	}
 
-//	@Override
-//	public void setCourse(ICourse course) {
-//		this.course = course;
-//	}
-//
-//	@Override
-//	public void removeCourse() {
-//		this.course = null;
-//	}
-	
+	// @Override
+	// public void setCourse(ICourse course) {
+	// this.course = course;
+	// }
+	//
+	// @Override
+	// public void removeCourse() {
+	// this.course = null;
+	// }
+
 	@Override
 	public boolean hasCourse(ICourse course) {
 		if (course != null) {

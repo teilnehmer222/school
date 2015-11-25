@@ -25,8 +25,8 @@ public class Address extends SchoolItemAbstract implements Serializable {
 	private String streetName;
 	private String houseNumber;
 	private int zipCode;
-	private String City;
-	private String Country;
+	private String city;
+	private String country;
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -56,19 +56,19 @@ public class Address extends SchoolItemAbstract implements Serializable {
 	}
 
 	public String getCity() {
-		return City;
+		return city;
 	}
 
 	public void setCity(String city) {
-		City = city;
+		this.city = city;
 	}
 
 	public String getCountry() {
-		return Country;
+		return country;
 	}
 
 	public void setCountry(String country) {
-		Country = country;
+		this.country = country;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 

@@ -65,13 +65,22 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		} else if (e.getSource() == this.saveButton) {
 			if (this.courseDF != null) {
 				ReadDataCourse();
+				SchoolLauncher.saveItem(this.courseDF);
 			} else if (this.teacherDF != null) {
 				ReadDataPerson(this.teacherDF);
 				ReadDataAdress(this.teacherDF.getAdress());
-
+				SchoolLauncher.saveItem(this.teacherDF);
 			} else if (this.studentDF != null) {
 				ReadDataPerson(this.studentDF);
 				ReadDataAdress(this.studentDF.getAdress());
+				SchoolLauncher.saveItem(this.studentDF);
+			}
+			if (this.courseDF != null) {
+				this.courseDF.setInEdit(false);
+			} else if (this.teacherDF != null) {
+				this.teacherDF.setInEdit(false);
+			} else if (this.studentDF != null) {
+				this.studentDF.setInEdit(false);
 			}
 			this.dispose();
 		}
@@ -208,6 +217,8 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 	FrameEdit(ITeacher editItem) { // ,WindowListener windowListener) {
 		// this.addWindowListener(windowListener);
 		this.teacherDF = (Teacher) editItem;
+		this.teacherDF.setInEdit(true);
+		SchoolLauncher.verifyData(this.teacherDF);
 		setTitle("Leerer editieren");
 		SpringLayout layout = new SpringLayout();
 		setupSpringLayout(this.teacherDF.getId() + " " + this.teacherDF.toString(), 20, layout);
@@ -263,6 +274,8 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 	FrameEdit(IStudent editItem) { // ,WindowListener windowListener) {
 		// this.addWindowListener(windowListener);
 		this.studentDF = (Student) editItem;
+		this.studentDF.setInEdit(true);
+		SchoolLauncher.verifyData(this.studentDF);
 		setTitle("Schüler editieren");
 		SpringLayout layout = new SpringLayout();
 		setupSpringLayout(this.studentDF.getId() + " " + this.studentDF.toString(), 20, layout);
@@ -318,6 +331,8 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 	FrameEdit(ICourse editItem) { // ),WindowListener windowListener) {
 		// this.addWindowListener(windowListener);
 		this.courseDF = (Course) editItem;
+		this.courseDF.setInEdit(true);
+		SchoolLauncher.verifyData(this.courseDF);
 		setTitle("Kurs editieren");
 
 		SpringLayout layout = new SpringLayout();

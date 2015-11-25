@@ -34,7 +34,7 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 
 	private static String generateNewName() {
 		String[] array = new String[] { "Geistig Abwesender", "Musikleerer", "Deuschleerer", "Verleerer", "Entlährer",
-				"Laubbläser", "Labersack", "Zutexter", "Volllaberer", "Berieseler", "Hintergrundrauschen",
+				"Laubbläsleer", "Labersack", "Zutexter", "Volllaberer", "Berieseler", "Hintergrundrauschen",
 				"Verstörendes Geräusch", "Arschkopf", "Dildogesicht", "Zwerg Nase", "Halodri", "Birkenstockdepp",
 				"Fotzenkopf", "Hirschgesicht", "Althippy" };
 		int randomNum = 0 + (int) (Math.random() * array.length);
@@ -59,7 +59,7 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 		if (!random) {
 			newName = JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
 		}
-		Teacher.createTeacher(newName, eDataAccess);
+		newTeacher = Teacher.createTeacher(newName, eDataAccess);
 		return newTeacher;
 	}
 
@@ -77,23 +77,24 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Getter / Setter ITeacher
 	@Override
-	public void addCourse(ICourse course) throws Exception {
-		try {
-			courses.add(course);
-			course.setTeacher(this);
-			// course.setMyTeacherId(myTeacherId);
+	public void addCourse(ICourse course) {
+		this.getCourses().add(course);
+		course.setTeacher(this);
+	}
 
-		} catch (Exception e) {
-			throw e;
+	private ArrayList<ICourse> getCourses() {
+		if (this.courses == null) {
+			this.courses = new ArrayList<>();
 		}
+		return courses;
 	}
 
 	@Override
 	public void removeCourse(ICourse course) {
 		course.removeTeacher();
-		for (ICourse courses : this.courses) {
+		for (ICourse courses : this.getCourses()) {
 			if (courses.equals(course)) {
-				this.courses.remove(course);
+				this.getCourses().remove(course);
 				break;
 			}
 

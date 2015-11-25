@@ -64,6 +64,13 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 	}
 
 	private SchoolLauncher() {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				SchoolLauncher.getInstance().closeConnections();
+				System.exit(0);
+			}
+		});
 		// Image icon = Toolkit.getDefaultToolkit().getImage("form.gif");
 		setTitle("Schulverwaltung");
 		setSize(winLength, winHight);
@@ -71,6 +78,10 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(null);
 		addControls();
+	}
+
+	protected void closeConnections() {
+		DaoSchoolAbstract.closeConnections();
 	}
 
 	private void addControls() {
@@ -181,6 +192,19 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 
 	public static IStudent getNewStudent(boolean random) {
 		return Student.createStudent(random, selectedDao);
+	}
+
+	/***
+	 * Updates the data on the object from the data source, if possible
+	 * 
+	 * @param schoolItemAbstract
+	 */
+	public static void verifyData(SchoolItemAbstract schoolItemAbstract) {
+		DaoSchoolAbstract.getDaoSchool(getSelectedDao()).loadElement(schoolItemAbstract);
+	}
+
+	public static void saveItem(SchoolItemAbstract schoolItemAbstract) {
+		DaoSchoolAbstract.getDaoSchool(getSelectedDao()).saveElement(schoolItemAbstract);
 	}
 
 	public void editItem(SchoolItemAbstract editItem) {

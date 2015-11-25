@@ -19,7 +19,7 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Class Properties
 	private File safeFile;
-	private boolean occupied = false;
+	private boolean occupied = false, loading = false;
 	String out = "";
 	int cc, ct, cs, ca;
 	private ObjectOutputStream oos;
@@ -58,6 +58,10 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 	public boolean saveElement(SchoolItemAbstract schoolItemAbstract) {
 		boolean ret = false;
 		boolean deleted = false;
+		// 4sql
+		if (schoolItemAbstract.isInEdit()) {
+			return true;
+		}
 		if (!this.occupied) {
 			this.occupied = true;
 			out = "";
@@ -117,32 +121,35 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 
 	@Override
 	public boolean loadElement(SchoolItemAbstract schoolItemAbstract) {
-		if (schoolItemAbstract instanceof Student) {
-			Student.load((Student) schoolItemAbstract);
-			System.out.println(((Student) schoolItemAbstract).toString());
-			cs++;
-		}
-		if (schoolItemAbstract instanceof Teacher) {
-			Teacher.load((Teacher) schoolItemAbstract);
-			System.out.println(((Teacher) schoolItemAbstract).toString());
-			ct++;
-		}
-		if (schoolItemAbstract instanceof Course) {
-			Course course = (Course) schoolItemAbstract;
-			System.out.println(course.toString());
-			Course.load(course);
-			cc++;
+		if (loading) {
+			if (schoolItemAbstract instanceof Student) {
+				Student.load((Student) schoolItemAbstract);
+				System.out.println(((Student) schoolItemAbstract).toString());
+				cs++;
+			}
+			if (schoolItemAbstract instanceof Teacher) {
+				Teacher.load((Teacher) schoolItemAbstract);
+				System.out.println(((Teacher) schoolItemAbstract).toString());
+				ct++;
+			}
+			if (schoolItemAbstract instanceof Course) {
+				Course course = (Course) schoolItemAbstract;
+				System.out.println(course.toString());
+				Course.load(course);
+				cc++;
+			}
 			// if (course.hasTeacher()) {
 			// Teacher.load((Teacher) course.getTeacher());
 			// ct++;
 			// }
-//			if (course.hasStudents()) {
-//				for (int index = 0; index < course.getStudents().size(); index++) {
-////					course.getStudents().get(index).setCourse(course);
-//					// Student.load((Student) course.getStudents().get(index));
-//					// cs++;
-//				}
-//			}
+			// if (course.hasStudents()) {
+			// for (int index = 0; index < course.getStudents().size(); index++)
+			// {
+			//// course.getStudents().get(index).setCourse(course);
+			// // Student.load((Student) course.getStudents().get(index));
+			// // cs++;
+			// }
+			// }
 		}
 		return true;
 	}
@@ -154,7 +161,7 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 		chooseFile(false);
 		if (this.safeFile != null) {
 			try {
-				ois = new ObjectInputStream(new FileInputStream(this.safeFile));
+				this.ois = new ObjectInputStream(new FileInputStream(this.safeFile));
 			} catch (FileNotFoundException e) {
 				JOptionPane.showMessageDialog(null, e.getMessage());
 				e.printStackTrace();
@@ -165,7 +172,7 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 			if (this.ois != null) {
 				Object read = null;
 				try {
-					read = ois.readObject();
+					read = this.ois.readObject();
 				} catch (ClassNotFoundException e) {
 					JOptionPane.showMessageDialog(null, e.getMessage());
 					e.printStackTrace();
@@ -174,7 +181,7 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 					read = null;
 				}
 				ret = true;
-
+				this.loading = true;
 				while (read != null) {
 					ret &= this.loadElement((SchoolItemAbstract) read);
 					read = null;
@@ -188,7 +195,8 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 						// We're done
 					}
 				}
-				out = "Aus Datei gelutscht: " + cc + " mal Dummgelaber, " + ct + " Labertaschen und " + cs
+				this.loading = false;
+				this.out = "Aus Datei gelutscht: " + cc + " mal Dummgelaber, " + ct + " Labertaschen und " + cs
 						+ " Hohlköpfe.";
 				JOptionPane.showMessageDialog(null, "Dreck fertig!\r\n\r\n" + out);
 				try {

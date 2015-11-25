@@ -24,4 +24,6 @@ public interface ICourse { // extends IDaoSchool {
 	void addStudent(IStudent student);
 
 	void removeStudent(IStudent student);
+
+	boolean hasStudent(IStudent student);
 }

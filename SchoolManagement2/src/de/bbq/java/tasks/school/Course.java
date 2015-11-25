@@ -2,6 +2,7 @@ package de.bbq.java.tasks.school;
 
 import java.util.ArrayList;
 import java.util.Date;
+
 import javax.swing.JOptionPane;
 
 /**
@@ -82,11 +83,10 @@ public class Course extends SchoolItemAbstract implements ICourse {
 		return allCourses;
 	}
 
-
 	public static void courseDeleted(ICourse course) {
 		allCourses.remove(course);
 	}
-	
+
 	public static void studentDeleted(IStudent student) {
 		for (ICourse c : allCourses) {
 			if (c.hasStudents()) {
@@ -144,33 +144,38 @@ public class Course extends SchoolItemAbstract implements ICourse {
 
 	@Override
 	public ArrayList<IStudent> getStudents() {
+		if (this.students == null) {
+			this.students = new ArrayList<>();
+		}
 		return this.students;
 	}
 
 	@Override
 	public void addStudent(IStudent student) {
-		this.students.add(student);
 		if (student.hasCourse()) {
 			ICourse oldCourse = student.getCourse();
 			oldCourse.removeStudent(student);
 		}
-//		student.setCourse(this);
+		this.getStudents().add(student);
+		// student.setCourse(this);
 	}
 
 	@Override
 	public void removeStudent(IStudent student) {
-		if (this.students.contains(student)) {
-			this.students.remove(student);
+		if (this.getStudents().contains(student)) {
+			this.getStudents().remove(student);
 		}
-//		student.removeCourse();
+		// student.removeCourse();
 	}
 
 	@Override
 	public boolean hasStudents() {
-		if (this.students == null) {
-			this.students = new ArrayList<>();
-		}
-		return (this.students.size() > 0);
+		return (this.getStudents().size() > 0);
+	}
+
+	@Override
+	public boolean hasStudent(IStudent student) {
+		return this.getStudents().contains(student);
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 

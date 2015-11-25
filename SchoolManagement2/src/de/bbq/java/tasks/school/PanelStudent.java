@@ -54,14 +54,12 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, e.getMessage());
 			}
-
 			if (!SchoolLauncher.getCourseList().contains(student)) {
 				try {
 					this.studentListModel.remove(index - 1);
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, e.getMessage());
 				}
-
 			}
 		}
 		for (IStudent p : SchoolLauncher.getStudentList()) {

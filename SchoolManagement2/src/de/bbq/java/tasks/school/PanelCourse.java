@@ -57,6 +57,7 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 	// Class methods
 	public void refresh() {
 		this.refresh = true;
+		this.teacherTextField.setText(null);
 		ICourse cindex = null;
 		for (int index = this.courseListModel.getSize(); index > 0; index--) {
 			try {

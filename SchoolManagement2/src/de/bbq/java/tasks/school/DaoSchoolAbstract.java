@@ -34,6 +34,7 @@ public abstract class DaoSchoolAbstract {
 	public static DaoSchoolAbstract getDaoSchool(EDaoSchool eDao) {
 		switch (eDao) {
 		case FILE:
+
 			return daoFile;
 		case JDBC_MYSQL:
 			return daoJdbcMysql;
@@ -96,6 +97,38 @@ public abstract class DaoSchoolAbstract {
 		}
 	}
 
+	public boolean saveAllAhead() {
+		boolean ret = false;
+		for (ITeacher t : SchoolLauncher.getTeacherList()) {
+			if (!(((SchoolItemAbstract) t).isSaved())) {
+				if (!unsavedTeacher((SchoolItemAbstract) t) && !unsavedStudent((SchoolItemAbstract) t)) {
+					((SchoolItemAbstract) t).setLast(true);
+				}
+				ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao())
+						.saveElement((SchoolItemAbstract) t);
+			}
+		}
+		for (int index = 0; index < Course.getCourses().size(); index++) {
+			ICourse c = Course.getCourses().get(index);
+			if (!unsavedTeacher((SchoolItemAbstract) c) && !unsavedCourse((SchoolItemAbstract) c)
+					&& !unsavedStudent((SchoolItemAbstract) c)) {
+				((SchoolItemAbstract) c).setLast(true);
+			}
+			ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao()).saveElement((SchoolItemAbstract) c);
+		}
+		for (IStudent s : SchoolLauncher.getStudentList()) {
+			if (!((SchoolItemAbstract) s).isSaved()) {
+				if (!unsavedStudent((SchoolItemAbstract) s)) {
+					((SchoolItemAbstract) s).setLast(true);
+				}
+				ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao())
+						.saveElement((SchoolItemAbstract) s);
+			}
+		}
+		unset();
+		return ret;
+	}
+
 	public boolean saveAll() {
 		boolean ret = false;
 		for (int index = 0; index < Course.getCourses().size(); index++) {
@@ -144,6 +177,14 @@ public abstract class DaoSchoolAbstract {
 			}
 		}
 		unset();
+		return ret;
+	}
+
+	public static boolean closeConnections() {
+		boolean ret = false;
+		daoFile = null;
+		ret = daoJdbcMysql.closeConnection();
+		daoJdbcMysql = null;
 		return ret;
 	}
 
