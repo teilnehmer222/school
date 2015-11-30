@@ -16,4 +16,5 @@ public interface IStudent { // extends IDaoSchool {
 	boolean hasCourse(ICourse course);
 
 	// void removeCourse();
+	String getDescription();
 }

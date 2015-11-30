@@ -1,7 +1,6 @@
 package de.bbq.java.tasks.school;
 
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
 /**
  * @author teilnehmer222
@@ -40,14 +39,13 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 		return array[randomNum];
 	}
 
-	private static Student createStudent(String firstName, EDaoSchool eDataAccess) {
+	public static Student createStudent(String firstName, EDaoSchool eDataAccess) {
 		Student student = null;
 		try {
 			student = new Student(firstName, eDataAccess);
 			allStudents.add(student);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
-			e.printStackTrace();
+			SchoolLauncher.showException(e);
 		}
 		return student;
 	}
@@ -56,7 +54,7 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 		String newName = Student.generateNewName();
 		Student newStudent = null;
 		if (!random) {
-			newName = JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
+			newName = SchoolLauncher.showInput("Bitte einen Namen eingeben:");
 		}
 		newStudent = Student.createStudent(newName, eDataAccess);
 		return newStudent;
@@ -84,7 +82,17 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 		}
 		return null;
 	}
-
+	
+	@Override
+	public String getDescription() {
+		StringBuffer bu = new StringBuffer();
+		bu.append(this.getFirstName() + " " + getLastName() + "\n");
+		if (this.getBirthDate() != null) {
+			bu.append( SchoolLauncher.getGermanDate().format(this.getBirthDate()) + "\n");
+		}
+		bu.append(this.getAdress().getDescription()); 
+		return bu.toString();
+	}
 	// @Override
 	// public void setCourse(ICourse course) {
 	// this.course = course;
@@ -109,5 +117,4 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 		return this.getCourse() != null;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
-
 }

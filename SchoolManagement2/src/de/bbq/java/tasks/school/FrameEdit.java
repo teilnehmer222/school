@@ -113,8 +113,7 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 			try {
 				add.setZipCode(Integer.parseInt(this.zipTextField.getText()));
 			} catch (Exception e) {
-				JOptionPane.showMessageDialog(null, e.getMessage());
-				e.printStackTrace();
+				SchoolLauncher.showException(e);
 			}
 			add.setCountry(this.countryTextField.getText());
 			add.setHouseNumber(this.streetNumberTextField.getText());

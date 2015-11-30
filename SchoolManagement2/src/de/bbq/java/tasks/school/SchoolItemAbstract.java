@@ -79,6 +79,7 @@ public abstract class SchoolItemAbstract implements Serializable {
 	public void setLast(boolean isLast) {
 		this.isLastObject = isLast;
 	}
+	public abstract String getDescription();
 	/////////////////////////////////////////////////////////////////////////////////////
 
 }

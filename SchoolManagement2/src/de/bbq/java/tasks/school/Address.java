@@ -70,6 +70,15 @@ public class Address extends SchoolItemAbstract implements Serializable {
 	public void setCountry(String country) {
 		this.country = country;
 	}
+	@Override
+	public String getDescription() {
+		StringBuffer bu = new StringBuffer();
+		bu.append(this.getStreetName() + " " + this.getHouseNumber() + "\n");
+		bu.append(this.getZipCode() + " " + this.getCity() + "\n");
+		bu.append(this.getCountry());
+		return bu.toString();
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////
 
 }

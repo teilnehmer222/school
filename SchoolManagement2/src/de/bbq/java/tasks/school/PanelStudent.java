@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
@@ -52,13 +51,13 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 			try {
 				student = (IStudent) this.studentListModel.getElementAt(index - 1);
 			} catch (Exception e) {
-				JOptionPane.showMessageDialog(null, e.getMessage());
+				SchoolLauncher.showException(e);
 			}
 			if (!SchoolLauncher.getCourseList().contains(student)) {
 				try {
 					this.studentListModel.remove(index - 1);
 				} catch (Exception e) {
-					JOptionPane.showMessageDialog(null, e.getMessage());
+					SchoolLauncher.showException(e);
 				}
 			}
 		}
@@ -170,8 +169,7 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 							index = 0;
 						}
 					} catch (Exception e) {
-						JOptionPane.showMessageDialog(null, e.getMessage());
-						e.printStackTrace();
+						SchoolLauncher.showException(e);
 					}
 				}
 			}
@@ -189,8 +187,7 @@ public class PanelStudent extends JPanel implements ActionListener, ListSelectio
 								indexPool = 0;
 							}
 						} catch (Exception e) {
-							JOptionPane.showMessageDialog(null, e.getMessage());
-							e.printStackTrace();
+							SchoolLauncher.showException(e);
 						}
 					}
 				}

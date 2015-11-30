@@ -14,7 +14,6 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -63,14 +62,14 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 			try {
 				cindex = this.courseListModel.getElementAt(index - 1);
 			} catch (Exception e) {
-				JOptionPane.showMessageDialog(null, e.getMessage());
+				SchoolLauncher.showException(e);
 			}
 
 			if (!SchoolLauncher.getCourseList().contains(cindex)) {
 				try {
 					this.courseListModel.remove(index - 1);
 				} catch (Exception e) {
-					JOptionPane.showMessageDialog(null, e.getMessage());
+					SchoolLauncher.showException(e);
 				}
 
 			}
@@ -244,9 +243,12 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		this.dataBase.setValue(0);
 		Hashtable<Integer, JLabel> ht = new Hashtable<Integer, JLabel>();
 
-		JLabel label = new JLabel("Filesystem");
+		JLabel label = new JLabel(EDaoSchool.FILE.toString()); // new
+																// JLabel("Filesystem");
 		ht.put(0, label);
-		label = new JLabel("Jdbc MySql");
+		label = new JLabel(EDaoSchool.JDBC_MYSQL.toString()); // new
+																// JLabel("Jdbc
+																// MySql");
 		ht.put(1, label);
 		this.dataBase.setLabelTable(ht);
 		this.dataBase.setPaintLabels(true);

@@ -183,7 +183,11 @@ public abstract class DaoSchoolAbstract {
 	public static boolean closeConnections() {
 		boolean ret = false;
 		daoFile = null;
-		ret = daoJdbcMysql.closeConnection();
+		if (daoJdbcMysql != null) {
+			ret = daoJdbcMysql.closeConnection();
+		} else {
+			ret = true;
+		}
 		daoJdbcMysql = null;
 		return ret;
 	}

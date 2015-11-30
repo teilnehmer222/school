@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
@@ -56,14 +55,14 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 			try {
 				cindex = this.teacherListModel.getElementAt(index - 1);
 			} catch (Exception e) {
-				JOptionPane.showMessageDialog(null, e.getMessage());
+				SchoolLauncher.showException(e);
 			}
 
 			if (!SchoolLauncher.getCourseList().contains(cindex)) {
 				try {
 					this.teacherListModel.remove(index - 1);
 				} catch (Exception e) {
-					JOptionPane.showMessageDialog(null, e.getMessage());
+					SchoolLauncher.showException(e);
 				}
 
 			}
@@ -176,13 +175,11 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 									indexPool--;
 								}
 							} catch (Exception e) {
-								JOptionPane.showMessageDialog(null, e.getMessage());
-								e.printStackTrace();
+								SchoolLauncher.showException(e);
 							}
 						}
 					} catch (Exception e) {
-						JOptionPane.showMessageDialog(null, e.getMessage());
-						e.printStackTrace();
+						SchoolLauncher.showException(e);
 					}
 				}
 			}
@@ -199,8 +196,7 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 							indexPool = 0;
 						}
 					} catch (Exception e) {
-						JOptionPane.showMessageDialog(null, e.getMessage());
-						e.printStackTrace();
+						SchoolLauncher.showException(e);
 					}
 				}
 			}

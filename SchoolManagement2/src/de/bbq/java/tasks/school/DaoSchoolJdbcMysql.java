@@ -11,8 +11,6 @@ import java.sql.Savepoint;
 import java.sql.Types;
 import java.util.HashMap;
 
-import javax.swing.JOptionPane;
-
 import com.mysql.jdbc.DatabaseMetaData;
 import com.mysql.jdbc.Statement;
 
@@ -42,8 +40,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "Loading com.mysql.jdbc.Driver failed.", "Error",
-					JOptionPane.ERROR_MESSAGE);
+			SchoolLauncher.showErrorMessage("Loading com.mysql.jdbc.Driver failed.");
 		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -90,8 +87,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 			this.resultSet = preparedStatement.executeQuery();
 			return this.resultSet.next();
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
-			e.printStackTrace();
+			SchoolLauncher.showException(e);
 			return false;
 		}
 	}
@@ -193,8 +189,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 				}
 			}
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
-			e.printStackTrace();
+			SchoolLauncher.showException(e);
 			return false;
 		}
 		return true;
@@ -312,8 +307,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 				}
 			}
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
-			e.printStackTrace();
+			SchoolLauncher.showException(e);
 			return false;
 		}
 		return true;
@@ -335,19 +329,19 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 			ret = super.saveAllAhead();
 			getConnection().commit();
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
-			e.printStackTrace();
 			try {
 				getConnection().rollback(savePoint);
 			} catch (SQLException e1) {
-				e1.printStackTrace();
+				System.out.println(e1.getStackTrace());
+				ret = false;
 			}
+			SchoolLauncher.showException(e);
 			ret = false;
 		}
 		try {
 			getConnection().setAutoCommit(true);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println(e.getStackTrace());
 		}
 		return ret;
 	}
@@ -384,8 +378,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 			preparedStatement.execute();
 			return true;
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
-			e.printStackTrace();
+			SchoolLauncher.showException(e);
 			return false;
 		}
 	}
@@ -519,15 +512,15 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 				preparedStatement.close();
 			}
 		} catch (HeadlessException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
+			SchoolLauncher.showException(e);
 			return false;
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
+			SchoolLauncher.showException(e);
 			return false;
 		}
 		String out = "Aus Datei gelutscht: " + cc + " mal Dummgelaber, " + ct + " Labertaschen und " + cs
 				+ " Hohlköpfe.";
-		JOptionPane.showMessageDialog(null, "loadAll fertig!\r\n\r\n" + out);
+		SchoolLauncher.showMessage("loadAll fertig!\r\n\r\n" + out);
 		return true;
 	}
 
@@ -551,10 +544,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 				String conString = "jdbc:mysql://" + database + "?user=" + username + "&password=" + password;
 				this.connection = DriverManager.getConnection(conString);
 			} catch (SQLException e) {
-				JOptionPane.showMessageDialog(null, "Username oder Passwort sind falsch.", "JDBC Anmelden",
-						JOptionPane.ERROR_MESSAGE);
-				// JOptionPane.showMessageDialog(null, e.getMessage());
-				e.printStackTrace();
+				SchoolLauncher.showErrorMessage("Username oder Passwort sind falsch.");
 				this.connection = null;
 				loginDialog = null;
 			}
@@ -585,8 +575,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 				this.connection.close();
 				return true;
 			} catch (SQLException e) {
-				JOptionPane.showMessageDialog(null, e.getMessage());
-				e.printStackTrace();
+				SchoolLauncher.showException(e);
 			}
 			return false;
 		}
@@ -635,8 +624,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 				try {
 					teacher.addCourse(course);
 				} catch (Exception e) {
-					JOptionPane.showMessageDialog(null, e.getMessage());
-					e.printStackTrace();
+					SchoolLauncher.showException(e);
 				}
 			}
 		}
@@ -660,8 +648,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 						try {
 							teacher.addCourse(course);
 						} catch (Exception e) {
-							JOptionPane.showMessageDialog(null, e.getMessage());
-							e.printStackTrace();
+							SchoolLauncher.showException(e);
 						}
 					}
 				}
@@ -696,8 +683,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 		try {
 			stmt = (Statement) getConnection().createStatement();
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
-			e.printStackTrace();
+			SchoolLauncher.showException(e);
 		}
 
 		switch (table) {
@@ -718,8 +704,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 		try {
 			stmt.executeUpdate(sql);
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
-			e.printStackTrace();
+			SchoolLauncher.showException(e);
 		}
 		return ret;
 	}

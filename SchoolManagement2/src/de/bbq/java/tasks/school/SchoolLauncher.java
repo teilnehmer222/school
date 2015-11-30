@@ -5,6 +5,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -16,7 +17,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * @author Thorsten2201
@@ -34,6 +37,9 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 	private static EDaoSchool selectedDao = EDaoSchool.FILE;
 	private static SchoolLauncher launcher;
 	private static ArrayList<FrameEdit> editFrames = new ArrayList<>();
+	private static boolean console = false;
+	private static Shell shell;
+	private static DateFormat dateFormatGermany;
 
 	private PanelCourse panel1;
 	private PanelTeacher panel2;
@@ -54,15 +60,62 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
 	public static void main(String[] args) {
-		// frame.add(keyboardExample);
+		console = false;
+		if (getGermanDate() == null) {
+			Locale locDE = new Locale(Locale.GERMANY.getCountry());
+			setDateFormatGermany(DateFormat.getDateInstance(DateFormat.FULL, locDE));
+		}
 		launcher = new SchoolLauncher();
-		launcher.setVisible(true);
+		args = new String[] { "asasas", "54908" };
+
+		if (args.length > 0) {
+			if (args[0].equalsIgnoreCase("DEBUG")) {
+				console = true;
+				launcher.setVisible(true);
+			} else {
+				console = true;
+				String out = "";
+				String add = "hat er";
+				String it = "er steht";
+				String param = "deinen";
+				for (int index = 0; index < args.length; index++) {
+					if (index != args.length - 1 && index > 0) {
+						out += ", ";
+						add = "haben sie";
+						it = "sie stehen";
+						param = "deine";
+					} else if (index == args.length - 1) {
+						out += " und ";
+						add = "haben sie";
+						it = "sie stehen";
+						param = "deine";
+					}
+					out += args[index];
+				}
+				System.out.println("Vielen Dank für " + param + " Parameter " + out + ",\ngebracht " + add
+						+ " dir nichts, aber dafür " + it + " jetzt da\nwo früher mal deine GUI gestanden hat.");
+				System.out.println();
+				launcher.setVisible(false);
+			}
+		} else {
+			launcher.setVisible(!console);
+		}
+		if (console) {
+			shell = new Shell();
+			shell.Start(console);
+			getInstance().closeConnections();
+			System.exit(0);
+		}
 	}
 
 	public static SchoolLauncher getInstance() {
 		return launcher;
 	}
-
+	private void refresh() {
+		panel1.refresh();
+		panel2.refresh();
+		panel3.refresh();
+	}
 	private SchoolLauncher() {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
@@ -78,6 +131,45 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(null);
 		addControls();
+	}
+
+	@SuppressWarnings("static-access")
+	public static void showErrorMessage(String s) {
+		if (console) {
+			getInstance().shell.showMessage("Error", s);
+		} else {
+			JOptionPane.showInternalMessageDialog(null, s, "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	@SuppressWarnings("static-access")
+	public static String showInput(String s) {
+		if (console) {
+			return getInstance().shell.showInput(s);
+		} else {
+			return JOptionPane.showInternalInputDialog(null, s, "Information", JOptionPane.QUESTION_MESSAGE);
+		}
+	}
+
+	@SuppressWarnings("static-access")
+	public static void showMessage(String s) {
+		if (console) {
+			getInstance().shell.showMessage(s);
+		} else {
+			// JOptionPane.showMessageDialog(null, s, "Information",
+			// JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showInternalMessageDialog(null, s, "Information", JOptionPane.INFORMATION_MESSAGE);
+		}
+	}
+
+	@SuppressWarnings("static-access")
+	public static void showException(Exception e) {
+		if (console) {
+			getInstance().shell.showMessage("Exception", e.getMessage(), e.getStackTrace().toString());
+		} else {
+			JOptionPane.showInternalMessageDialog(null, e.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+			System.out.println(e.getStackTrace());
+		}
 	}
 
 	protected void closeConnections() {
@@ -182,16 +274,40 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 		return Student.getStudents();
 	}
 
+	public static ArrayList<ICourse> getCourses(ITeacher teacher) {
+		ArrayList<ICourse> ret = new ArrayList<>();
+		for (ICourse c : getCourseList()) {
+			if (c.hasTeacher()) {
+				if (c.getTeacher().equals(teacher)) {
+					ret.add(c);
+				}
+			}
+		}
+		return ret;
+	}
+
 	public static ICourse getNewCourse(boolean random) {
 		return Course.createCourse(true, selectedDao);
+	}
+
+	public static ICourse getNewCourse(String name) {
+		return Course.createCourse(name, selectedDao);
 	}
 
 	public static ITeacher getNewTeacher(boolean random) {
 		return Teacher.createTeacher(random, selectedDao);
 	}
 
+	public static ITeacher getNewTeacher(String name) {
+		return Teacher.createTeacher(name, selectedDao);
+	}
+
 	public static IStudent getNewStudent(boolean random) {
 		return Student.createStudent(random, selectedDao);
+	}
+
+	public static IStudent getNewStudent(String name) {
+		return Student.createStudent(name, selectedDao);
 	}
 
 	/***
@@ -239,6 +355,10 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 		}
 	}
 
+	public static boolean getShell() {
+		return console;
+	}
+
 	public static boolean deleteElement(SchoolItemAbstract editItem) {
 		boolean ret = DaoSchoolAbstract.getDaoSchool(selectedDao).deleteElement(editItem);
 		if (ret) {
@@ -253,7 +373,6 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 			} else if (editItem instanceof Address) {
 				//
 			}
-
 		}
 		return ret;
 	}
@@ -304,5 +423,18 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
+
+	public static DateFormat getGermanDate() {
+		return dateFormatGermany;
+	}
+
+	public static void setDateFormatGermany(DateFormat dateFormatGermany) {
+		SchoolLauncher.dateFormatGermany = dateFormatGermany;
+	}
+
+	public static void toggleFrame() {
+		launcher.setVisible(!launcher.isVisible());
+		launcher.refresh();
+	}
 
 }

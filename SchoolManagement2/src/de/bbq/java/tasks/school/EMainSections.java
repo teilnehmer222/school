@@ -4,32 +4,17 @@ package de.bbq.java.tasks.school;
  * @author Thorsten2201
  *
  */
-public enum EDaoSchool {
-	ABSTACT(0), FILE(1), JDBC(2), JDBC_MYSQL(3);
+public enum EMainSections {
+	COURSE(0), TEACHER(1), STUDENT(2), DATASOURCE(3), EDITOR(4);
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Class Properties
 	int enumId = 0;
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	public String toString() {
-		switch (this.enumId) {
-		case 0:
-			return "Abstrakt";
-		case 1:
-			return "Dateisystem";
-		case 2:
-			return "Jdbc abstrakt";
-		case 3:
-			return "Jdbc MySql";
-		default:
-			return "Nicht existent";
-		}
-	}
-
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
-	EDaoSchool(int enumId) {
+	EMainSections(int enumId) {
 		this.enumId = enumId;
 	};
 	/////////////////////////////////////////////////////////////////////////////////////

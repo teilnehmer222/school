@@ -3,8 +3,6 @@ package de.bbq.java.tasks.school;
 import java.util.ArrayList;
 import java.util.Date;
 
-import javax.swing.JOptionPane;
-
 /**
  * @author teinlehmer222
  *
@@ -52,13 +50,12 @@ public class Course extends SchoolItemAbstract implements ICourse {
 		return names[randomNum];
 	}
 
-	private static Course createCourse(String courseName, EDaoSchool store) {
+	public static ICourse createCourse(String courseName, EDaoSchool store) {
 		Course course = null;
 		try {
 			course = new Course(courseName, store);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
-			e.printStackTrace();
+			SchoolLauncher.showException(e);
 		}
 		return course;
 	};
@@ -68,12 +65,11 @@ public class Course extends SchoolItemAbstract implements ICourse {
 		course.id = SchoolItemAbstract.getNewId();
 		return true;
 	}
-
 	public static ICourse createCourse(boolean random, EDaoSchool store) {
 		String newName = Course.generateNewName();
-		Course newCourse = null;
+		ICourse newCourse = null;
 		if (!random) {
-			newName = JOptionPane.showInputDialog("Bitte einen Kursnamen eingeben:");
+			newName = SchoolLauncher.showInput("Bitte einen Kursnamen eingeben:");
 		}
 		newCourse = Course.createCourse(newName, store);
 		return newCourse;
@@ -243,6 +239,27 @@ public class Course extends SchoolItemAbstract implements ICourse {
 
 	public void setNeedsBeamer(Boolean needsBeamer) {
 		this.needsBeamer = needsBeamer;
+	}
+	
+	@Override
+	public String getDescription() {
+		StringBuffer bu = new StringBuffer();
+		bu.append(this.getCourseName() + "\n");
+		bu.append("Fach: " + ((this.getTopic() == null)? "" : this.getTopic()) + "\n");
+		if (this.getSartTime() == null) {
+			bu.append("Start: "  + "\n");
+		} else {
+		bu.append("Start: " + SchoolLauncher.getGermanDate().format(this.getSartTime()) + "\n");
+		}
+		if (this.getEndTime() == null) {
+			bu.append("Ende: "  + "\n");
+		} else {
+			bu.append("Ende: " + SchoolLauncher.getGermanDate().format(this.getEndTime()) + "\n");
+		}
+		bu.append("Raumnummer: " + ((this.getRoomNumber() == null)? "" : this.getRoomNumber()) + "\n");
+		bu.append("Sprache: " + ((this.getLanguage() == null)? "" : this.getLanguage()) + "\n");
+		bu.append("Benötigt Beamer: " + (this.getNeedsBeamer()? "Ja" : "Nein"));
+		return bu.toString();
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 

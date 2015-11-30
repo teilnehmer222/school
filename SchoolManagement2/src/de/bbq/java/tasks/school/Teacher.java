@@ -1,7 +1,6 @@
 package de.bbq.java.tasks.school;
 
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
 /**
  * @author teilnehmer222
@@ -33,22 +32,20 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 	}
 
 	private static String generateNewName() {
-		String[] array = new String[] { "Geistig Abwesender", "Musikleerer", "Deuschleerer", "Verleerer", "Entlährer",
-				"Laubbläsleer", "Labersack", "Zutexter", "Volllaberer", "Berieseler", "Hintergrundrauschen",
-				"Verstörendes Geräusch", "Arschkopf", "Dildogesicht", "Zwerg Nase", "Halodri", "Birkenstockdepp",
-				"Fotzenkopf", "Hirschgesicht", "Althippy" };
+		String[] array = new String[] { "Geistig Abwesender", "Laubbläsleer", "Labersack", "Zutexter", "Volllaberer", "Berieseler", "Hintergrundrauschen",
+				"Verstörendes Geräusch", "Dildogesicht", "Halodri", "Birkenstockdepp",
+				"Fotzenkopf", "Hirschfresse", "Althippy", "Schnarchnase" };
 		int randomNum = 0 + (int) (Math.random() * array.length);
 		return array[randomNum];
 	}
 
-	private static Teacher createTeacher(String firstName, EDaoSchool eDataAccess) {
+	public static Teacher createTeacher(String firstName, EDaoSchool eDataAccess) {
 		Teacher teacher = null;
 		try {
 			teacher = new Teacher(firstName, eDataAccess);
 			allTeachers.add(teacher);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e.getMessage());
-			e.printStackTrace();
+			SchoolLauncher.showException(e);
 		}
 		return teacher;
 	}
@@ -57,7 +54,7 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 		String newName = Teacher.generateNewName();
 		Teacher newTeacher = null;
 		if (!random) {
-			newName = JOptionPane.showInputDialog("Bitte einen Namen eingeben:");
+			newName = SchoolLauncher.showInput("Bitte einen Namen eingeben:");
 		}
 		newTeacher = Teacher.createTeacher(newName, eDataAccess);
 		return newTeacher;
@@ -71,6 +68,18 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 		if (allTeachers.contains(editItem)) {
 			allTeachers.remove(editItem);
 		}
+	}
+
+	private static int getCourseCount(Teacher teacher) {
+		int cnt = 0;
+		for(ICourse c : Course.getCourses()) {
+			if(c.hasTeacher()) {
+				if (c.getTeacher().equals(teacher)) {
+					cnt++;
+				}
+			}
+		}
+		return cnt;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -99,6 +108,22 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 			}
 
 		}
+	}
+	
+	@Override
+	public String getDescription() {
+		StringBuffer bu = new StringBuffer();
+		bu.append(this.getFirstName() + " " + getLastName() + "\n");
+		if (this.getBirthDate() != null) {
+			bu.append( SchoolLauncher.getGermanDate().format(this.getBirthDate()) + "\n");
+		}
+		bu.append(this.getAdress().getDescription()); 
+		return bu.toString();
+	}
+	
+	@Override
+	public int getCoursesCount() {
+		return Teacher.getCourseCount(this);
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
