@@ -99,12 +99,12 @@ public abstract class DaoSchoolAbstract {
 
 	public boolean saveAllAhead() {
 		boolean ret = false;
-		for (ITeacher t : SchoolLauncher.getTeacherList()) {
+		for (ITeacher t : Kursverwaltung.getTeacherList()) {
 			if (!(((SchoolItemAbstract) t).isSaved())) {
 				if (!unsavedTeacher((SchoolItemAbstract) t) && !unsavedStudent((SchoolItemAbstract) t)) {
 					((SchoolItemAbstract) t).setLast(true);
 				}
-				ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao())
+				ret &= DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao())
 						.saveElement((SchoolItemAbstract) t);
 			}
 		}
@@ -114,14 +114,14 @@ public abstract class DaoSchoolAbstract {
 					&& !unsavedStudent((SchoolItemAbstract) c)) {
 				((SchoolItemAbstract) c).setLast(true);
 			}
-			ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao()).saveElement((SchoolItemAbstract) c);
+			ret &= DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao()).saveElement((SchoolItemAbstract) c);
 		}
-		for (IStudent s : SchoolLauncher.getStudentList()) {
+		for (IStudent s : Kursverwaltung.getStudentList()) {
 			if (!((SchoolItemAbstract) s).isSaved()) {
 				if (!unsavedStudent((SchoolItemAbstract) s)) {
 					((SchoolItemAbstract) s).setLast(true);
 				}
-				ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao())
+				ret &= DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao())
 						.saveElement((SchoolItemAbstract) s);
 			}
 		}
@@ -137,14 +137,14 @@ public abstract class DaoSchoolAbstract {
 					&& !unsavedStudent((SchoolItemAbstract) c)) {
 				((SchoolItemAbstract) c).setLast(true);
 			}
-			ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao()).saveElement((SchoolItemAbstract) c);
+			ret &= DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao()).saveElement((SchoolItemAbstract) c);
 			if (c.hasTeacher()) {
 				if (!unsavedTeacher((SchoolItemAbstract) c.getTeacher())
 						&& !unsavedCourse((SchoolItemAbstract) c.getTeacher())
 						&& !unsavedStudent((SchoolItemAbstract) c.getTeacher())) {
 					((SchoolItemAbstract) c.getTeacher()).setLast(true);
 				}
-				ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao())
+				ret &= DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao())
 						.saveElement((SchoolItemAbstract) c.getTeacher());
 			}
 			if (c.hasStudents()) {
@@ -153,26 +153,26 @@ public abstract class DaoSchoolAbstract {
 							&& !unsavedStudent((SchoolItemAbstract) s)) {
 						((SchoolItemAbstract) s).setLast(true);
 					}
-					ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao())
+					ret &= DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao())
 							.saveElement((SchoolItemAbstract) s);
 				}
 			}
 		}
-		for (ITeacher t : SchoolLauncher.getTeacherList()) {
+		for (ITeacher t : Kursverwaltung.getTeacherList()) {
 			if (!(((SchoolItemAbstract) t).isSaved())) {
 				if (!unsavedTeacher((SchoolItemAbstract) t) && !unsavedStudent((SchoolItemAbstract) t)) {
 					((SchoolItemAbstract) t).setLast(true);
 				}
-				ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao())
+				ret &= DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao())
 						.saveElement((SchoolItemAbstract) t);
 			}
 		}
-		for (IStudent s : SchoolLauncher.getStudentList()) {
+		for (IStudent s : Kursverwaltung.getStudentList()) {
 			if (!((SchoolItemAbstract) s).isSaved()) {
 				if (!unsavedStudent((SchoolItemAbstract) s)) {
 					((SchoolItemAbstract) s).setLast(true);
 				}
-				ret &= DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao())
+				ret &= DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao())
 						.saveElement((SchoolItemAbstract) s);
 			}
 		}

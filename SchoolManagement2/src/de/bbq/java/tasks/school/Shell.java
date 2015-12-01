@@ -1,60 +1,33 @@
 package de.bbq.java.tasks.school;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
 public class Shell {
 	private EMainSections section;
 	private EMainSections selectedClass = EMainSections.DATASOURCE;
+
 	private Course course;
 	private Teacher teacher;
 	private Student student;
+
 	private Scanner scanner = new Scanner(System.in);
-
-	public EMainSections getSection() {
-		return section;
-	}
-
-	public ICourse getICourse(int i) {
-		return (ICourse) Course.getCourses().get(i - 1);
-	}
-
-	public ITeacher getITeacher(int i) {
-		return (ITeacher) Teacher.getTeachers().get(i - 1);
-	}
-
-	public IStudent getIStudent(int i) {
-		return (IStudent) Student.getStudents().get(i - 1);
-	}
-
-	public void setSection(EMainSections section) {
-		this.section = section;
-	}
-
-	private int subsection;
-
-	public int getSubsection() {
-		return subsection;
-	}
-
-	public void setSubsection(int subsection) {
-		this.subsection = subsection;
-	}
-
-	private int input;
-	private int selection;
-
-	public boolean cont = true;
-
 	private StringBuffer name = new StringBuffer();
 	private StringBuffer header = new StringBuffer();
+
+	private int selection;
+	private int subsection;
+	private int input;
+
+	public boolean cont = true;
 
 	public void Start(boolean init) {
 		setSection(EMainSections.COURSE);
 		setSubsection(1);
 		if (init) {
-			System.out.println("Willkommen zur Konsolenverwaltung von Kursen.");
+			System.out.println("Willkommen zur konsolengesteuerten Kursverwaltung.");
 			showPromt(getSection(), getSubsection());
 			while (getInput() && this.cont) {
 				navigate();
@@ -63,6 +36,138 @@ public class Shell {
 		}
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Input handling
+	private void showPromt(EMainSections section, int subsection) {
+		String out = getSubSection(section, subsection, this.header);
+		this.header.append("\r\n" + out);
+		System.out.println();
+		System.out.println(this.header.toString());
+	}
+
+	private boolean getInput() {
+		this.input = scanInput();
+		if (isExitInput(this.input)) {
+			scanner.close();
+			return false;
+		}
+		return true;
+	}
+
+	private int scanInput() {
+		String s = "";
+		try {
+			s  = scanner.nextLine();
+		} catch (Exception e) {
+			s = "1";
+		}
+		StringTokenizer t = new StringTokenizer(s);
+		Integer ret = 999;
+		try {
+			ret = Integer.parseUnsignedInt(s);
+		} catch (Exception ex) {
+		}
+		try {
+			ret = Integer.parseUnsignedInt(t.nextToken());
+		} catch (Exception e) {
+
+		}
+		if (s.compareTo("gopro") == 0)
+			Kursverwaltung.toggleFrame();
+		if ((getSection().equals(EMainSections.COURSE) || getSection().equals(EMainSections.TEACHER)
+				|| getSection().equals(EMainSections.STUDENT)) && getSubsection() == 1 && ret == 2) {
+
+			this.name.setLength(0);
+			if (t.hasMoreElements()) {
+				StringBuffer tok = new StringBuffer(t.nextToken());
+				this.name.append(tok);
+				while (t.hasMoreTokens()) {
+					this.name.append(" " + tok);
+					String next = t.nextToken();
+					tok = new StringBuffer(next);
+				}
+			} else {
+				this.name.append("");
+			}
+		} else if (((getSection().equals(EMainSections.COURSE) || getSection().equals(EMainSections.TEACHER)
+				|| getSection().equals(EMainSections.STUDENT)) && (getSubsection() == 3 && ret == 1))
+
+				|| ((getSection().equals(EMainSections.COURSE) || getSection().equals(EMainSections.TEACHER)
+						|| getSection().equals(EMainSections.STUDENT)) && getSubsection() == 2 && ret != 4)
+
+				|| (getSection().equals(EMainSections.TEACHER) && getSubsection() == 3 && ret == 1)
+				|| (getSection().equals(EMainSections.TEACHER) && getSubsection() == 4 && ret == 1)) {
+			if (t.hasMoreTokens()) {
+				try {
+					Integer sel = Integer.parseUnsignedInt(t.nextToken());
+					setSelection(sel);
+				} catch (Exception e) {
+					setSelection(1);
+				}
+			} else {
+				System.out.println("Bitte treffen sie eine Auswahl:");
+				s = scanner.nextLine();
+				t = new StringTokenizer(s);
+				try {
+					setSelection(Integer.parseUnsignedInt(t.nextToken()));
+				} catch (Exception e) {
+					setSubsection(1);
+					ret = 1;
+				}
+			}
+		} else if (getSection().equals(EMainSections.STUDENT) && (getSubsection() == 3) && ret == 2) {
+			setSubsection(3);
+			ret = 2;
+		}
+		return ret;
+	}
+
+	private boolean isExitInput(int i) {
+		if (getSubsection() == 1 && (getSection().equals(EMainSections.COURSE)
+				|| getSection().equals(EMainSections.TEACHER) || getSection().equals(EMainSections.STUDENT))) {
+			if (i == 6)
+				return true;
+		} else if (getSubsection() == 1 && (getSection().equals(EMainSections.DATASOURCE))) {
+			if (i == 9)
+				return true;
+		} else if (getSection().equals(EMainSections.EDITOR)) {
+			if (this.getSelectedClass() == EMainSections.COURSE) {
+				if (i == 11)
+					return true;
+			} else if ((this.getSelectedClass() == EMainSections.TEACHER
+					|| this.getSelectedClass() == EMainSections.TEACHER)) {
+				if (i == 12)
+					return true;
+			}
+		}
+		return false;
+	}
+
+	public void showMessage(String... messages) {
+		StringBuffer st = new StringBuffer();
+		for (int index = 0; index < messages.length; index++) {
+			st.append(messages[index]);
+			if (index != messages.length - 1) {
+				st.append("\n\r");
+			}
+		}
+		System.out.println(st.toString());
+		getInput();
+		// continue while loop
+	}
+
+	// MessageBox for external code
+	public String showInput(String s) {
+		System.out.println(s);
+		Scanner scanner = new Scanner(System.in);
+		String input = scanner.next();
+		scanner.close();
+		return input;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Navigation-spaghetti
 	private void navigate() {
 		ICourse c = null;
 
@@ -76,10 +181,10 @@ public class Shell {
 					break;
 				case 2:
 					if (this.name.length() > 0) {
-						this.course = (Course) SchoolLauncher.getNewCourse(this.name.toString());
+						this.course = (Course) Kursverwaltung.getNewCourse(this.name.toString());
 						setSelection(selection);
 					} else {
-						this.course = (Course) SchoolLauncher.getNewCourse(true);
+						this.course = (Course) Kursverwaltung.getNewCourse(true);
 					}
 					setSelectedClass(EMainSections.COURSE);
 					System.out.println(this.course.getCourseName() + " angelegt.");
@@ -136,7 +241,7 @@ public class Shell {
 						this.course = null;
 						setSelectedClass(EMainSections.DATASOURCE);
 					}
-					if (SchoolLauncher.deleteElement(this.course)) {
+					if (Kursverwaltung.deleteElement(this.course)) {
 						this.course = null;
 					} else {
 						System.out.println("Fehler beim Löschen des Kurses.");
@@ -158,10 +263,10 @@ public class Shell {
 					break;
 				case 2:
 					if (this.name.length() > 0) {
-						this.teacher = (Teacher) SchoolLauncher.getNewTeacher(this.name.toString());
+						this.teacher = (Teacher) Kursverwaltung.getNewTeacher(this.name.toString());
 						setSelection(selection);
 					} else {
-						this.teacher = (Teacher) SchoolLauncher.getNewTeacher(true);
+						this.teacher = (Teacher) Kursverwaltung.getNewTeacher(true);
 					}
 					setSelectedClass(EMainSections.TEACHER);
 					System.out.println(this.teacher.toString() + " angelegt.");
@@ -181,7 +286,7 @@ public class Shell {
 				switch (this.input) {
 				case 1:
 					try {
-						this.teacher = (Teacher) SchoolLauncher.getTeacherList().get(this.getSelection() - 1);
+						this.teacher = (Teacher) Kursverwaltung.getTeacherList().get(this.getSelection() - 1);
 						setSelectedClass(EMainSections.TEACHER);
 					} catch (Exception e) {
 						this.teacher = null;
@@ -192,7 +297,7 @@ public class Shell {
 					break;
 				case 2:
 					try {
-						this.teacher = (Teacher) SchoolLauncher.getTeacherList().get(this.getSelection() - 1);
+						this.teacher = (Teacher) Kursverwaltung.getTeacherList().get(this.getSelection() - 1);
 						setSelectedClass(EMainSections.TEACHER);
 						System.out.println(this.teacher.getDescription());
 						setSubsection(3);
@@ -205,13 +310,13 @@ public class Shell {
 					break;
 				case 3:
 					try {
-						this.teacher = (Teacher) SchoolLauncher.getTeacherList().get(this.getSelection() - 1);
+						this.teacher = (Teacher) Kursverwaltung.getTeacherList().get(this.getSelection() - 1);
 						setSelectedClass(EMainSections.TEACHER);
 					} catch (Exception e) {
 						this.teacher = null;
 						setSelectedClass(EMainSections.DATASOURCE);
 					}
-					if (SchoolLauncher.deleteElement(this.teacher)) {
+					if (Kursverwaltung.deleteElement(this.teacher)) {
 						this.teacher = null;
 					} else {
 						System.out.println("Fehler beim Löschen des Leerers.");
@@ -287,10 +392,10 @@ public class Shell {
 					break;
 				case 2:
 					if (this.name.length() > 0) {
-						this.student = (Student) SchoolLauncher.getNewStudent(this.name.toString());
+						this.student = (Student) Kursverwaltung.getNewStudent(this.name.toString());
 						setSelection(selection);
 					} else {
-						this.student = (Student) SchoolLauncher.getNewStudent(true);
+						this.student = (Student) Kursverwaltung.getNewStudent(true);
 					}
 					setSelectedClass(EMainSections.STUDENT);
 					System.out.println(this.student.toString() + " angelegt.");
@@ -340,7 +445,7 @@ public class Shell {
 						this.student = null;
 						setSelectedClass(EMainSections.DATASOURCE);
 					}
-					if (SchoolLauncher.deleteElement(this.student)) {
+					if (Kursverwaltung.deleteElement(this.student)) {
 						this.student = null;
 					} else {
 						System.out.println("Fehler beim Löschen des Schülers.");
@@ -391,19 +496,24 @@ public class Shell {
 		case DATASOURCE:
 			switch (this.input) {
 			case 1:
-				// TODO:
+				Kursverwaltung.setSelectedDao(EDaoSchool.FILE);
+				System.out.println("Datenquelle auf " + EDaoSchool.FILE.toString() + " gewechselt.");
 				break;
 			case 2:
-				// TODO:
+				Kursverwaltung.setSelectedDao(EDaoSchool.JDBC_MYSQL);
+				System.out.println("Datenquelle auf " + EDaoSchool.JDBC_MYSQL.toString() + " gewechselt.");
 				break;
 			case 3:
-				// TODO:
+				DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao()).loadAll();
+				System.out.println("Daten geladen.");
 				break;
 			case 4:
-				// TODO:
+				DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao()).saveAll();
+				System.out.println("Daten gespeichert.");
 				break;
 			case 5:
-				// TODO:
+				Kursverwaltung.reset();
+				System.out.println("Daten zurückgesetzt.");
 				break;
 			case 6:
 				setSection(EMainSections.COURSE);
@@ -419,154 +529,110 @@ public class Shell {
 		case EDITOR:
 			setSection(EMainSections.COURSE);
 			if (this.getSelectedClass() == EMainSections.COURSE) {
-				// name = ++index + ". Kursname bearbeiten\r\n";
-				// name += ++index + ". Fach bearbeiten\r\n";
-				// name += ++index + ". Start bearbeiten\r\n";
-				// name += ++index + ". Ende bearbeiten\r\n";
-				// name += ++index + ". Sprache bearbeiten\r\n";
-				// name += ++index + ". Raum bearbeiten\r\n";
-				// name += ++index + ". hat Beamer bearbeiten\r\n";
-				// name += ++index + ". Zu Kurse wechseln\r\n";
-				// name += ++index + ". Zu Schüler wechseln\r\n";
-				// name += ++index + ". Zu Datenquelle wechseln\r\n";
-				// name += ++index + ". Programm beenden";
+				switch (this.input) {
+				case 1: // Kursname bearbeiten
+					this.course.setCourseName(this.name.toString());
+					break;
+				case 2: // Fach bearbeiten
+					this.course.setTopic(this.name.toString());
+					break;
+				case 3: // Start bearbeiten
+					Date start = null;
+					try {
+						start = Kursverwaltung.parseDate(this.name.toString());
+						this.course.setStartTime(start);
+					} catch (Exception e) {
+						Kursverwaltung.showException(e);
+					}
+					break;
+				case 4: // Ende bearbeiten
+					Date end = null;
+					try {
+						end = Kursverwaltung.parseDate(this.name.toString());
+						this.course.setEndTime(end);
+					} catch (Exception e) {
+						Kursverwaltung.showException(e);
+					}
+					break;
+				case 5: // Sprache bearbeiten
+					this.course.setLanguage(this.name.toString());
+					break;
+				case 6: // Raum bearbeiten
+					this.course.setRoomNumber(this.name.toString());
+					break;
+
+				case 7: // Fach bearbeiten
+					this.course.setTopic(this.name.toString());
+					break;
+				case 8: // Beamer bearbeiten
+					this.course.setNeedsBeamer(this.name.toString().equalsIgnoreCase("ja"));
+					break;
+				case 9:
+					setSection(EMainSections.COURSE);
+					break;
+				case 10:
+					setSection(EMainSections.TEACHER);
+					break;
+				case 11:
+					setSection(EMainSections.STUDENT);
+					break;
+				default:
+					System.out.println(this.course.getDescription());
+				}
 			} else if ((this.getSelectedClass() == EMainSections.TEACHER)
-					|| (this.getSelectedClass() == EMainSections.TEACHER)) {
-				// name = ++index + ". Nachname bearbeiten\r\n";
-				// name += ++index + ". Vorname bearbeiten\r\n";
-				// name += ++index + ". Geburtsdatum bearbeiten\r\n";
-				// name += ++index + ". Strasse bearbeiten\r\n";
-				// name += ++index + ". Hausnummer bearbeiten\r\n";
-				// name += ++index + ". Stadt bearbeiten\r\n";
-				// name += ++index + ". PLZ bearbeiten\r\n";
-				// name += ++index + ". Land bearbeiten\r\n";
-				// name += ++index + ". Zu Kurse wechseln\r\n";
-				// name += ++index + ". Zu Schüler wechseln\r\n";
-				// name += ++index + ". Zu Datenquelle wechseln\r\n";
-				// name += ++index + ". Programm beenden";
-			}
-			switch (this.input) {
-			case 1:
-				;
-				break;
+					|| (this.getSelectedClass() == EMainSections.STUDENT)) {
+				switch (this.input) {
+				case 1: // Nachname bearbeiten
+					(this.getSelectedClass() == EMainSections.TEACHER ? this.teacher : this.student)
+							.setLastName(this.name.toString());
+					break;
+				case 2: // Firstname bearbeiten
+					(this.getSelectedClass() == EMainSections.TEACHER ? this.teacher : this.student)
+							.setFirstName(this.name.toString());
+					break;
+				case 3: // Geburtsdatum bearbeiten
+					Date birth = null;
+					try {
+						birth = Kursverwaltung.parseDate(this.name.toString());
+						(this.getSelectedClass() == EMainSections.TEACHER ? this.teacher : this.student)
+								.setBirthDate(birth);
+					} catch (Exception e) {
+						Kursverwaltung.showException(e);
+					}
+					break;
+				case 4: // Straße bearbeiten
+					(this.getSelectedClass() == EMainSections.TEACHER ? this.teacher : this.student).getAdress()
+							.setStreetName(this.name.toString());
+					break;
+				case 5: // Hausnummer bearbeiten
+					(this.getSelectedClass() == EMainSections.TEACHER ? this.teacher : this.student).getAdress()
+							.setHouseNumber(this.name.toString());
+					break;
+				case 6: // Stadt bearbeiten
+					(this.getSelectedClass() == EMainSections.TEACHER ? this.teacher : this.student).getAdress()
+							.setCity(this.name.toString());
+					break;
+				case 7: // Zip bearbeiten
+					try {
+						(this.getSelectedClass() == EMainSections.TEACHER ? this.teacher : this.student).getAdress()
+								.setZipCode(Integer.parseInt(this.name.toString()));
+					} catch (Exception e) {
+						Kursverwaltung.showException(e);
+					}
+					break;
+				case 8: // Land bearbeiten
+					(this.getSelectedClass() == EMainSections.TEACHER ? this.teacher : this.student).getAdress()
+							.setCountry(this.name.toString());
+					break;
+				}
 			}
 			break;
 		}
-
 	}
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	public void showMessage(String... messages) {
-		StringBuffer st = new StringBuffer();
-		for (int index = 0; index < messages.length; index++) {
-			st.append(messages[index]);
-			if (index != messages.length - 1) {
-				st.append("\n\r");
-			}
-		}
-		System.out.println(st.toString());
-		getInput();
-		// continue while loop
-	}
-
-	private void showPromt(EMainSections section, int subsection) {
-		String out = getSubSection(section, subsection, this.header);
-		this.header.append("\r\n" + out);
-		System.out.println();
-		System.out.println(this.header.toString());
-	}
-
-	private boolean getInput() {
-		this.input = scanInput();
-		if (isExitInput(this.input)) {
-			scanner.close();
-			return false;
-		}
-		return true;
-	}
-
-	private int scanInput() {
-		String s = scanner.nextLine();
-		StringTokenizer t = new StringTokenizer(s);
-		Integer ret = 999;
-		try {
-			ret = Integer.parseUnsignedInt(s);
-		} catch (Exception ex) {
-		}
-		try {
-			ret = Integer.parseUnsignedInt(t.nextToken());
-		} catch (Exception e) {
-
-		}
-		if (s.compareTo("gopro") == 0) SchoolLauncher.toggleFrame();
-		if ((getSection().equals(EMainSections.COURSE) || getSection().equals(EMainSections.TEACHER)
-				|| getSection().equals(EMainSections.STUDENT)) && getSubsection() == 1 && ret == 2) {
-
-			this.name.setLength(0);
-			if (t.hasMoreElements()) {
-				StringBuffer tok = new StringBuffer(t.nextToken());
-				this.name.append(tok);
-				while (t.hasMoreTokens()) {
-					this.name.append(" " + tok);
-					String next = t.nextToken();
-					tok = new StringBuffer(next);
-				}
-			} else {
-				this.name.append("");
-			}
-		} else if (((getSection().equals(EMainSections.COURSE) || getSection().equals(EMainSections.TEACHER)
-				|| getSection().equals(EMainSections.STUDENT)) && (getSubsection() == 3 && ret == 1))
-
-				|| ((getSection().equals(EMainSections.COURSE) || getSection().equals(EMainSections.TEACHER)
-						|| getSection().equals(EMainSections.STUDENT)) && getSubsection() == 2 && ret != 4)
-
-				|| (getSection().equals(EMainSections.TEACHER) && getSubsection() == 3 && ret == 1)
-				|| (getSection().equals(EMainSections.TEACHER) && getSubsection() == 4 && ret == 1)) {
-			if (t.hasMoreTokens()) {
-				try {
-					Integer sel = Integer.parseUnsignedInt(t.nextToken());
-					setSelection(sel);
-				} catch (Exception e) {
-					setSelection(1);
-				}
-			} else {
-				System.out.println("Bitte treffen sie eine Auswahl:");
-				s = scanner.nextLine();
-				t = new StringTokenizer(s);
-				try {
-					setSelection(Integer.parseUnsignedInt(t.nextToken()));
-				} catch (Exception e) {
-					setSubsection(1);
-					ret = 1;
-				}
-			}
-		} else if (getSection().equals(EMainSections.STUDENT) && (getSubsection() == 3) && ret == 2) {
-			setSubsection(3);
-			ret = 2;
-		}
-		return ret;
-	}
-
-	private boolean isExitInput(int i) {
-		if (getSubsection() == 1 && (getSection().equals(EMainSections.COURSE)
-				|| getSection().equals(EMainSections.TEACHER) || getSection().equals(EMainSections.STUDENT))) {
-			if (i == 6)
-				return true;
-		} else if (getSubsection() == 1 && (getSection().equals(EMainSections.DATASOURCE))) {
-			if (i == 9)
-				return true;
-		} else if (getSection().equals(EMainSections.EDITOR)) {
-			if (this.getSelectedClass() == EMainSections.COURSE) {
-				if (i == 11)
-					return true;
-			} else if ((this.getSelectedClass() == EMainSections.TEACHER
-					|| this.getSelectedClass() == EMainSections.TEACHER)) {
-				if (i == 12)
-					return true;
-			}
-		}
-		return false;
-	}
-
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Returns promt-text
 	private String getSubSection(EMainSections section, int subsection, StringBuffer header) {
 		String name = null;
 		switch (section) {
@@ -575,7 +641,7 @@ public class Shell {
 			case 1:
 				header.setLength(0);
 				header.append("Sie befinden sich auf <Kurse>");
-				name = "1. Liste aller Kurse (" + SchoolLauncher.getCourseList().size() + ") anzeigen\r\n";
+				name = "1. Liste aller Kurse (" + Kursverwaltung.getCourseList().size() + ") anzeigen\r\n";
 				name += "2. Einen Kurs <...> anlegen\r\n";
 				name += "3. Zu Leerer wechseln\r\n";
 				name += "4. Zu Schüler wechseln\r\n";
@@ -600,8 +666,8 @@ public class Shell {
 				header.append("Sie befinden sich auf <Datenquelle>\r\n");
 				name = "1. Datenquelle auf <" + EDaoSchool.FILE.toString() + "> setzen\r\n";
 				name += "2. Datenquelle auf <" + EDaoSchool.JDBC_MYSQL.toString() + "> setzen\r\n";
-				name += "3. Datensatz per " + SchoolLauncher.getSelectedDao().toString() + " laden\r\n";
-				name += "4. Komplette Daten per " + SchoolLauncher.getSelectedDao().toString() + " speichern\r\n";
+				name += "3. Datensatz per " + Kursverwaltung.getSelectedDao().toString() + " laden\r\n";
+				name += "4. Komplette Daten per " + Kursverwaltung.getSelectedDao().toString() + " speichern\r\n";
 				name += "5. Komplette Daten auf \"null\" setzen\r\n";
 				name += "6. Zu Kurse wechseln\r\n";
 				name += "7. Zu Leerer wechseln\r\n";
@@ -615,7 +681,7 @@ public class Shell {
 			case 1:
 				header.setLength(0);
 				header.append("Sie befinden sich auf <Schüler>");
-				name = "1. Liste aller Schüler(" + SchoolLauncher.getStudentList().size() + ") anzeigen\r\n";
+				name = "1. Liste aller Schüler(" + Kursverwaltung.getStudentList().size() + ") anzeigen\r\n";
 				name += "2. Einen Schüler <...> anlegen\r\n";
 				name += "3. Zu Kurse wechseln\r\n";
 				name += "4. Zu Leerer wechseln\r\n";
@@ -651,7 +717,7 @@ public class Shell {
 			case 1:
 				header.setLength(0);
 				header.append("Sie befinden sich auf <Leerer>");
-				name = "1. Liste aller Leerer(" + SchoolLauncher.getTeacherList().size() + ") anzeigen\r\n";
+				name = "1. Liste aller Leerer(" + Kursverwaltung.getTeacherList().size() + ") anzeigen\r\n";
 				name += "2. Einen Leerer <...> anlegen\r\n";
 				name += "3. Zu Kurse wechseln\r\n";
 				name += "4. Zu Schüler wechseln\r\n";
@@ -727,6 +793,44 @@ public class Shell {
 		}
 		return name;
 	}
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Getter / Setter
+	private String getList() {
+		StringBuffer ret = new StringBuffer();
+		@SuppressWarnings("rawtypes")
+		ArrayList list = null;
+		switch (getSection()) {
+		case COURSE:
+			list = Kursverwaltung.getCourseList();
+			for (int index = 1; index <= list.size(); index++) {
+				ret.append(index + ". " + list.get(index - 1).toString() + "\n");
+			}
+			break;
+		case DATASOURCE: // refurbished
+			list = Kursverwaltung.getCourses(this.teacher);
+			for (int index = 1; index <= list.size(); index++) {
+				ret.append(index + ". " + list.get(index - 1).toString() + "\n");
+			}
+			break;
+		case EDITOR:
+			break;
+		case STUDENT:
+			list = Kursverwaltung.getStudentList();
+			for (int index = 1; index <= list.size(); index++) {
+				ret.append(index + ". " + list.get(index - 1).toString() + "\n");
+			}
+			break;
+		case TEACHER:
+			list = Kursverwaltung.getTeacherList();
+			for (int index = 1; index <= list.size(); index++) {
+				ret.append(index + ". " + list.get(index - 1).toString() + "\n");
+			}
+			break;
+		}
+		return ret.toString();
+	}
 
 	@SuppressWarnings("incomplete-switch")
 	private String getSelectedName() {
@@ -755,41 +859,6 @@ public class Shell {
 		this.selectedClass = ec;
 	}
 
-	private String getList() {
-		StringBuffer ret = new StringBuffer();
-		@SuppressWarnings("rawtypes")
-		ArrayList list = null;
-		switch (getSection()) {
-		case COURSE:
-			list = SchoolLauncher.getCourseList();
-			for (int index = 1; index <= list.size(); index++) {
-				ret.append(index + ". " + list.get(index - 1).toString() + "\n");
-			}
-			break;
-		case DATASOURCE:
-			list = SchoolLauncher.getCourses(this.teacher);
-			for (int index = 1; index <= list.size(); index++) {
-				ret.append(index + ". " + list.get(index - 1).toString() + "\n");
-			}
-			break;
-		case EDITOR:
-			break;
-		case STUDENT:
-			list = SchoolLauncher.getStudentList();
-			for (int index = 1; index <= list.size(); index++) {
-				ret.append(index + ". " + list.get(index - 1).toString() + "\n");
-			}
-			break;
-		case TEACHER:
-			list = SchoolLauncher.getTeacherList();
-			for (int index = 1; index <= list.size(); index++) {
-				ret.append(index + ". " + list.get(index - 1).toString() + "\n");
-			}
-			break;
-		}
-		return ret.toString();
-	}
-
 	public int getSelection() {
 		return selection;
 	}
@@ -798,11 +867,32 @@ public class Shell {
 		this.selection = selection;
 	}
 
-	public String showInput(String s) {
-		System.out.println(s);
-		Scanner scanner = new Scanner(System.in);
-		String input = scanner.next();
-		scanner.close();
-		return input;
+	public EMainSections getSection() {
+		return section;
 	}
+
+	public ICourse getICourse(int i) {
+		return (ICourse) Course.getCourses().get(i - 1);
+	}
+
+	public ITeacher getITeacher(int i) {
+		return (ITeacher) Teacher.getTeachers().get(i - 1);
+	}
+
+	public IStudent getIStudent(int i) {
+		return (IStudent) Student.getStudents().get(i - 1);
+	}
+
+	public void setSection(EMainSections section) {
+		this.section = section;
+	}
+
+	public int getSubsection() {
+		return subsection;
+	}
+
+	public void setSubsection(int subsection) {
+		this.subsection = subsection;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////
 }

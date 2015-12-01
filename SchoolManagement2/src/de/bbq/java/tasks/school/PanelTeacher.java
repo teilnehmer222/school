@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -55,26 +56,26 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 			try {
 				cindex = this.teacherListModel.getElementAt(index - 1);
 			} catch (Exception e) {
-				SchoolLauncher.showException(e);
+				Kursverwaltung.showException(e);
 			}
 
-			if (!SchoolLauncher.getCourseList().contains(cindex)) {
+			if (!Kursverwaltung.getCourseList().contains(cindex)) {
 				try {
 					this.teacherListModel.remove(index - 1);
 				} catch (Exception e) {
-					SchoolLauncher.showException(e);
+					Kursverwaltung.showException(e);
 				}
 
 			}
 		}
-		for (ITeacher t : SchoolLauncher.getTeacherList()) {
+		for (ITeacher t : Kursverwaltung.getTeacherList()) {
 			this.teacherListModel.addElement(t);
 		}
 		int poolIndex = coursePoolJList.getSelectedIndex();
 		this.coursePoolListModel.clear();
 		this.courseSelectedListModel.clear();
 		if (this.selectedTeacher != null) {
-			for (ICourse c : SchoolLauncher.getCourseList()) {
+			for (ICourse c : Kursverwaltung.getCourseList()) {
 				if (this.selectedTeacher.equals(c.getTeacher())) {
 					this.courseSelectedListModel.addElement(c);
 				} else if (!c.hasTeacher()) {
@@ -147,15 +148,15 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 		int indexPool = this.coursePoolJList.getSelectedIndex();
 		int indexSel = this.courseSelectedJList.getSelectedIndex();
 		if (arg0.getSource() == this.addTeacherButton) {
-			SchoolLauncher.getNewTeacher(true);
+			Kursverwaltung.getNewTeacher(true);
 			index = this.teachersJList.getModel().getSize();
 		} else if (arg0.getSource() == this.deleteTeacherButton) {
-			if (!SchoolLauncher.getTeacherList().contains(this.selectedTeacher)) {
+			if (!Kursverwaltung.getTeacherList().contains(this.selectedTeacher)) {
 				this.teachersJList.setSelectedIndex(index);
 				this.selectedTeacher = this.teachersJList.getSelectedValue();
 			}
 			if (this.selectedTeacher != null) {
-				SchoolLauncher.deleteElement((SchoolItemAbstract) this.selectedTeacher);
+				Kursverwaltung.deleteElement((SchoolItemAbstract) this.selectedTeacher);
 				this.selectedTeacher = null;
 			}
 			if (index >= this.teachersJList.getModel().getSize() - 1) {
@@ -175,11 +176,11 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 									indexPool--;
 								}
 							} catch (Exception e) {
-								SchoolLauncher.showException(e);
+								Kursverwaltung.showException(e);
 							}
 						}
 					} catch (Exception e) {
-						SchoolLauncher.showException(e);
+						Kursverwaltung.showException(e);
 					}
 				}
 			}
@@ -196,7 +197,7 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 							indexPool = 0;
 						}
 					} catch (Exception e) {
-						SchoolLauncher.showException(e);
+						Kursverwaltung.showException(e);
 					}
 				}
 			}
@@ -249,7 +250,7 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 					index = list.locationToIndex(evt.getPoint());
 				}
 				if (index >= 0) {
-					SchoolLauncher.getInstance().editItem((SchoolItemAbstract) teacherListModel.get(index));
+					Kursverwaltung.getInstance().editItem((SchoolItemAbstract) teacherListModel.get(index));
 				}
 			}
 		});
@@ -264,21 +265,21 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 		// this.add(teacherScroller);
 		panelBottom.add(teacherScroller);
 
-		this.addTeacherButton = SchoolLauncher.getButton("newTeacher", 5, 5, 100, 20, this, "Erstellen",
+		this.addTeacherButton = Kursverwaltung.getButton("newTeacher", 5, 5, 100, 20, this, "Erstellen",
 				"Neuer Leerer");
-		this.deleteTeacherButton = SchoolLauncher.getButton("delTeacher", 110, 5, 100, 20, this, "Löschen",
+		this.deleteTeacherButton = Kursverwaltung.getButton("delTeacher", 110, 5, 100, 20, this, "Löschen",
 				"Leerer löschen");
 		// this.add(this.addTeacherButton);
 		// this.add(this.deleteTeacherButton);
 		panelCreate.add(this.addTeacherButton);
 		panelCreate.add(this.deleteTeacherButton);
 
-		this.addCourseButton = SchoolLauncher.getButton("addCourse", 235, 5, 205, 20, this, "Hinzufügen ->",
+		this.addCourseButton = Kursverwaltung.getButton("addCourse", 235, 5, 205, 20, this, "Hinzufügen ->",
 				"Kurs Hinzufügen");
 		// this.add(this.addCourseButton);
 		panelTop.add(this.addCourseButton);
 
-		this.removeCourseButton = SchoolLauncher.getButton("remCourse", 470, 5, 205, 20, this, "<- Entfernen",
+		this.removeCourseButton = Kursverwaltung.getButton("remCourse", 470, 5, 205, 20, this, "<- Entfernen",
 				"Kurs Entfernen");
 		// this.add(this.removeCourseButton);
 		panelTop.add(this.removeCourseButton);
@@ -288,7 +289,25 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 		this.coursePoolJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		this.coursePoolJList.setLayoutOrientation(JList.VERTICAL);
 		this.coursePoolJList.setVisibleRowCount(-1);
-
+		this.coursePoolJList.addMouseListener(new MouseAdapter() {
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			public void mouseClicked(MouseEvent evt) {
+				JList list = (JList) evt.getSource();
+				int index = -1;
+				if (evt.getClickCount() == 2) {
+					// Double-click detected
+					index = list.locationToIndex(evt.getPoint());
+				} else if (evt.getClickCount() == 3) {
+					// Triple-click detected
+					index = list.locationToIndex(evt.getPoint());
+				}
+				if (index >= 0) {
+					Kursverwaltung.getInstance().editItem((SchoolItemAbstract) ((List<ICourse>) coursePoolJList).get(index));
+					refresh();
+				}
+			}
+		});
+		
 		JScrollPane poolScroller = new JScrollPane(this.coursePoolJList);
 		poolScroller.setPreferredSize(new Dimension(206, 300));
 		poolScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -302,7 +321,25 @@ public class PanelTeacher extends JPanel implements ActionListener, ListSelectio
 		this.courseSelectedJList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		this.courseSelectedJList.setLayoutOrientation(JList.VERTICAL);
 		this.courseSelectedJList.setVisibleRowCount(-1);
-
+		this.courseSelectedJList.addMouseListener(new MouseAdapter() {
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			public void mouseClicked(MouseEvent evt) {
+				JList list = (JList) evt.getSource();
+				int index = -1;
+				if (evt.getClickCount() == 2) {
+					// Double-click detected
+					index = list.locationToIndex(evt.getPoint());
+				} else if (evt.getClickCount() == 3) {
+					// Triple-click detected
+					index = list.locationToIndex(evt.getPoint());
+				}
+				if (index >= 0) {
+					Kursverwaltung.getInstance().editItem((SchoolItemAbstract) ((List<ICourse>) coursePoolJList).get(index));
+					refresh();
+				}
+			}
+		});
+		
 		JScrollPane tookScroller = new JScrollPane(this.courseSelectedJList);
 		tookScroller.setPreferredSize(new Dimension(206, 300));
 		tookScroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);

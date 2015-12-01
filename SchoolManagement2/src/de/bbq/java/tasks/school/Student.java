@@ -45,7 +45,7 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 			student = new Student(firstName, eDataAccess);
 			allStudents.add(student);
 		} catch (Exception e) {
-			SchoolLauncher.showException(e);
+			Kursverwaltung.showException(e);
 		}
 		return student;
 	}
@@ -54,7 +54,7 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 		String newName = Student.generateNewName();
 		Student newStudent = null;
 		if (!random) {
-			newName = SchoolLauncher.showInput("Bitte einen Namen eingeben:");
+			newName = Kursverwaltung.showInput("Bitte einen Namen eingeben:");
 		}
 		newStudent = Student.createStudent(newName, eDataAccess);
 		return newStudent;
@@ -69,6 +69,10 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 			allStudents.remove(student);
 		}
 	}
+
+	public static void reset() {
+		allStudents = new ArrayList<>();
+	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -82,15 +86,15 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public String getDescription() {
 		StringBuffer bu = new StringBuffer();
 		bu.append(this.getFirstName() + " " + getLastName() + "\n");
 		if (this.getBirthDate() != null) {
-			bu.append( SchoolLauncher.getGermanDate().format(this.getBirthDate()) + "\n");
+			bu.append(Kursverwaltung.getGermanDate().format(this.getBirthDate()) + "\n");
 		}
-		bu.append(this.getAdress().getDescription()); 
+		bu.append(this.getAdress().getDescription());
 		return bu.toString();
 	}
 	// @Override

@@ -18,14 +18,16 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 /**
  * @author Thorsten2201
  *
  */
-public class SchoolLauncher extends JFrame implements WindowListener {
+public class Kursverwaltung extends JFrame implements WindowListener {
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Class Properties
@@ -35,7 +37,7 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 	private static final int workStart = 7;
 	private static final int workEnd = 17;
 	private static EDaoSchool selectedDao = EDaoSchool.FILE;
-	private static SchoolLauncher launcher;
+	private static Kursverwaltung launcher;
 	private static ArrayList<FrameEdit> editFrames = new ArrayList<>();
 	private static boolean console = false;
 	private static Shell shell;
@@ -51,7 +53,7 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 	}
 
 	public static void setSelectedDao(EDaoSchool selectedDao) {
-		SchoolLauncher.selectedDao = selectedDao;
+		Kursverwaltung.selectedDao = selectedDao;
 		Course.dataAccessObject = DaoSchoolAbstract.getDaoSchool(selectedDao);
 		Teacher.dataAccessObject = DaoSchoolAbstract.getDaoSchool(selectedDao);
 		Student.dataAccessObject = DaoSchoolAbstract.getDaoSchool(selectedDao);
@@ -65,11 +67,17 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 			Locale locDE = new Locale(Locale.GERMANY.getCountry());
 			setDateFormatGermany(DateFormat.getDateInstance(DateFormat.FULL, locDE));
 		}
-		launcher = new SchoolLauncher();
-		args = new String[] { "asasas", "54908" };
+		launcher = new Kursverwaltung();
+		// args = new String[] { "asasas", "54908" };
+		String osname = System.getProperty("os.name");
 
-		if (args.length > 0) {
+		if (!(osname.regionMatches(true, 0, "Windows", 0, 7))) {
+			System.out.println(
+					"Was ist das denn für ein Dreck, wo ist meine Windows API hin?\nNa da darfst du jetzt schön tippen mein Freund, klicken is nicht.\r\n");
+			console = true;
+		} else if (args.length > 0) {
 			if (args[0].equalsIgnoreCase("DEBUG")) {
+				System.out.println("<Rebug-Mode>");
 				console = true;
 				launcher.setVisible(true);
 			} else {
@@ -93,7 +101,7 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 					out += args[index];
 				}
 				System.out.println("Vielen Dank für " + param + " Parameter " + out + ",\ngebracht " + add
-						+ " dir nichts, aber dafür " + it + " jetzt da\nwo früher mal deine GUI gestanden hat.");
+						+ " dir nichts, aber dafür " + it + " jetzt da wo früher mal deine GUI gestanden hat.");
 				System.out.println();
 				launcher.setVisible(false);
 			}
@@ -108,19 +116,17 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 		}
 	}
 
-	public static SchoolLauncher getInstance() {
-		return launcher;
-	}
 	private void refresh() {
 		panel1.refresh();
 		panel2.refresh();
 		panel3.refresh();
 	}
-	private SchoolLauncher() {
+
+	private Kursverwaltung() {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				SchoolLauncher.getInstance().closeConnections();
+				Kursverwaltung.getInstance().closeConnections();
 				System.exit(0);
 			}
 		});
@@ -131,6 +137,14 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(null);
 		addControls();
+	}
+
+	public static Date parseDate(String st) throws ParseException {
+		return dateFormatGermany.parse(st);
+	}
+
+	public static String formatDate(Date date) throws ParseException {
+		return dateFormatGermany.format(date);
 	}
 
 	@SuppressWarnings("static-access")
@@ -227,7 +241,7 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 	// Static for Panels, etc.
 	/** Returns an ImageIcon, or null if the path was invalid. */
 	protected static ImageIcon createImageIcon(String path) {
-		java.net.URL imgURL = SchoolLauncher.class.getResource(path);
+		java.net.URL imgURL = Kursverwaltung.class.getResource(path);
 		if (imgURL != null) {
 			return new ImageIcon(imgURL);
 		} else {
@@ -257,6 +271,30 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 
 	public static Integer getWorkEnd() {
 		return workEnd;
+	}
+
+	public static DateFormat getGermanDate() {
+		return dateFormatGermany;
+	}
+
+	public static void setDateFormatGermany(DateFormat dateFormatGermany) {
+		Kursverwaltung.dateFormatGermany = dateFormatGermany;
+	}
+
+	public static void toggleFrame() {
+		launcher.setVisible(!launcher.isVisible());
+		launcher.refresh();
+	}
+
+	public static Kursverwaltung getInstance() {
+		return launcher;
+	}
+
+	public static void reset() {
+		SchoolItemAbstract.highestMemberId = 1000;
+		Course.reset();
+		Teacher.reset();
+		Student.reset();
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -349,7 +387,7 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 		if (edit != null) {
 			editItem.setInEdit(true);
 
-			edit.addWindowListener(SchoolLauncher.getInstance());
+			edit.addWindowListener(Kursverwaltung.getInstance());
 			System.out.println("opened");
 			editFrames.add(edit);
 		}
@@ -423,18 +461,4 @@ public class SchoolLauncher extends JFrame implements WindowListener {
 
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
-
-	public static DateFormat getGermanDate() {
-		return dateFormatGermany;
-	}
-
-	public static void setDateFormatGermany(DateFormat dateFormatGermany) {
-		SchoolLauncher.dateFormatGermany = dateFormatGermany;
-	}
-
-	public static void toggleFrame() {
-		launcher.setVisible(!launcher.isVisible());
-		launcher.refresh();
-	}
-
 }

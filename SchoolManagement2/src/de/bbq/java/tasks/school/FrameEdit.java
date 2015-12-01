@@ -65,15 +65,15 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		} else if (e.getSource() == this.saveButton) {
 			if (this.courseDF != null) {
 				ReadDataCourse();
-				SchoolLauncher.saveItem(this.courseDF);
+				Kursverwaltung.saveItem(this.courseDF);
 			} else if (this.teacherDF != null) {
 				ReadDataPerson(this.teacherDF);
 				ReadDataAdress(this.teacherDF.getAdress());
-				SchoolLauncher.saveItem(this.teacherDF);
+				Kursverwaltung.saveItem(this.teacherDF);
 			} else if (this.studentDF != null) {
 				ReadDataPerson(this.studentDF);
 				ReadDataAdress(this.studentDF.getAdress());
-				SchoolLauncher.saveItem(this.studentDF);
+				Kursverwaltung.saveItem(this.studentDF);
 			}
 			if (this.courseDF != null) {
 				this.courseDF.setInEdit(false);
@@ -113,7 +113,7 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 			try {
 				add.setZipCode(Integer.parseInt(this.zipTextField.getText()));
 			} catch (Exception e) {
-				SchoolLauncher.showException(e);
+				Kursverwaltung.showException(e);
 			}
 			add.setCountry(this.countryTextField.getText());
 			add.setHouseNumber(this.streetNumberTextField.getText());
@@ -217,7 +217,7 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		// this.addWindowListener(windowListener);
 		this.teacherDF = (Teacher) editItem;
 		this.teacherDF.setInEdit(true);
-		SchoolLauncher.verifyData(this.teacherDF);
+		Kursverwaltung.verifyData(this.teacherDF);
 		setTitle("Leerer editieren");
 		SpringLayout layout = new SpringLayout();
 		setupSpringLayout(this.teacherDF.getId() + " " + this.teacherDF.toString(), 20, layout);
@@ -249,10 +249,10 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		// bottomPanel.setLayout(null);
 		bottomPanel.setAlignmentY(JComponent.CENTER_ALIGNMENT);
 
-		this.exitButton = SchoolLauncher.getButton("Abbrechen", 110, 235, 100, 20, this, "Abbrechen",
+		this.exitButton = Kursverwaltung.getButton("Abbrechen", 110, 235, 100, 20, this, "Abbrechen",
 				"Nichts wie raus hier, Leerer stinken...");
 		// add(this.exitButton);
-		this.saveButton = SchoolLauncher.getButton("Speichern", 230, 235, 100, 20, this, "Speichern",
+		this.saveButton = Kursverwaltung.getButton("Speichern", 230, 235, 100, 20, this, "Speichern",
 				"Den Leerer fein abspeichern damit auch nichts verloren geht");
 		// add(this.saveButton);
 		bottomPanel.add(this.exitButton);
@@ -274,7 +274,7 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		// this.addWindowListener(windowListener);
 		this.studentDF = (Student) editItem;
 		this.studentDF.setInEdit(true);
-		SchoolLauncher.verifyData(this.studentDF);
+		Kursverwaltung.verifyData(this.studentDF);
 		setTitle("Schüler editieren");
 		SpringLayout layout = new SpringLayout();
 		setupSpringLayout(this.studentDF.getId() + " " + this.studentDF.toString(), 20, layout);
@@ -306,10 +306,10 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		// bottomPanel.setLayout(null);
 		bottomPanel.setAlignmentY(JComponent.CENTER_ALIGNMENT);
 
-		this.exitButton = SchoolLauncher.getButton("Abbrechen", 110, 235, 100, 20, this, "Abbrechen",
+		this.exitButton = Kursverwaltung.getButton("Abbrechen", 110, 235, 100, 20, this, "Abbrechen",
 				"Nichts wie raus hier, Schüler nerven...");
 		// add(this.exitButton);
-		this.saveButton = SchoolLauncher.getButton("Speichern", 230, 235, 100, 20, this, "Speichern",
+		this.saveButton = Kursverwaltung.getButton("Speichern", 230, 235, 100, 20, this, "Speichern",
 				"Schüler fein abspeichern damit er auch nichts über sich vergissst");
 		// add(this.saveButton);
 		bottomPanel.add(this.exitButton);
@@ -331,7 +331,7 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		// this.addWindowListener(windowListener);
 		this.courseDF = (Course) editItem;
 		this.courseDF.setInEdit(true);
-		SchoolLauncher.verifyData(this.courseDF);
+		Kursverwaltung.verifyData(this.courseDF);
 		setTitle("Kurs editieren");
 
 		SpringLayout layout = new SpringLayout();
@@ -362,9 +362,9 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		p.put("text.month", "Monat");
 		p.put("text.year", "Jahr");
 
-		Integer[] hourArray = new Integer[SchoolLauncher.getWorkEnd() - SchoolLauncher.getWorkStart()];
-		for (Integer index = SchoolLauncher.getWorkStart(); index < SchoolLauncher.getWorkEnd(); index++) {
-			hourArray[index - SchoolLauncher.getWorkStart()] = index;
+		Integer[] hourArray = new Integer[Kursverwaltung.getWorkEnd() - Kursverwaltung.getWorkStart()];
+		for (Integer index = Kursverwaltung.getWorkStart(); index < Kursverwaltung.getWorkEnd(); index++) {
+			hourArray[index - Kursverwaltung.getWorkStart()] = index;
 		}
 		Integer[] minuteAray = new Integer[60 / 5];
 		for (Integer index = 0; index < 60; index = index + 5) {
@@ -424,10 +424,10 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		JPanel bottomPanel = new JPanel();
 		// bottomPanel.setLayout(null);
 		bottomPanel.setAlignmentY(JComponent.CENTER_ALIGNMENT);
-		this.exitButton = SchoolLauncher.getButton("exitButton", 110, 195, buttonWidth, 20, this, "Abbrechen",
+		this.exitButton = Kursverwaltung.getButton("exitButton", 110, 195, buttonWidth, 20, this, "Abbrechen",
 				"Nichts wie raus hier, Kurse sind anstrengend...");
 		// add(this.exitButton);
-		this.saveButton = SchoolLauncher.getButton("saveButton", 230, 195, buttonWidth, 20, this, "Speichern",
+		this.saveButton = Kursverwaltung.getButton("saveButton", 230, 195, buttonWidth, 20, this, "Speichern",
 				"Kurs fein abspeichern damit er auch nicht verloren geht");
 		// add(this.saveButton);
 
@@ -571,11 +571,11 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		// addComponent(texts, name, dateHeight, panel);
 		int selectIndex = 0;
 		if (hours != null) {
-			Integer[] hourArray = new Integer[SchoolLauncher.getWorkEnd() - SchoolLauncher.getWorkStart()];
-			for (Integer index = SchoolLauncher.getWorkStart(); index < SchoolLauncher.getWorkEnd(); index++) {
-				hourArray[index - SchoolLauncher.getWorkStart()] = index;
+			Integer[] hourArray = new Integer[Kursverwaltung.getWorkEnd() - Kursverwaltung.getWorkStart()];
+			for (Integer index = Kursverwaltung.getWorkStart(); index < Kursverwaltung.getWorkEnd(); index++) {
+				hourArray[index - Kursverwaltung.getWorkStart()] = index;
 				if (cal.get(Calendar.HOUR_OF_DAY) == index) {
-					selectIndex = index - SchoolLauncher.getWorkStart();
+					selectIndex = index - Kursverwaltung.getWorkStart();
 				}
 			}
 			hours.setMaximumSize(new Dimension(50, 26));

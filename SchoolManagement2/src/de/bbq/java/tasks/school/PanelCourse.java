@@ -62,30 +62,30 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 			try {
 				cindex = this.courseListModel.getElementAt(index - 1);
 			} catch (Exception e) {
-				SchoolLauncher.showException(e);
+				Kursverwaltung.showException(e);
 			}
 
-			if (!SchoolLauncher.getCourseList().contains(cindex)) {
+			if (!Kursverwaltung.getCourseList().contains(cindex)) {
 				try {
 					this.courseListModel.remove(index - 1);
 				} catch (Exception e) {
-					SchoolLauncher.showException(e);
+					Kursverwaltung.showException(e);
 				}
 
 			}
 		}
-		for (ICourse c : SchoolLauncher.getCourseList()) {
+		for (ICourse c : Kursverwaltung.getCourseList()) {
 			if (!this.courseListModel.contains(c)) {
 				this.courseListModel.addElement(c);
 			}
 		}
 		this.deleteCourseButton.setEnabled(this.coursesJList.getSelectedValue() != null);
 		boolean enableSave = false, enableLoad = true;
-		if (!SchoolLauncher.getCourseList().isEmpty()) {
+		if (!Kursverwaltung.getCourseList().isEmpty()) {
 			enableSave = true;
-		} else if (!SchoolLauncher.getTeacherList().isEmpty()) {
+		} else if (!Kursverwaltung.getTeacherList().isEmpty()) {
 			enableSave = true;
-		} else if (!SchoolLauncher.getStudentList().isEmpty()) {
+		} else if (!Kursverwaltung.getStudentList().isEmpty()) {
 			enableSave = true;
 		}
 		int index = this.coursesJList.getSelectedIndex();
@@ -129,12 +129,12 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 	public void stateChanged(ChangeEvent arg0) {
 		if (arg0.getSource() == dataBase) {
 			if (dataBase.getValue() == 0) {
-				if (!SchoolLauncher.getSelectedDao().equals(EDaoSchool.FILE)) {
-					SchoolLauncher.setSelectedDao(EDaoSchool.FILE);
+				if (!Kursverwaltung.getSelectedDao().equals(EDaoSchool.FILE)) {
+					Kursverwaltung.setSelectedDao(EDaoSchool.FILE);
 				}
 			} else if (dataBase.getValue() == 1) {
-				if (!SchoolLauncher.getSelectedDao().equals(EDaoSchool.JDBC_MYSQL)) {
-					SchoolLauncher.setSelectedDao(EDaoSchool.JDBC_MYSQL);
+				if (!Kursverwaltung.getSelectedDao().equals(EDaoSchool.JDBC_MYSQL)) {
+					Kursverwaltung.setSelectedDao(EDaoSchool.JDBC_MYSQL);
 				}
 			}
 		}
@@ -148,26 +148,26 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		this.refresh = true;
 		int index = this.coursesJList.getSelectedIndex();
 		if (arg0.getSource() == addCourseButton) {
-			SchoolLauncher.getNewCourse(true);
+			Kursverwaltung.getNewCourse(true);
 			index = this.coursesJList.getModel().getSize();
 		} else if (arg0.getSource() == deleteCourseButton) {
 			ICourse selected = this.coursesJList.getSelectedValue();
 			if (selected != null) {
-				SchoolLauncher.deleteElement((SchoolItemAbstract) selected);
+				Kursverwaltung.deleteElement((SchoolItemAbstract) selected);
 			}
 			if (index >= this.coursesJList.getModel().getSize() - 1) {
 				index--;
 			}
 		} else if (arg0.getSource() == saveAllButton) {
 			// if (!SchoolLauncher.getCourseList().isEmpty()) {
-			DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao()).saveAll();
+			DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao()).saveAll();
 			// } else if (!SchoolLauncher.getTeacherList().isEmpty()) {
 			// SchoolLauncher.getTeacherList().get(0).saveAll();
 			// } else if (!SchoolLauncher.getStudentList().isEmpty()) {
 			// SchoolLauncher.getStudentList().get(0).saveAll();
 			// }
 		} else if (arg0.getSource() == loadAllButton) {
-			DaoSchoolAbstract.getDaoSchool(SchoolLauncher.getSelectedDao()).loadAll();
+			DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao()).loadAll();
 		}
 		this.refresh = false;
 		refresh();
@@ -218,7 +218,8 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 					index = list.locationToIndex(evt.getPoint());
 				}
 				if (index >= 0) {
-					SchoolLauncher.getInstance().editItem((SchoolItemAbstract) courseListModel.get(index));
+					Kursverwaltung.getInstance().editItem((SchoolItemAbstract) courseListModel.get(index));
+					refresh();
 				}
 			}
 		});
@@ -256,16 +257,16 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		this.dataBase.addChangeListener(this);
 		this.dataBase.setBounds(5, 30, 130, 20);
 
-		this.addCourseButton = SchoolLauncher.getButton("newCourse", 5, 5, 130, 20, this, "Neuer Kurs", "Neuer Kurs");
+		this.addCourseButton = Kursverwaltung.getButton("newCourse", 5, 5, 130, 20, this, "Neuer Kurs", "Neuer Kurs");
 
-		this.deleteCourseButton = SchoolLauncher.getButton("delCourse", 110, 5, 130, 20, this, "Löschen",
+		this.deleteCourseButton = Kursverwaltung.getButton("delCourse", 110, 5, 130, 20, this, "Löschen",
 				"Kurs löschen");
 		panelCreate.add(this.addCourseButton);
 		panelCreate.add(this.deleteCourseButton);
 
-		this.saveAllButton = SchoolLauncher.getButton("saveAll", 450, 5, 130, 20, this, "Alles speichern",
+		this.saveAllButton = Kursverwaltung.getButton("saveAll", 450, 5, 130, 20, this, "Alles speichern",
 				"Kurse, Leerer und Schüler speichern");
-		this.loadAllButton = SchoolLauncher.getButton("loadAll", 590, 5, 130, 20, this, "Alles laden",
+		this.loadAllButton = Kursverwaltung.getButton("loadAll", 590, 5, 130, 20, this, "Alles laden",
 				"Kurse, Leerer und Schüler laden");
 		panelLoadSave.add(this.saveAllButton);
 		panelLoadSave.add(this.loadAllButton);
@@ -274,6 +275,22 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		this.teacherTextField.setBounds(235, 5, 265, 20);
 		this.teacherTextField.setText("");
 		this.teacherTextField.setEditable(false);
+		this.teacherTextField.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent evt) {
+				int index = -1;
+				if (evt.getClickCount() == 2) {
+					// Double-click detected
+					index = coursesJList.getSelectedIndex();
+				} else if (evt.getClickCount() == 3) {
+					// Triple-click detected
+					index = coursesJList.getSelectedIndex();
+				}
+				if (index >= 0) {
+					Kursverwaltung.getInstance().editItem((SchoolItemAbstract) courseListModel.get(index).getTeacher());
+					refresh();
+				}
+			}
+		});
 		panelTeacher.add(this.teacherTextField);
 		// this.add(panelTop);
 
@@ -283,6 +300,24 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		this.studentsJList.setLayoutOrientation(JList.VERTICAL);
 		this.studentsJList.setVisibleRowCount(-1);
 		this.studentsJList.addListSelectionListener(this);
+		this.studentsJList.addMouseListener(new MouseAdapter() {
+			@SuppressWarnings("rawtypes")
+			public void mouseClicked(MouseEvent evt) {
+				JList list = (JList) evt.getSource();
+				int index = -1;
+				if (evt.getClickCount() == 2) {
+					// Double-click detected
+					index = list.locationToIndex(evt.getPoint());
+				} else if (evt.getClickCount() == 3) {
+					// Triple-click detected
+					index = list.locationToIndex(evt.getPoint());
+				}
+				if (index >= 0) {
+					Kursverwaltung.getInstance().editItem((SchoolItemAbstract) studentListModel.get(index));
+					refresh();
+				}
+			}
+		});
 
 		JScrollPane pupScroller = new JScrollPane(this.studentsJList);
 		// pupScroller.setPreferredSize(new Dimension(206, 300));

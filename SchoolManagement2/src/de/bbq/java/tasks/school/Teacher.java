@@ -32,9 +32,9 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 	}
 
 	private static String generateNewName() {
-		String[] array = new String[] { "Geistig Abwesender", "Laubbläsleer", "Labersack", "Zutexter", "Volllaberer", "Berieseler", "Hintergrundrauschen",
-				"Verstörendes Geräusch", "Dildogesicht", "Halodri", "Birkenstockdepp",
-				"Fotzenkopf", "Hirschfresse", "Althippy", "Schnarchnase" };
+		String[] array = new String[] { "Geistig Abwesender", "Laubbläsleer", "Labersack", "Zutexter", "Volllaberer",
+				"Berieseler", "Hintergrundrauschen", "Verstörendes Geräusch", "Dildogesicht", "Halodri",
+				"Birkenstockdepp", "Fotzenkopf", "Hirschfresse", "Althippy", "Schnarchnase" };
 		int randomNum = 0 + (int) (Math.random() * array.length);
 		return array[randomNum];
 	}
@@ -45,7 +45,7 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 			teacher = new Teacher(firstName, eDataAccess);
 			allTeachers.add(teacher);
 		} catch (Exception e) {
-			SchoolLauncher.showException(e);
+			Kursverwaltung.showException(e);
 		}
 		return teacher;
 	}
@@ -54,7 +54,7 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 		String newName = Teacher.generateNewName();
 		Teacher newTeacher = null;
 		if (!random) {
-			newName = SchoolLauncher.showInput("Bitte einen Namen eingeben:");
+			newName = Kursverwaltung.showInput("Bitte einen Namen eingeben:");
 		}
 		newTeacher = Teacher.createTeacher(newName, eDataAccess);
 		return newTeacher;
@@ -72,14 +72,18 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 
 	private static int getCourseCount(Teacher teacher) {
 		int cnt = 0;
-		for(ICourse c : Course.getCourses()) {
-			if(c.hasTeacher()) {
+		for (ICourse c : Course.getCourses()) {
+			if (c.hasTeacher()) {
 				if (c.getTeacher().equals(teacher)) {
 					cnt++;
 				}
 			}
 		}
 		return cnt;
+	}
+
+	public static void reset() {
+		allTeachers = new ArrayList<>();
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -109,18 +113,18 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 
 		}
 	}
-	
+
 	@Override
 	public String getDescription() {
 		StringBuffer bu = new StringBuffer();
 		bu.append(this.getFirstName() + " " + getLastName() + "\n");
 		if (this.getBirthDate() != null) {
-			bu.append( SchoolLauncher.getGermanDate().format(this.getBirthDate()) + "\n");
+			bu.append(Kursverwaltung.getGermanDate().format(this.getBirthDate()) + "\n");
 		}
-		bu.append(this.getAdress().getDescription()); 
+		bu.append(this.getAdress().getDescription());
 		return bu.toString();
 	}
-	
+
 	@Override
 	public int getCoursesCount() {
 		return Teacher.getCourseCount(this);

@@ -40,7 +40,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
-			SchoolLauncher.showErrorMessage("Loading com.mysql.jdbc.Driver failed.");
+			Kursverwaltung.showErrorMessage("Loading com.mysql.jdbc.Driver failed.");
 		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 			this.resultSet = preparedStatement.executeQuery();
 			return this.resultSet.next();
 		} catch (SQLException e) {
-			SchoolLauncher.showException(e);
+			Kursverwaltung.showException(e);
 			return false;
 		}
 	}
@@ -189,7 +189,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 				}
 			}
 		} catch (SQLException e) {
-			SchoolLauncher.showException(e);
+			Kursverwaltung.showException(e);
 			return false;
 		}
 		return true;
@@ -307,7 +307,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 				}
 			}
 		} catch (SQLException e) {
-			SchoolLauncher.showException(e);
+			Kursverwaltung.showException(e);
 			return false;
 		}
 		return true;
@@ -335,7 +335,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 				System.out.println(e1.getStackTrace());
 				ret = false;
 			}
-			SchoolLauncher.showException(e);
+			Kursverwaltung.showException(e);
 			ret = false;
 		}
 		try {
@@ -378,7 +378,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 			preparedStatement.execute();
 			return true;
 		} catch (SQLException e) {
-			SchoolLauncher.showException(e);
+			Kursverwaltung.showException(e);
 			return false;
 		}
 	}
@@ -475,11 +475,11 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 								+ " `country`, `houseNumber`, `streetName`, `zipCode` FROM " + TEACHER_TABLE + ";");
 				this.resultSet = preparedStatement.executeQuery();
 				while (this.resultSet.next()) {
-					SchoolItemAbstract loadItem = (SchoolItemAbstract) SchoolLauncher.getNewTeacher(true);
+					SchoolItemAbstract loadItem = (SchoolItemAbstract) Kursverwaltung.getNewTeacher(true);
 					if (this.loadElement(loadItem)) {
 						ct++;
 					} else {
-						SchoolLauncher.deleteElement(loadItem);
+						Kursverwaltung.deleteElement(loadItem);
 					}
 				}
 
@@ -488,11 +488,11 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 								+ COURSE_TABLE + ";");
 				this.resultSet = preparedStatement.executeQuery();
 				while (this.resultSet.next()) {
-					SchoolItemAbstract loadItem = (SchoolItemAbstract) SchoolLauncher.getNewCourse(true);
+					SchoolItemAbstract loadItem = (SchoolItemAbstract) Kursverwaltung.getNewCourse(true);
 					if (this.loadElement(loadItem)) {
 						cc++;
 					} else {
-						SchoolLauncher.deleteElement(loadItem);
+						Kursverwaltung.deleteElement(loadItem);
 					}
 				}
 
@@ -501,26 +501,26 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 								+ " `country`, `houseNumber`, `streetName`, `zipCode` FROM " + STUDENT_TABLE + ";");
 				resultSet = preparedStatement.executeQuery();
 				while (resultSet.next()) {
-					SchoolItemAbstract loadItem = (SchoolItemAbstract) SchoolLauncher.getNewStudent(true);
+					SchoolItemAbstract loadItem = (SchoolItemAbstract) Kursverwaltung.getNewStudent(true);
 					if (this.loadElement(loadItem)) {
 						cs++;
 					} else {
-						SchoolLauncher.deleteElement(loadItem);
+						Kursverwaltung.deleteElement(loadItem);
 					}
 				}
 				resultSet.close();
 				preparedStatement.close();
 			}
 		} catch (HeadlessException e) {
-			SchoolLauncher.showException(e);
+			Kursverwaltung.showException(e);
 			return false;
 		} catch (SQLException e) {
-			SchoolLauncher.showException(e);
+			Kursverwaltung.showException(e);
 			return false;
 		}
 		String out = "Aus Datei gelutscht: " + cc + " mal Dummgelaber, " + ct + " Labertaschen und " + cs
 				+ " Hohlköpfe.";
-		SchoolLauncher.showMessage("loadAll fertig!\r\n\r\n" + out);
+		Kursverwaltung.showMessage("loadAll fertig!\r\n\r\n" + out);
 		return true;
 	}
 
@@ -544,7 +544,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 				String conString = "jdbc:mysql://" + database + "?user=" + username + "&password=" + password;
 				this.connection = DriverManager.getConnection(conString);
 			} catch (SQLException e) {
-				SchoolLauncher.showErrorMessage("Username oder Passwort sind falsch.");
+				Kursverwaltung.showErrorMessage("Username oder Passwort sind falsch.");
 				this.connection = null;
 				loginDialog = null;
 			}
@@ -575,7 +575,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 				this.connection.close();
 				return true;
 			} catch (SQLException e) {
-				SchoolLauncher.showException(e);
+				Kursverwaltung.showException(e);
 			}
 			return false;
 		}
@@ -613,7 +613,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 	}
 
 	private boolean checkIds(ICourse course, int sqlCoursTeacherId) {
-		for (ITeacher teacher : SchoolLauncher.getTeacherList()) {
+		for (ITeacher teacher : Kursverwaltung.getTeacherList()) {
 			int sqlTeacherId = -1;
 			SchoolItemAbstract t = (SchoolItemAbstract) teacher;
 			if (this.teacherIds.containsKey(t.getId())) {
@@ -624,7 +624,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 				try {
 					teacher.addCourse(course);
 				} catch (Exception e) {
-					SchoolLauncher.showException(e);
+					Kursverwaltung.showException(e);
 				}
 			}
 		}
@@ -633,7 +633,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 	}
 
 	private boolean checkIds(ITeacher teacher) {
-		for (ICourse course : SchoolLauncher.getCourseList()) {
+		for (ICourse course : Kursverwaltung.getCourseList()) {
 			SchoolItemAbstract c = (SchoolItemAbstract) course;
 			int sqlCourseId = 0, sqlTeacherId = -1;
 			if (this.courseIdsInv.containsKey(c.getId())) {
@@ -648,7 +648,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 						try {
 							teacher.addCourse(course);
 						} catch (Exception e) {
-							SchoolLauncher.showException(e);
+							Kursverwaltung.showException(e);
 						}
 					}
 				}
@@ -661,7 +661,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 	private boolean checkIds(IStudent student, int sqlCourseId) {
 		// int sqlStudentId = this.studentIds.get(((SchoolItemAbstract)
 		// student).getId());
-		for (ICourse course : SchoolLauncher.getCourseList()) {
+		for (ICourse course : Kursverwaltung.getCourseList()) {
 			SchoolItemAbstract sac = (SchoolItemAbstract) course;
 			if (this.courseIdsInv.containsKey(sac.getId())) {
 				int sqlStudentId = this.courseIdsInv.get(sac.getId());
@@ -683,7 +683,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 		try {
 			stmt = (Statement) getConnection().createStatement();
 		} catch (SQLException e) {
-			SchoolLauncher.showException(e);
+			Kursverwaltung.showException(e);
 		}
 
 		switch (table) {
@@ -704,7 +704,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 		try {
 			stmt.executeUpdate(sql);
 		} catch (SQLException e) {
-			SchoolLauncher.showException(e);
+			Kursverwaltung.showException(e);
 		}
 		return ret;
 	}

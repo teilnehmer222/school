@@ -37,11 +37,11 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 	void chooseFile(boolean export) {
 		JFileChooser fileChooser = new JFileChooser();
 		int returnValue = -1;
-		if (SchoolLauncher.getShell()) {
+		if (Kursverwaltung.getShell()) {
 			if (export) {
-				this.safeFile = new File(SchoolLauncher.showInput("Bitte die Datei zum exportieren auswählen"));
+				this.safeFile = new File(Kursverwaltung.showInput("Bitte die Datei zum exportieren auswählen"));
 			} else {
-				this.safeFile = new File(SchoolLauncher.showInput("Bitte die Datei zum importieren auswählen"));
+				this.safeFile = new File(Kursverwaltung.showInput("Bitte die Datei zum importieren auswählen"));
 			}
 		} else {
 			if (export) {
@@ -81,9 +81,9 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 				try {
 					oos = new ObjectOutputStream(new FileOutputStream(this.safeFile, false));
 				} catch (FileNotFoundException e) {
-					SchoolLauncher.showException(e);
+					Kursverwaltung.showException(e);
 				} catch (IOException e) {
-					SchoolLauncher.showException(e);
+					Kursverwaltung.showException(e);
 				}
 			}
 		}
@@ -101,7 +101,7 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 			schoolItemAbstract.setSaved(true);
 			ret = true;
 		} catch (IOException e) {
-			SchoolLauncher.showException(e);
+			Kursverwaltung.showException(e);
 			ret = false;
 		}
 		if (schoolItemAbstract.isLast()) {
@@ -110,11 +110,11 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 			if (deleted) {
 				out += "\r\nVorhandene Datei gelöscht.";
 			}
-			SchoolLauncher.showMessage("Dreck fertig!\r\n\r\n" + out);
+			Kursverwaltung.showMessage("Dreck fertig!\r\n\r\n" + out);
 			try {
 				oos.close();
 			} catch (IOException e) {
-				SchoolLauncher.showException(e);
+				Kursverwaltung.showException(e);
 				ret = false;
 			}
 			this.safeFile = null;
@@ -166,16 +166,16 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 			try {
 				this.ois = new ObjectInputStream(new FileInputStream(this.safeFile));
 			} catch (FileNotFoundException e) {
-				SchoolLauncher.showException(e);
+				Kursverwaltung.showException(e);
 			} catch (IOException e) {
-				SchoolLauncher.showException(e);
+				Kursverwaltung.showException(e);
 			}
 			if (this.ois != null) {
 				Object read = null;
 				try {
 					read = this.ois.readObject();
 				} catch (ClassNotFoundException e) {
-					SchoolLauncher.showException(e);
+					Kursverwaltung.showException(e);
 				} catch (IOException e) {
 					// We're done
 					read = null;
@@ -188,7 +188,7 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 					try {
 						read = ois.readObject();
 					} catch (ClassNotFoundException e) {
-						SchoolLauncher.showException(e);
+						Kursverwaltung.showException(e);
 						ret = false;
 					} catch (IOException e) {
 						// We're done
@@ -197,16 +197,16 @@ public class DaoSchoolFile extends DaoSchoolAbstract {
 				this.loading = false;
 				this.out = "Aus Datei gelutscht: " + cc + " mal Dummgelaber, " + ct + " Labertaschen und " + cs
 						+ " Hohlköpfe.";
-				SchoolLauncher.showMessage("Dreck fertig!\r\n\r\n" + out);
+				Kursverwaltung.showMessage("Dreck fertig!\r\n\r\n" + out);
 				try {
 					ois.close();
 				} catch (IOException e) {
-					SchoolLauncher.showException(e);
+					Kursverwaltung.showException(e);
 					ret = false;
 				}
 			}
 		}
-		SchoolLauncher.setSelectedDao(EDaoSchool.FILE);
+		Kursverwaltung.setSelectedDao(EDaoSchool.FILE);
 		this.safeFile = null;
 		return ret;
 	}

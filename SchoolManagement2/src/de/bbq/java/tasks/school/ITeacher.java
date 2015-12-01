@@ -10,8 +10,8 @@ public interface ITeacher { // extends IDaoSchool {
 	void addCourse(ICourse course) throws Exception;
 
 	void removeCourse(ICourse course);
-	
+
 	int getCoursesCount();
-	
+
 	String getDescription();
 }
