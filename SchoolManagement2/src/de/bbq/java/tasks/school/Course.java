@@ -110,6 +110,11 @@ public class Course extends SchoolItemAbstract implements ICourse {
 			}
 		}
 	}
+	
+
+	public static void reset() {
+		allCourses = new ArrayList<>();
+	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -127,11 +132,13 @@ public class Course extends SchoolItemAbstract implements ICourse {
 	@Override
 	public void setTeacher(ITeacher t) {
 		this.teacher = t;
+		this.afterChange();	
 	}
 
 	@Override
 	public void removeTeacher() {
 		this.teacher = null;
+		this.afterChange();	
 	}
 
 	@Override
@@ -154,6 +161,7 @@ public class Course extends SchoolItemAbstract implements ICourse {
 			oldCourse.removeStudent(student);
 		}
 		this.getStudents().add(student);
+		this.afterChange();	
 		// student.setCourse(this);
 	}
 
@@ -162,6 +170,7 @@ public class Course extends SchoolItemAbstract implements ICourse {
 		if (this.getStudents().contains(student)) {
 			this.getStudents().remove(student);
 		}
+		this.afterChange();	
 		// student.removeCourse();
 	}
 
@@ -218,10 +227,6 @@ public class Course extends SchoolItemAbstract implements ICourse {
 		this.startTime = startTime;
 	}
 
-	public void setStudents(ArrayList<IStudent> students) {
-		this.students = students;
-	}
-
 	public void setTopic(String topic) {
 		this.topic = topic;
 	}
@@ -263,9 +268,4 @@ public class Course extends SchoolItemAbstract implements ICourse {
 		return bu.toString();
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
-
-	public static void reset() {
-		allCourses = new ArrayList<>();
-	}
-
 }

@@ -9,13 +9,16 @@ import java.awt.Frame;
 public abstract class DaoSchoolJdbcAbstract extends DaoSchoolAbstract {
 
 	/////////////////////////////////////////////////////////////////////////////////////
+	// Class Properties
+	public final static EDaoSchool eDao = EDaoSchool.JDBC;
+	/////////////////////////////////////////////////////////////////////////////////////
+	
+	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
-	protected DaoSchoolJdbcAbstract(EDaoSchool eDao) {
-		super(eDao);
-	}
+//	protected DaoSchoolJdbcAbstract(EDaoSchool eDao) {
+//		super(eDao);
+//	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	public abstract boolean connect(Frame parent, String database, String username, String password);
-
-	public abstract boolean closeConnection();
 }

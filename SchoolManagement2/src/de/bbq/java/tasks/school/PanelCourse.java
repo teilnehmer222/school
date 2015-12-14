@@ -50,10 +50,28 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 	private JSlider dataBase;
 	private DefaultListModel<ICourse> courseListModel;
 	private DefaultListModel<IStudent> studentListModel;
+	private boolean noAction = false;
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Class methods
+
+	public void setDataBase(EDaoSchool selectedDao) {
+		noAction = true;
+		dataBase.setValueIsAdjusting(false);
+		switch (selectedDao) {
+		case JDBC_MYSQL:
+			dataBase.setValue(1);
+			break;
+		default:
+			dataBase.setValue(0);
+			break;
+		}
+//		dataBase.validate();
+		dataBase.setValueIsAdjusting(true);
+		noAction = false;
+	}
+
 	public void refresh() {
 		this.refresh = true;
 		this.teacherTextField.setText(null);
@@ -106,6 +124,7 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		if (!this.refresh && arg0.getSource() == this.coursesJList) {
 			selectCourse(selectedCourse);
 		}
+		this.deleteCourseButton.setEnabled(this.coursesJList.getSelectedValue() != null);
 	}
 
 	private void selectCourse(ICourse selectedCourse) {
@@ -125,19 +144,26 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 		}
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void stateChanged(ChangeEvent arg0) {
-		if (arg0.getSource() == dataBase) {
-			if (dataBase.getValue() == 0) {
-				if (!Kursverwaltung.getSelectedDao().equals(EDaoSchool.FILE)) {
-					Kursverwaltung.setSelectedDao(EDaoSchool.FILE);
-				}
-			} else if (dataBase.getValue() == 1) {
-				if (!Kursverwaltung.getSelectedDao().equals(EDaoSchool.JDBC_MYSQL)) {
-					Kursverwaltung.setSelectedDao(EDaoSchool.JDBC_MYSQL);
+		if (!noAction) {
+			if (arg0.getSource() == dataBase) {
+				if (dataBase.getValue() == 0) {
+					if (Kursverwaltung.getSelectedDao().equals(EDaoSchool.JDBC_MYSQL)) {
+						Kursverwaltung.setSelectedDao(EDaoSchool.FILE);
+//						dataBase.setValue(0);
+					}
+				} else if (dataBase.getValue() == 1) {
+					if (Kursverwaltung.getSelectedDao().equals(EDaoSchool.FILE)) {
+						Kursverwaltung.setSelectedDao(EDaoSchool.JDBC_MYSQL);
+						DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao()).setCanceled(false);
+//						dataBase.setValue(1);
+					}
 				}
 			}
 		}
+//		dataBase.validate();
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -170,7 +196,7 @@ public class PanelCourse extends JPanel implements ActionListener, ListSelection
 			DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao()).loadAll();
 		}
 		this.refresh = false;
-		refresh();
+		Kursverwaltung.getInstance().refresh();
 		if (index <= this.coursesJList.getModel().getSize()) {
 			this.coursesJList.setSelectedIndex(index);
 			selectCourse(this.coursesJList.getSelectedValue());

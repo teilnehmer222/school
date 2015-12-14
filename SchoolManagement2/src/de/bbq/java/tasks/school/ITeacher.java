@@ -7,7 +7,7 @@ package de.bbq.java.tasks.school;
 public interface ITeacher { // extends IDaoSchool {
 	String toString();
 
-	void addCourse(ICourse course) throws Exception;
+	void addCourse(ICourse course);
 
 	void removeCourse(ICourse course);
 

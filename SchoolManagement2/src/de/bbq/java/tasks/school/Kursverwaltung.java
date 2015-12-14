@@ -9,10 +9,15 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import java.awt.AWTException;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridLayout;
-//import java.awt.Image;
-//import java.awt.Toolkit;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
@@ -36,37 +41,55 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 	private static final int winHight = 430;
 	private static final int workStart = 7;
 	private static final int workEnd = 17;
+
 	private static EDaoSchool selectedDao = EDaoSchool.FILE;
 	private static Kursverwaltung launcher;
 	private static ArrayList<FrameEdit> editFrames = new ArrayList<>();
-	private static boolean console = false;
+	@SuppressWarnings("unused")
+	private static boolean console = false, initalizing = true, mainDataSourceLoaded = false, backupLoaded = false;
 	private static Shell shell;
 	private static DateFormat dateFormatGermany;
-
-	private PanelCourse panel1;
-	private PanelTeacher panel2;
-	private PanelStudent panel3;
+	private static EStoreMode operationMode = EStoreMode.MYSQL_LOAD;
+	private PanelCourse panelCourse;
+	private PanelTeacher panelTeacher;
+	private PanelStudent panelStudent;
+	private static TrayIcon trayIcon = null;
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	public static EDaoSchool getSelectedDao() {
 		return selectedDao;
 	}
 
-	public static void setSelectedDao(EDaoSchool selectedDao) {
+	protected static void setSelectedDao(EDaoSchool selectedDao) {
 		Kursverwaltung.selectedDao = selectedDao;
 		Course.dataAccessObject = DaoSchoolAbstract.getDaoSchool(selectedDao);
 		Teacher.dataAccessObject = DaoSchoolAbstract.getDaoSchool(selectedDao);
 		Student.dataAccessObject = DaoSchoolAbstract.getDaoSchool(selectedDao);
+		// setStoreMode(selectedDao, "setSelectedDao");
+	}
+
+	public static String getOperationMode() {
+		return operationMode.toString();
+	}
+
+	private static void setOperationMode(EStoreMode operationMode, String source) {
+		if (!(Kursverwaltung.operationMode.equals(operationMode))) {
+			System.out.println("State Changed: " + operationMode.toString() + "; Source: " + source);
+		}
+		Kursverwaltung.operationMode = operationMode;
+
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
+	@SuppressWarnings("incomplete-switch")
 	public static void main(String[] args) {
 		console = false;
 		if (getGermanDate() == null) {
 			Locale locDE = new Locale(Locale.GERMANY.getCountry());
 			setDateFormatGermany(DateFormat.getDateInstance(DateFormat.FULL, locDE));
 		}
+		setSelectedDao(EDaoSchool.JDBC_MYSQL);
 		launcher = new Kursverwaltung();
 		// args = new String[] { "asasas", "54908" };
 		String osname = System.getProperty("os.name");
@@ -108,34 +131,62 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 		} else {
 			launcher.setVisible(!console);
 		}
+		
+		switch (getSelectedDao()) {
+		case FILE:
+			setOperationMode(EStoreMode.DISK_IDLE, "main(String[] args)");
+			break;
+		case JDBC_MYSQL:
+//			setOperationMode(EStoreMode.MYSQL_IDLE, "main(String[] args)");
+	//		DaoSchoolAbstract jdbcDao = DaoSchoolAbstract.getDaoSchool(getSelectedDao());
+////			boolean success = jdbcDao.loadAll();
+//			if (false) {
+//				setSelectedDao(EDaoSchool.JDBC_MYSQL);
+//				setOperationMode(EStoreMode.MYSQL_IDLE, "main(String[] args)");
+//			} else {
+//				setSelectedDao(EDaoSchool.FILE);
+//				setOperationMode((DaoSchoolAbstract.getDaoSchool(getSelectedDao()).connected() == TriState.UNCERTAIN)?EStoreMode.RAM_IDLE:EStoreMode.DISK_IDLE, "main(String[] args)");	
+//			}
+			((DaoSchoolJdbcMysql)DaoSchoolAbstract.getDaoSchool(getSelectedDao())).startTimer();
+			break;
+		}
+		addTrayIcon();
+		initalizing = false;
 		if (console) {
 			shell = new Shell();
 			shell.Start(console);
+			System.out.println("Application exiting from console...");
 			getInstance().closeConnections();
 			System.exit(0);
 		}
 	}
 
-	private void refresh() {
-		panel1.refresh();
-		panel2.refresh();
-		panel3.refresh();
+	protected void refresh() {
+		panelCourse.refresh();
+		panelTeacher.refresh();
+		panelStudent.refresh();
 	}
 
 	private Kursverwaltung() {
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				Kursverwaltung.getInstance().closeConnections();
-				System.exit(0);
-			}
-		});
+		// Runtime.getRuntime().addShutdownHook(new Thread() {
+		// @Override
+		// public void run() {
+		// System.out.println("Application closing from ShutdownHook...");
+		//// if (getInstance() != null) {
+		// getInstance().closeConnections();
+		//// }
+		// launcher = null;
+		// System.exit(0);
+		// }
+		// });
 		// Image icon = Toolkit.getDefaultToolkit().getImage("form.gif");
 		setTitle("Schulverwaltung");
 		setSize(winLength, winHight);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(null);
+		addWindowListener(this);
+		// dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
 		addControls();
 	}
 
@@ -152,8 +203,18 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 		if (console) {
 			getInstance().shell.showMessage("Error", s);
 		} else {
-			JOptionPane.showInternalMessageDialog(null, s, "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(Kursverwaltung.getInstance(), s, "Error", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	@SuppressWarnings("static-access")
+	public static void showErrorMessage(Frame parent, String s) {
+		if (console) {
+			getInstance().shell.showMessage("Error", s);
+		} else {
+			JOptionPane.showMessageDialog(parent, s, "Error", JOptionPane.ERROR_MESSAGE);
+		}
+
 	}
 
 	@SuppressWarnings("static-access")
@@ -161,7 +222,18 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 		if (console) {
 			return getInstance().shell.showInput(s);
 		} else {
-			return JOptionPane.showInternalInputDialog(null, s, "Information", JOptionPane.QUESTION_MESSAGE);
+			return JOptionPane.showInputDialog(Kursverwaltung.getInstance(), s, "Information",
+					JOptionPane.QUESTION_MESSAGE);
+		}
+	}
+
+	@SuppressWarnings("static-access")
+	public static int showYesNo(String s, boolean cancel) {
+		if (console) {
+			return getInstance().shell.showConfirm(s, cancel);
+		} else {
+			return JOptionPane.showConfirmDialog(Kursverwaltung.getInstance(), s, "Information",
+					(cancel ? JOptionPane.YES_NO_OPTION : JOptionPane.YES_NO_CANCEL_OPTION));
 		}
 	}
 
@@ -172,7 +244,8 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 		} else {
 			// JOptionPane.showMessageDialog(null, s, "Information",
 			// JOptionPane.INFORMATION_MESSAGE);
-			JOptionPane.showInternalMessageDialog(null, s, "Information", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(Kursverwaltung.getInstance(), s, "Information",
+					JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 
@@ -181,13 +254,43 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 		if (console) {
 			getInstance().shell.showMessage("Exception", e.getMessage(), e.getStackTrace().toString());
 		} else {
-			JOptionPane.showInternalMessageDialog(null, e.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(Kursverwaltung.getInstance(), e.getMessage(), "Exception",
+					JOptionPane.ERROR_MESSAGE);
 			System.out.println(e.getStackTrace());
 		}
 	}
 
 	protected void closeConnections() {
-		DaoSchoolAbstract.closeConnections();
+		try {
+			DaoSchoolAbstract.closeConnections();
+		} catch (Exception e) {
+		}
+		try {
+			panelCourse.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+		} catch (Exception e) {
+		}
+		try {
+			panelTeacher.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+		} catch (Exception e) {
+		}
+		try {
+			panelStudent.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+		} catch (Exception e) {
+		}
+		try {
+			editFrames.clear();
+		} catch (Exception e) {
+		}
+		trayIcon = null;
+		editFrames = null;
+		shell = null;
+		dateFormatGermany = null;
+
+		panelCourse = null;
+		panelTeacher = null;
+		panelStudent = null;
+
+		launcher = null;
 	}
 
 	private void addControls() {
@@ -197,19 +300,19 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 		tabbedPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		ImageIcon icon = createImageIcon("course.png");
 
-		panel1 = new PanelCourse();
-		tabbedPane.addTab("Kurse", icon, panel1, "Kurse verwalten");
+		panelCourse = new PanelCourse();
+		tabbedPane.addTab("Kurse", icon, panelCourse, "Kurse verwalten");
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
 		icon = createImageIcon("teacher.png");
-		panel2 = new PanelTeacher();
-		tabbedPane.addTab("Leerer", icon, panel2, "Leerer den Kursen zuweisen");
+		panelTeacher = new PanelTeacher();
+		tabbedPane.addTab("Leerer", icon, panelTeacher, "Leerer den Kursen zuweisen");
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
 		icon = createImageIcon("student.png");
-		panel3 = new PanelStudent();
-		tabbedPane.addTab("Schüler", icon, panel3, "Schüler den Kursen zuweisen");
-		panel3.setPreferredSize(new Dimension(410, 50));
+		panelStudent = new PanelStudent();
+		tabbedPane.addTab("Schüler", icon, panelStudent, "Schüler den Kursen zuweisen");
+		panelStudent.setPreferredSize(new Dimension(410, 50));
 		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
 
 		tabbedPane.addChangeListener(new ChangeListener() {
@@ -219,13 +322,13 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 				JTabbedPane source = (JTabbedPane) e.getSource();
 				switch (source.getSelectedIndex()) {
 				case 0:
-					panel1.refresh();
+					panelCourse.refresh();
 					break;
 				case 1:
-					panel2.refresh();
+					panelTeacher.refresh();
 					break;
 				case 2:
-					panel3.refresh();
+					panelStudent.refresh();
 					break;
 
 				}
@@ -233,7 +336,7 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 		});
 		add(tabbedPane);
 		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		panel1.refresh();
+		panelCourse.refresh();
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -364,6 +467,7 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 	public void editItem(SchoolItemAbstract editItem) {
 		FrameEdit edit = null;
 		boolean found = false;
+		String type = "";
 		if (editItem.isInEdit()) {
 			for (FrameEdit edited : editFrames) {
 				if (edited.hastItem(editItem)) {
@@ -371,24 +475,26 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 					edited.toFront();
 					edited.repaint();
 					found = true;
-					System.out.println("reactivate");
+					System.out.println("Bearbeiten-Fenster von \"" + editItem.toString() + "\" sichtbar gemacht");
 				}
 			}
 		}
 		if (!found) {
 			if (editItem.getClass() == Teacher.class) {
 				edit = new FrameEdit((ITeacher) editItem);
+				type = "Teacher";
 			} else if (editItem.getClass() == Student.class) {
 				edit = new FrameEdit((IStudent) editItem);
+				type = "Student";
 			} else if (editItem.getClass() == Course.class) {
 				edit = new FrameEdit((ICourse) editItem);
+				type = "Course";
 			}
 		}
 		if (edit != null) {
 			editItem.setInEdit(true);
-
 			edit.addWindowListener(Kursverwaltung.getInstance());
-			System.out.println("opened");
+			System.out.println(type + " zum Bearbeiten geöffnet: " + editItem.toString());
 			editFrames.add(edit);
 		}
 	}
@@ -416,24 +522,28 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 	}
 
 	@Override
-	public void windowActivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowClosed(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void windowClosing(WindowEvent arg0) {
-		FrameEdit edit = (FrameEdit) arg0.getSource();
-		if (editFrames.contains(edit)) {
-			System.out.println("destory:" + edit.toString());
-			editFrames.remove(edit);
-			edit = null;
+		FrameEdit edit = null;
+
+		if (arg0.getSource() == this) {
+			System.out.println("Application closing...");
+			// if (getInstance() != null) {
+			getInstance().closeConnections();
+			// }
+			System.exit(0);
+		} else {
+			try {
+				edit = (FrameEdit) arg0.getSource();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if (edit != null) {
+			if (editFrames.contains(edit)) {
+				System.out.println("Fenster zerstört: " + edit.toString());
+				editFrames.remove(edit);
+				edit = null;
+			}
 		}
 	}
 
@@ -460,5 +570,114 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	public void windowActivated(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowClosed(WindowEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public static void setDataBase(EDaoSchool edao, String sourceFunction) {
+		setStoreMode(edao, sourceFunction);
+	}
+
+	@SuppressWarnings("static-access")
+	public static void setStoreMode(EDaoSchool edao, String sourceFunction) {
+		EStoreMode sStore = null;
+		switch (edao) {
+		case FILE:
+			sStore = EStoreMode.DISK_LOAD;
+			break;
+		case JDBC_MYSQL:
+			sStore = EStoreMode.MYSQL_LOAD;
+			break;
+		default:
+			sStore = EStoreMode.RAM_LOAD;
+			break;
+		}
+		DaoSchoolAbstract jdbc = DaoSchoolAbstract.getDaoSchool(EDaoSchool.JDBC_MYSQL);
+		TriState connected = TriState.FALSE;
+		if (jdbc != null) {
+			connected = jdbc.connected();
+		}
+		if (!mainDataSourceLoaded && sourceFunction.equals("TimerTask MySQL()")
+				&& (jdbc.isConnected()
+						&& (connected == TriState.TRUE))) {
+			// MySql TimerTask returned connected or not
+			setOperationMode(sStore, sourceFunction + "(EDaoSchool " + edao.toString() + ")");
+			setSelectedDao(edao);
+			getInstance().panelCourse.setDataBase(edao);
+			DaoSchoolAbstract.getDaoSchool(getSelectedDao()).loadAll();
+			getInstance().refresh();
+			mainDataSourceLoaded = true;
+		} else if (!backupLoaded && (sourceFunction.equals("TimerTask MySQL()") ||sourceFunction.equals("DaoSchoolJdbcMysql()")    )
+				&& (connected == TriState.FALSE)) {
+			edao = EDaoSchool.FILE;
+			setSelectedDao(edao);
+			getInstance().panelCourse.setDataBase(edao);
+			setOperationMode(sStore, sourceFunction + "(EDaoSchool " + edao.toString() + ")");
+			if (! ((DaoSchoolFile)DaoSchoolAbstract.getDaoSchool(edao)).isCancel()) {
+				DaoSchoolAbstract.getDaoSchool(edao).loadAll();
+			}
+			getInstance().refresh();
+			backupLoaded = true;
+		} 
+	}
+
+	private static void addTrayIcon() {
+		if (SystemTray.isSupported()) {
+			// get the SystemTray instance
+			SystemTray tray = SystemTray.getSystemTray();
+			// load an image
+			ImageIcon image = createImageIcon("courseS.png"); // Toolkit.getDefaultToolkit().getImage(...);
+			// create a action listener to listen for default action executed on
+			// the tray icon
+			// create a popup menu
+			PopupMenu popup = new PopupMenu();
+			// create menu item for the default action
+			MenuItem defaultItem = new MenuItem("Fenster " +(getInstance().isVisible()?"un":"") + "sichtbar machen");
+			defaultItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Kursverwaltung.toggleFrame();
+					getInstance().setLocationRelativeTo(null);
+					trayIcon.getPopupMenu().getItem(0).setLabel("Fenster " +(getInstance().isVisible()?"un":"") + "sichtbar machen");
+				}
+			});
+			popup.add(defaultItem);
+			/// ... add other items
+			// construct a TrayIcon
+			trayIcon = new TrayIcon(image.getImage(), "Kursverwaltung", popup);
+			// set the TrayIcon properties
+			trayIcon.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Kursverwaltung.toggleFrame();
+					getInstance().setLocationRelativeTo(null);
+					trayIcon.getPopupMenu().getItem(0).setLabel("Fenster " +(getInstance().isVisible()?"un":"") + "sichtbar machen");
+				}
+			});
+			// ...
+			// add the tray image
+			try {
+				tray.add(trayIcon);
+			} catch (AWTException e) {
+				showException(e);
+			}
+		} else {
+			// disable tray option in your application or
+			// perform other actions
+		}
+		// some time later
+		// the application state has changed - update the image
+		// if (trayIcon != null) {
+		// trayIcon.setImage(updatedImage);
+		// }
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////
 }

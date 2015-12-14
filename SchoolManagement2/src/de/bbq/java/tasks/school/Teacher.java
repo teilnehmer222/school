@@ -93,6 +93,7 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 	public void addCourse(ICourse course) {
 		this.getCourses().add(course);
 		course.setTeacher(this);
+		this.afterChange();	
 	}
 
 	private ArrayList<ICourse> getCourses() {
@@ -110,8 +111,8 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 				this.getCourses().remove(course);
 				break;
 			}
-
 		}
+		this.afterChange();	
 	}
 
 	@Override

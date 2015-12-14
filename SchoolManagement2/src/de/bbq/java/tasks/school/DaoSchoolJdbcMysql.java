@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Types;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.mysql.jdbc.DatabaseMetaData;
 import com.mysql.jdbc.Statement;
@@ -20,33 +22,63 @@ import com.mysql.jdbc.Statement;
  */
 public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 	Connection connection;
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Class Properties
+	public final static EDaoSchool eDao = EDaoSchool.JDBC_MYSQL;
 	final String DEFAULT_DATABASE = "localhost/jdbc";
 	final String DEFAULT_USERNAME = "root";
 	final String COURSE_TABLE = "course";
 	final String TEACHER_TABLE = "teacher";
 	final String STUDENT_TABLE = "student";
+	private boolean firstLogin = true, errorShown = false;
+
+	final static int checkInterval = 500;
+	static Timer checkConn;
 
 	HashMap<Integer, Long> courseIds = new HashMap<>();
 	HashMap<Long, Integer> courseIdsInv = new HashMap<>();
 	HashMap<Long, Integer> teacherIds = new HashMap<>();
 	HashMap<Long, Integer> studentIds = new HashMap<>();
 
+	private String usernameBuffer = "";
+	private String passwordBuffer = "";
+	private String databaseBuffer = "";
+
+	public static String dataBaseName;
+	public static String dataBaseUser;
+	public static String dataBasePass;
+
 	ResultSet resultSet;
+	static LoginDialog loginDialog = null;
+	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
 	public DaoSchoolJdbcMysql() {
-		super(EDaoSchool.JDBC_MYSQL);
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
-			Kursverwaltung.showErrorMessage("Loading com.mysql.jdbc.Driver failed.");
+			Kursverwaltung.showErrorMessage("Loading com.mysql.jdbc.Driver fehlgeschlagen.");
 		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// DaoSchoolAbstract properties
+	@Override
+	public TriState connected() {
+		if (this.connection == null || super.isCanceled()) {
+			return TriState.FALSE;
+		} else {
+			try {
+				return (this.connection.isClosed() || this.connection.isReadOnly()) ? TriState.FALSE : TriState.TRUE;
+			} catch (SQLException e) {
+				return TriState.FALSE;
+			}
+		}
+	}
+
 	@Override
 	public boolean saveElement(SchoolItemAbstract schoolItemAbstract) {
 		if (elementExists(schoolItemAbstract)) {
@@ -315,33 +347,37 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 
 	@Override
 	public boolean saveAll() {
-		boolean ret = true;
+		boolean ret = false;
 		Savepoint savePoint = null;
-		try {
+		Kursverwaltung.setStoreMode(eDao, "saveAll()");
+
+		try { // 1
 			getConnection().setAutoCommit(false);
-			savePoint = getConnection().setSavepoint();
-
-			// this.courseIds = new HashMap<>();
-			// this.courseIdsInv = new HashMap<>();
-			// this.teacherIds = new HashMap<>();
-			// this.studentIds = new HashMap<>();
-
-			ret = super.saveAllAhead();
-			getConnection().commit();
-		} catch (SQLException e) {
 			try {
-				getConnection().rollback(savePoint);
-			} catch (SQLException e1) {
-				System.out.println(e1.getStackTrace());
-				ret = false;
+				savePoint = getConnection().setSavepoint();
+			} catch (Exception e) {
+				System.out.println("SetSavepoint fehlgeschlagen: " + e.getStackTrace());
 			}
-			Kursverwaltung.showException(e);
-			ret = false;
-		}
-		try {
-			getConnection().setAutoCommit(true);
-		} catch (SQLException e) {
-			System.out.println(e.getStackTrace());
+			ret = super.saveAllAhead();
+			try {
+				getConnection().commit();
+			} catch (SQLException e) {
+				System.out.println("Commit fehlgeschlagen: " + e.getStackTrace());
+				ret = false;
+				try {
+					getConnection().rollback(savePoint);
+				} catch (SQLException e1) {
+					System.out.println("Rollback fehlgeschlagen: " + e1.getStackTrace());
+					ret = false;
+				}
+			}
+			try {
+				getConnection().setAutoCommit(true);
+			} catch (Exception e1) {
+				System.out.println("setAutoCommit(true) fehlgeschlagen: " + e1.getStackTrace());
+			}
+		} catch (Exception e) {
+			System.out.println("SetAutoCommit(false) fehlgeschlagen: " + e.getStackTrace());
 		}
 		return ret;
 	}
@@ -459,6 +495,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 	public boolean loadAll() {
 		int cc, ct, cs;
 		cc = ct = cs = 0;
+		Kursverwaltung.setStoreMode(eDao, "loadAll()");
 		try {
 			if (getConnection() != null) {
 				checkTables();
@@ -510,6 +547,11 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 				}
 				resultSet.close();
 				preparedStatement.close();
+
+				String out = "Aus MySql-Datenbank gelutscht: " + cc + " mal Dummgelaber, " + ct + " Labertaschen und "
+						+ cs + " Hohlköpfe.";
+				Kursverwaltung.showMessage("loadAll fertig!\r\n\r\n" + out);
+				return true;
 			}
 		} catch (HeadlessException e) {
 			Kursverwaltung.showException(e);
@@ -518,42 +560,55 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 			Kursverwaltung.showException(e);
 			return false;
 		}
-		String out = "Aus Datei gelutscht: " + cc + " mal Dummgelaber, " + ct + " Labertaschen und " + cs
-				+ " Hohlköpfe.";
-		Kursverwaltung.showMessage("loadAll fertig!\r\n\r\n" + out);
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean connect(Frame parent, String database, String username, String password) {
-		LoginDialog loginDialog = null;
 		if (database.length() == 0) {
 			database = DEFAULT_DATABASE;
 			username = DEFAULT_USERNAME;
-			loginDialog = new LoginDialog(parent, this, database, username, password);
-			loginDialog.setVisible(true);
-			database = loginDialog.getDatabase();
-			username = loginDialog.getUsername();
-			password = loginDialog.getPassword();
+			if (loginDialog == null) {
+				loginDialog = new LoginDialog(parent, this, database, username, password);
+			} else {
+				// firstLogin = false;
+			}
+			if ((firstLogin && !errorShown)) { // ||
+				loginDialog.setVisible(true);
+				setCanceled(loginDialog.cancel());
+				if (isCanceled()) {
+					firstLogin = false;
+					errorShown = true;
+					this.connection = null;
+				} else {
+					database = loginDialog.getDatabase();
+					username = loginDialog.getUsername();
+					password = loginDialog.getPassword();
+				}
+			}
 		}
 		if (database.length() == 0 && username.length() == 0) {
 			loginDialog.setVisible(false);
+			firstLogin = !loginDialog.isSucceeded();
 			return loginDialog.isSucceeded();
 		} else {
 			try {
 				String conString = "jdbc:mysql://" + database + "?user=" + username + "&password=" + password;
 				this.connection = DriverManager.getConnection(conString);
 			} catch (SQLException e) {
-				Kursverwaltung.showErrorMessage("Username oder Passwort sind falsch.");
+				if (!errorShown) {
+					Kursverwaltung.showErrorMessage(parent, "Username oder Passwort sind falsch.");
+					errorShown = true;
+				}
 				this.connection = null;
-				loginDialog = null;
+				// loginDialog = null;
 			}
-			if (loginDialog != null) {
+			if (loginDialog != null && (database.length() == 0 && username.length() == 0)) {
 				loginDialog.setVisible(false);
 				return loginDialog.isSucceeded();
 			} else {
 				if (this.connection == null) {
-					return false;
+					return errorShown;
 				} else {
 					boolean ret = true;
 					try {
@@ -569,17 +624,41 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 	}
 
 	@Override
-	public boolean closeConnection() {
+	public boolean dispose() {
 		if (this.connection != null) {
 			try {
+				System.out.println("MySQL: " + this.getClass().getName() + " closing...");
 				this.connection.close();
+				this.connection = null;
+
 				return true;
 			} catch (SQLException e) {
 				Kursverwaltung.showException(e);
 			}
 			return false;
 		}
+		checkConn.cancel();
+		checkConn = null;
 		return true;
+	}
+
+	@Override
+	public boolean isConnected() {
+		boolean ret = false;
+		if (connection != null && !isCanceled()) {
+			try {
+				ret = (!connection.isClosed()) && (!connection.isReadOnly());
+			} catch (SQLException e) {
+			}
+		} else {
+			if (!isCanceled()) {
+				try {
+					ret = connect(null, "", "", "");
+				} catch (Exception e) {
+				}
+			}
+		}
+		return ret;
 	}
 
 	private void checkTables() throws SQLException {
@@ -596,7 +675,7 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 			if (rs.getString(3).compareTo(STUDENT_TABLE) == 0) {
 				foundStudent = true;
 			}
-			System.out.println(rs.getString(3));
+			// System.out.println("database table: " + rs.getString(3));
 			if (foundCourse && foundTeacher && foundStudent) {
 				break;
 			}
@@ -714,6 +793,56 @@ public class DaoSchoolJdbcMysql extends DaoSchoolJdbcAbstract {
 			connect(null, "", "", "");
 		}
 		return this.connection;
+	}
+
+	public void startTimer() {
+		checkConn = new Timer(true);
+		checkConn.scheduleAtFixedRate(new TimerTask() {
+
+			@Override
+			public void run() {
+				try {
+					if (connection != null || isCanceled()) {
+						//
+					} else {
+						if (connect(null, usernameBuffer, passwordBuffer, databaseBuffer)) {
+							System.out.println("Neue MySQL-Verbindung: "
+									+ (isCanceled() ? "abgebrochen" : !connection.isClosed()));
+							errorShown = false;
+							firstLogin = true;
+							Kursverwaltung.setDataBase(eDao, "DaoSchoolJdbcMysql()");
+						} else {
+							// System.out.println("Connection failed");
+						}
+					}
+
+					if (connection.isClosed() && !isCanceled()) {
+						if (connect(null, usernameBuffer, passwordBuffer, databaseBuffer)) {
+							System.out.println("Geschlossene MySQl-Verbindung öffnen: " + !connection.isClosed());
+							errorShown = false;
+							firstLogin = true;
+							Kursverwaltung.setDataBase(eDao, "DaoSchoolJdbcMysql()");
+						}
+					}
+					// real check
+					if (firstLogin && !isCanceled()) {
+						getConnection().getMetaData().getTables("TABLE", null, "%", null);
+						Kursverwaltung.setDataBase(eDao, "TimerTask MySQL()");
+						firstLogin = false;
+					}
+					// System.out.println("Database ready");
+				} catch (Exception e) {
+					// if (firstLogin) {
+					// Kursverwaltung.showException(e);
+					if (!Kursverwaltung.getSelectedDao().equals(EDaoSchool.FILE) && firstLogin) {
+						System.out.println("Verbindung herstellen fehlgeschlagen");
+						Kursverwaltung.setDataBase(EDaoSchool.FILE, "TimerTask MySQL()");
+					}
+					// }
+				}
+			}
+		}, 0, checkInterval);
+
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 

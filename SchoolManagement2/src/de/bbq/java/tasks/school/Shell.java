@@ -74,6 +74,7 @@ public class Shell {
 		}
 		if (s.compareTo("gopro") == 0)
 			Kursverwaltung.toggleFrame();
+			Kursverwaltung.getInstance().setLocationRelativeTo(null);
 		if ((getSection().equals(EMainSections.COURSE) || getSection().equals(EMainSections.TEACHER)
 				|| getSection().equals(EMainSections.STUDENT)) && getSubsection() == 1 && ret == 2) {
 
@@ -164,6 +165,19 @@ public class Shell {
 		scanner.close();
 		return input;
 	}
+	
+	public int showConfirm(String s, boolean cancel) {
+		System.out.println(s + "\r\n1:Ja 2:Nö" + (cancel?" 3:Abbruch!":""));
+		Scanner scanner = new Scanner(System.in);
+		String input = scanner.next();
+		scanner.close();
+		try {
+			return Integer.parseInt(input); 
+		} catch (Exception e) {
+			return showConfirm(s,cancel); // (cancel?3:2);
+		}
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -505,6 +519,7 @@ public class Shell {
 				break;
 			case 3:
 				DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao()).loadAll();
+				Kursverwaltung.getInstance().refresh();
 				System.out.println("Daten geladen.");
 				break;
 			case 4:

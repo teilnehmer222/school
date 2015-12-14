@@ -12,7 +12,7 @@ public class LoginDialog extends JDialog implements ActionListener {
 	private JTextField username = new JTextField(), database = new JTextField();
 	private JPasswordField password = new JPasswordField();
 	private JButton saveButton, exitButton;
-	private boolean succeeded;
+	private boolean succeeded, cancel = false;
 	private DaoSchoolJdbcAbstract jdbcAbstract;
 	private JPanel contentPane;
 
@@ -186,12 +186,13 @@ public class LoginDialog extends JDialog implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		if (arg0.getSource() == this.saveButton) {
-			if (jdbcAbstract.connect(null, getDatabase(), getUsername(), getPassword())) {
+			if (jdbcAbstract.connect(Kursverwaltung.getInstance(), getDatabase(), getUsername(), getPassword())) {
 				// JOptionPane.showMessageDialog(LoginDialog.this,
 				// "Hallo " + getUsername() + "! Datenbankverbindung
 				// hergestellt.", "JDBC Anmelden",
 				// JOptionPane.INFORMATION_MESSAGE);
 				succeeded = true;
+				cancel = false;
 				dispose();
 			} else {
 				// JOptionPane.showMessageDialog(LoginDialog.this, "Username
@@ -202,15 +203,20 @@ public class LoginDialog extends JDialog implements ActionListener {
 				// username.setText("");
 				password.setText("");
 				succeeded = false;
+				cancel = false;
+				dispose();
 			}
 		} else if (arg0.getSource() == this.exitButton) {
-			{
-				database.setText("");
-				username.setText("");
-				password.setText("");
-				succeeded = false;
-				this.dispose();
-			}
+			database.setText("");
+			username.setText("");
+			password.setText("");
+			succeeded = true;
+			cancel = true;
+			this.dispose();
 		}
+	}
+
+	public boolean cancel() {
+		return this.cancel;
 	}
 }

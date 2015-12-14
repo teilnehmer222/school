@@ -12,8 +12,9 @@ public abstract class SchoolItemAbstract implements Serializable {
 	// Class Properties
 	protected transient long id;
 	private transient boolean isInEdit;
-	private transient boolean isLastObject;
-	private transient boolean saved;
+	private transient boolean isSingle = false; // used by serialize
+	private transient boolean isLastObject; // used by serialize
+	private transient boolean saved; // used by serialize
 	protected static DaoSchoolAbstract dataAccessObject;
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -23,17 +24,14 @@ public abstract class SchoolItemAbstract implements Serializable {
 		return SchoolItemAbstract.highestMemberId++;
 	}
 
-	public SchoolItemAbstract(EDaoSchool eDataAccess) throws Exception {
+	public SchoolItemAbstract(EDaoSchool eDataAccess) {
 		id = SchoolItemAbstract.highestMemberId++;
 		DaoSchoolAbstract accessObject = null;
-		try {
-			accessObject = DaoSchoolAbstract.getDaoSchool(eDataAccess);
-		} catch (Exception e) {
-			throw e;
-		}
-		if (accessObject == null)
-			throw new Exception("Datenzugriffs-Objekt \"" + eDataAccess.name() + "\2 nicht gefunden.");
+		accessObject = DaoSchoolAbstract.getDaoSchool(eDataAccess);
 
+		if (accessObject == null) {
+			Kursverwaltung.showErrorMessage("Datenzugriffs-Objekt \"" + eDataAccess.name() + "\2 nicht gefunden.");
+		}
 		if (dataAccessObject != null && accessObject != null) {
 			if (!dataAccessObject.getClass().equals(accessObject.getClass())) {
 				dataAccessObject = accessObject;
@@ -78,6 +76,24 @@ public abstract class SchoolItemAbstract implements Serializable {
 
 	public void setLast(boolean isLast) {
 		this.isLastObject = isLast;
+	}
+
+	protected void afterChange() {
+		this.isLastObject = true;
+		this.isSingle = true;
+		if (dataAccessObject != null) {
+			dataAccessObject.saveElement(this);
+		} else {
+			dataAccessObject = DaoSchoolAbstract.getDaoSchool(Kursverwaltung.getSelectedDao());
+		}
+	}
+
+	public boolean isSingle() {
+		return isSingle;
+	}
+
+	public void setSingle(boolean isSingle) {
+		this.isSingle = isSingle;
 	}
 
 	public abstract String getDescription();

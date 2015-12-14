@@ -51,9 +51,12 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 			zipTextField = new JTextField(""), countryTextField = new JTextField(""),
 			roomNumberTextField = new JTextField("");
 	private JTextField streetNumberTextField = new JTextField("");
-	private JComboBox<Integer> hourStartComboBox = new JComboBox<>(), minuteStartComboBox = new JComboBox<>(),
-			hourEndComboBox = new JComboBox<>(), minuteEndComboBox = new JComboBox<>();
+//	private JComboBox<Integer> hourStartComboBox = new JComboBox<>(), minuteStartComboBox = new JComboBox<>(),
+//			hourEndComboBox = new JComboBox<>(), minuteEndComboBox = new JComboBox<>();
 	private JPanel contentPane;
+	private JSpinner timeSpinnerStart, timeSpinnerEnd;
+	private JComponent dateEditorStart,dateEditorEnd;
+	private SpinnerModel spinnerModelStart, spinnerModelEnd;
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -110,49 +113,49 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		if (add != null) {
 			add.setStreetName(this.streetTextField.getText());
 			add.setCity(this.cityTextField.getText());
-			try {
-				add.setZipCode(Integer.parseInt(this.zipTextField.getText()));
-			} catch (Exception e) {
-				Kursverwaltung.showException(e);
+			if (this.zipTextField.getText().length() > 0) {
+				try {
+					add.setZipCode(Integer.parseInt(this.zipTextField.getText()));
+				} catch (Exception e) {
+					Kursverwaltung.showException(e);
+				}
+				add.setCountry(this.countryTextField.getText());
+				add.setHouseNumber(this.streetNumberTextField.getText());
 			}
-			add.setCountry(this.countryTextField.getText());
-			add.setHouseNumber(this.streetNumberTextField.getText());
 		}
 	}
 
 	public void ReadDataCourse() {
 		this.courseDF.setTopic(this.topicTextField.getText());
 		Calendar cal = Calendar.getInstance(); // creates calendar
+		Calendar date = Calendar.getInstance(); // creates calendar
 		try {
 			UtilDateModel model = (UtilDateModel) this.startTextField.getModel();
-			cal.setTime(model.getValue());
-			cal.set(Calendar.HOUR_OF_DAY, (int) this.hourStartComboBox.getSelectedItem());
-			cal.set(Calendar.MINUTE, (int) this.minuteStartComboBox.getSelectedItem());
+			date.setTime(model.getValue());
+			cal.setTime((Date) timeSpinnerStart.getModel().getValue());
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
+			cal.set(Calendar.YEAR, date.get(Calendar.YEAR));
+			cal.set(Calendar.MONTH, date.get(Calendar.MONTH));
+			cal.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH));
+			this.courseDF.setStartTime(cal.getTime());
 		} catch (Exception e2) {
-			cal.setTime(new Date());
-			cal.set(Calendar.HOUR_OF_DAY, 0);
-			cal.set(Calendar.MINUTE, 0);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
+			this.courseDF.setStartTime(null);
 		}
-		this.courseDF.setStartTime(cal.getTime());
+
 		try {
 			UtilDateModel model = (UtilDateModel) this.endTextField.getModel();
-			cal.setTime(model.getValue());
-			cal.set(Calendar.HOUR_OF_DAY, (int) this.hourEndComboBox.getSelectedItem());
-			cal.set(Calendar.MINUTE, (int) this.minuteEndComboBox.getSelectedItem());
+			date.setTime(model.getValue());
+			cal.setTime((Date) timeSpinnerEnd.getValue());
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
+			cal.set(Calendar.YEAR, date.get(Calendar.YEAR));
+			cal.set(Calendar.MONTH, date.get(Calendar.MONTH));
+			cal.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH));
+			this.courseDF.setEndTime(cal.getTime());
 		} catch (Exception e2) {
-			cal.setTime(new Date());
-			cal.set(Calendar.HOUR_OF_DAY, 0);
-			cal.set(Calendar.MINUTE, 0);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
+			this.courseDF.setEndTime(null);
 		}
-		this.courseDF.setEndTime(cal.getTime());
 		this.courseDF.setLanguage(this.languageTextField.getText());
 		this.courseDF.setRoomNumber(this.roomNumberTextField.getText());
 		courseDF.setNeedsBeamer(this.beamerCheckBox.isSelected());
@@ -188,28 +191,30 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 				true);
 		addTextField(labels, texts, "lastNameTextField", "Vorname:", pers.getFirstName(), this.firstNameTextField,
 				true);
-		UtilDateModel model = new UtilDateModel();
-		Calendar cal = Calendar.getInstance();
-		if (pers.getBirthDate() != null) {
-			model.setValue(pers.getBirthDate());
-			cal.setTime(pers.getBirthDate());
-		} else {
-			cal.setTime(new Date());
-			cal.set(Calendar.HOUR_OF_DAY, (int) 0);
-			cal.set(Calendar.MINUTE, (int) 0);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
-		}
-		model.setSelected(true);
+		UtilDateModel model = getDate(pers.getBirthDate(), false);
+		// new UtilDateModel();
+		// Calendar cal = getDate(pers.getBirthDate());
+		// Calendar.getInstance();
+		// if (pers.getBirthDate() != null) {
+		// model.setValue(pers.getBirthDate());
+		// cal.setTime(pers.getBirthDate());
+		// } else {
+		// cal.setTime(new Date());
+		// cal.set(Calendar.HOUR_OF_DAY, (int) 0);
+		// cal.set(Calendar.MINUTE, (int) 0);
+		// cal.set(Calendar.SECOND, 0);
+		// cal.set(Calendar.MILLISECOND, 0);
+		// }
+		// model.setSelected(true);
 		Properties p = new Properties();
 		p.put("text.today", "Heute");
 		p.put("text.month", "Monat");
 		p.put("text.year", "Jahr");
 
-		JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
-		this.birthDayTextField = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-		addDateTime(labels, texts, "birthDayTextField", "Geburtsdatum:", pers.getBirthDate(), this.birthDayTextField,
-				null, null, true);
+		// JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
+		this.birthDayTextField = new JDatePickerImpl(new JDatePanelImpl(model, p), new DateLabelFormatter());
+		addDateTime(labels, texts, "birthDayTextField", "Geburtsdatum:", pers.getBirthDate(),this.birthDayTextField,
+				this.timeSpinnerStart, true);
 		Construct(pers.getAdress(), labels, texts);
 	}
 
@@ -344,58 +349,79 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		texts.setLayout(new BoxLayout(texts, BoxLayout.Y_AXIS));
 		addTextField(labels, texts, "topicTextField", "Fach:", this.courseDF.getTopic(), this.topicTextField, true);
 
-		UtilDateModel model = new UtilDateModel();
-		Calendar cal = Calendar.getInstance();
-		if (this.courseDF.getSartTime() != null) {
-			model.setValue(this.courseDF.getSartTime());
-			cal.setTime(this.courseDF.getSartTime());
-		} else {
-			cal.setTime(new Date());
-			cal.set(Calendar.HOUR_OF_DAY, (int) 0);
-			cal.set(Calendar.MINUTE, (int) 0);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
-		}
-		model.setSelected(true);
+		Date value = this.courseDF.getSartTime();
+		UtilDateModel model = getDate(value, true);// new UtilDateModel();
+		// Calendar cal = Calendar.getInstance();
+		// if (value != null) {
+		// model.setValue(value);
+		// cal.setTime(value);
+		// cal.set(Calendar.SECOND, 0);
+		// cal.set(Calendar.MILLISECOND, 0);
+		// } else {
+		// cal.setTime(new Date());
+		// cal.set(Calendar.HOUR_OF_DAY, (int) 0);
+		// cal.set(Calendar.MINUTE, (int) 0);
+		// cal.set(Calendar.SECOND, 0);
+		// cal.set(Calendar.MILLISECOND, 0);
+		// }
+		// model.setSelected(true);
 		Properties p = new Properties();
 		p.put("text.today", "Heute");
 		p.put("text.month", "Monat");
 		p.put("text.year", "Jahr");
 
-		Integer[] hourArray = new Integer[Kursverwaltung.getWorkEnd() - Kursverwaltung.getWorkStart()];
-		for (Integer index = Kursverwaltung.getWorkStart(); index < Kursverwaltung.getWorkEnd(); index++) {
-			hourArray[index - Kursverwaltung.getWorkStart()] = index;
-		}
-		Integer[] minuteAray = new Integer[60 / 5];
-		for (Integer index = 0; index < 60; index = index + 5) {
-			minuteAray[index / 5] = index;
-		}
-		JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
-		this.startTextField = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-		hourStartComboBox = new JComboBox<>(hourArray);
-		minuteStartComboBox = new JComboBox<>(minuteAray);
-		addDateTime(labels, texts, "startDatePicker", "Start:", this.courseDF.getSartTime(), this.startTextField,
-				this.hourStartComboBox, this.minuteStartComboBox, true);
+		// Integer[] hourArray = new Integer[Kursverwaltung.getWorkEnd() -
+		// Kursverwaltung.getWorkStart()];
+		// for (Integer index = Kursverwaltung.getWorkStart(); index <
+		// Kursverwaltung.getWorkEnd(); index++) {
+		// hourArray[index - Kursverwaltung.getWorkStart()] = index;
+		// }
+		// Integer[] minuteAray = new Integer[60 / 5];
+		// for (Integer index = 0; index < 60; index = index + 5) {
+		// minuteAray[index / 5] = index;
+		// }
+		// JDatePanelImpl datePanel =;
+		this.startTextField = new JDatePickerImpl(new JDatePanelImpl(model, p), new DateLabelFormatter());
+		// hourStartComboBox = new JComboBox<>(hourArray);
+		// minuteStartComboBox = new JComboBox<>(minuteAray);
 
-		hourEndComboBox = new JComboBox<>(hourArray);
-		minuteEndComboBox = new JComboBox<>(minuteAray);
-		model = new UtilDateModel();
-		cal = Calendar.getInstance();
-		if (this.courseDF.getEndTime() != null) {
-			model.setValue(this.courseDF.getEndTime());
-			cal.setTime(this.courseDF.getEndTime());
-		} else {
-			cal.setTime(new Date());
-			cal.set(Calendar.HOUR_OF_DAY, (int) 0);
-			cal.set(Calendar.MINUTE, (int) 0);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
-		}
-		model.setSelected(true);
-		datePanel = new JDatePanelImpl(model, p);
-		this.endTextField = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-		addDateTime(labels, texts, "endDatePicker", "Ende:", this.courseDF.getEndTime(), endTextField, hourEndComboBox,
-				minuteEndComboBox, true);
+		spinnerModelStart  = new SpinnerDateModel();
+		timeSpinnerStart = new JSpinner(spinnerModelStart);
+		dateEditorStart = new JSpinner.DateEditor(timeSpinnerStart, "HH:mm:ss");
+		timeSpinnerStart.setEditor(dateEditorStart);
+		timeSpinnerStart.setValue(startTextField.getModel().getValue());
+//		texts.add(timeSpinnerStart);
+		addDateTime(labels, texts, "startDatePicker", "Start:", this.courseDF.getSartTime(), this.startTextField,timeSpinnerStart, true);
+		//
+		// hourEndComboBox = new JComboBox<>(hourArray);
+		// minuteEndComboBox = new JComboBox<>(minuteAray);
+		value = this.courseDF.getEndTime();
+		model = getDate(value, true);
+		// cal = Calendar.getInstance();
+		// if (value != null) {
+		// model.setValue(value);
+		// cal.setTime(value);
+		// cal.set(Calendar.SECOND, 0);
+		// cal.set(Calendar.MILLISECOND, 0);
+		// } else {
+		// cal.setTime(new Date());
+		// cal.set(Calendar.HOUR_OF_DAY, (int) 0);
+		// cal.set(Calendar.MINUTE, (int) 0);
+		// cal.set(Calendar.SECOND, 0);
+		// cal.set(Calendar.MILLISECOND, 0);
+		// }
+		// model.setSelected(true);
+		// datePanel = new JDatePanelImpl(model, p);
+		this.endTextField = new JDatePickerImpl(new JDatePanelImpl(model, p), new DateLabelFormatter());
+
+		spinnerModelEnd = new SpinnerDateModel();
+		timeSpinnerEnd = new JSpinner(spinnerModelEnd);
+		dateEditorEnd = new JSpinner.DateEditor(timeSpinnerEnd, "HH:mm:ss");
+		timeSpinnerEnd.setEditor(dateEditorEnd);
+		timeSpinnerEnd.setValue(this.endTextField.getModel().getValue());
+		texts.add(timeSpinnerEnd);
+
+		addDateTime(labels, texts, "endDatePicker", "Ende:", this.courseDF.getEndTime(), endTextField,timeSpinnerEnd, true);
 		addTextField(labels, texts, "languageTextField", "Sprache:", this.courseDF.getLanguage(),
 				this.languageTextField, true);
 		String roomNr = "";
@@ -445,7 +471,6 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		this.winHight = 269;
 
 		Construct();
-
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -541,12 +566,35 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		contentPane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 	}
 
+	private UtilDateModel getDate(Date value, boolean withTime) {
+		UtilDateModel model = new UtilDateModel();
+		Calendar cal = Calendar.getInstance();
+		if (value != null) {
+			cal.setTime(value);
+		} else {
+			cal.setTime(new Date());
+		}
+		if (!withTime) {
+			cal.set(Calendar.HOUR_OF_DAY, (int) 0);
+			cal.set(Calendar.MINUTE, (int) 0);
+			cal.set(Calendar.SECOND,(int) 0);
+			cal.set(Calendar.MILLISECOND,(int) 0);
+		} else {
+			cal.set(Calendar.SECOND,(int) 0);
+			cal.set(Calendar.MILLISECOND,(int) 0);
+		}
+		model.setValue(cal.getTime());
+		model.setSelected(true);
+		return model;
+	}
+
 	public void addDateTime(JPanel labels, JPanel texts, String name, String text, Date value, JDatePickerImpl date,
-			JComboBox<Integer> hours, JComboBox<Integer> minutes, boolean spacer) {
+			JSpinner timeSpinnerStart, boolean spacer) { // JComboBox<Integer> hours, JComboBox<Integer>
+								// minutes,
 		addLabel(labels, text, dateHeight);
 
 		JPanel panel = new JPanel();
-		SpringLayout layout = new SpringLayout();
+		BorderLayout layout = new BorderLayout(); // SpringLayout();
 		panel.setLayout(layout);
 		panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, dateHeight));
 		panel.setMinimumSize(new Dimension(Integer.MAX_VALUE, dateHeight));
@@ -554,8 +602,10 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		UtilDateModel model = new UtilDateModel();
 		Calendar cal = Calendar.getInstance();
 		if (value != null) {
-			model.setValue(value);
 			cal.setTime(value);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+			model.setValue(value);
 		} else {
 			cal.setTime(new Date());
 			cal.set(Calendar.HOUR_OF_DAY, (int) 0);
@@ -566,68 +616,97 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		date.setName(name);
 		date.setMinimumSize(new Dimension(130, dateHeight));
 		date.setMaximumSize(new Dimension(Integer.MAX_VALUE, dateHeight));
-		panel.add(date);
-
-		// addComponent(texts, name, dateHeight, panel);
-		int selectIndex = 0;
-		if (hours != null) {
-			Integer[] hourArray = new Integer[Kursverwaltung.getWorkEnd() - Kursverwaltung.getWorkStart()];
-			for (Integer index = Kursverwaltung.getWorkStart(); index < Kursverwaltung.getWorkEnd(); index++) {
-				hourArray[index - Kursverwaltung.getWorkStart()] = index;
-				if (cal.get(Calendar.HOUR_OF_DAY) == index) {
-					selectIndex = index - Kursverwaltung.getWorkStart();
-				}
-			}
-			hours.setMaximumSize(new Dimension(50, 26));
-			hours.setMinimumSize(new Dimension(50, 26));
-			hours.setSelectedIndex(selectIndex);
-			// if (minutes != null) {
-			// hours.setBorder(new EmptyBorder(0,0,0,10));
-			// }
-			panel.add(hours);
+		panel.add(date, BorderLayout.CENTER);
+		if (timeSpinnerStart != null) {
+			panel.add(timeSpinnerStart,BorderLayout.EAST);
 		}
-		if (minutes != null) {
-			selectIndex = 0;
-			Integer[] minuteAray = new Integer[60 / 5];
-			for (Integer index = 0; index < 60; index = index + 5) {
-				minuteAray[index / 5] = index;
-				if (cal.get(Calendar.MINUTE) == index) {
-					selectIndex = index / 5;
-				}
-			}
-			// minutes.setBounds(180, 0, 50, 26);
-			minutes.setMaximumSize(new Dimension(50, 26));
-			minutes.setMinimumSize(new Dimension(50, 26));
-			minutes.setSelectedIndex(selectIndex);
-			panel.add(minutes);
-		}
-		Component[] components = panel.getComponents();
-		Spring xPad = Spring.constant(5);
-		Spring ySpring = Spring.constant(0);
-		Spring xSpring = ySpring;
+		// // addComponent(texts, name, dateHeight, panel);
+		// int selectIndex = 0;
+		// if (hours != null) {
+		// SpinnerModel spinnerModel = new SpinnerDateModel();
+		// JSpinner timeSpinner = new JSpinner(spinnerModel);
+		// JComponent dateEditor = new JSpinner.DateEditor(timeSpinner,
+		// "HH:mm:ss");
+		// timeSpinner.setEditor(dateEditor);
+		// if (value != null) {
+		// timeSpinner.setValue(cal.getTime());
+		// }
+		// panel.add(timeSpinner);
+		//
+		// if (false) {
+		// Integer[] hourArray = new Integer[Kursverwaltung.getWorkEnd() -
+		// Kursverwaltung.getWorkStart()];
+		// for (Integer index = Kursverwaltung.getWorkStart(); index <
+		// Kursverwaltung.getWorkEnd(); index++) {
+		// hourArray[index - Kursverwaltung.getWorkStart()] = index;
+		// if (cal.get(Calendar.HOUR_OF_DAY) == index) {
+		// selectIndex = index - Kursverwaltung.getWorkStart();
+		// }
+		// }
+		// hours.setMaximumSize(new Dimension(50, 26));
+		// hours.setMinimumSize(new Dimension(50, 26));
+		// hours.setSelectedIndex(selectIndex);
+		// // if (minutes != null) {
+		// // hours.setBorder(new EmptyBorder(0,0,0,10));
+		// // }
+		// panel.add(hours);
+		// }
+		// }
+		// if (minutes != null && false) {
+		// selectIndex = 0;
+		// Integer[] minuteAray = new Integer[60 / 5];
+		// for (Integer index = 0; index < 60; index = index + 5) {
+		// minuteAray[index / 5] = index;
+		// if (cal.get(Calendar.MINUTE) == index) {
+		// selectIndex = index / 5;
+		// }
+		// }
+		// // minutes.setBounds(180, 0, 50, 26);
+		// minutes.setMaximumSize(new Dimension(50, 26));
+		// minutes.setMinimumSize(new Dimension(50, 26));
+		// minutes.setSelectedIndex(selectIndex);
+		// panel.add(minutes);
+		// }
+//		Component[] components = panel.getComponents();
+//		Spring xPad = Spring.constant(5);
+//		Spring ySpring = Spring.constant(0);
+//		Spring xSpring = ySpring;
 
 		// Make every component 5 pixels away from the component to its left.
-		for (int i = 0; i < components.length; i++) {
-			SpringLayout.Constraints cons = layout.getConstraints(components[i]);
-			cons.setX(xSpring);
-			if (i == components.length - 1) {
-				xSpring = cons.getConstraint("East");
-			} else {
-				xSpring = Spring.sum(xPad, cons.getConstraint("East"));
-			}
-			cons.setY(ySpring);
-		}
-		Spring maxHeightSpring = Spring.constant(dateHeight);
+//		for (int i = 0; i < components.length; i++) {
+//			SpringLayout.Constraints cons = layout.getConstraints(components[i]);
+//			cons.setX(xSpring);
+//			if (i == components.length - 1) {
+//				xSpring = cons.getConstraint("East");
+//			} else {
+//				xSpring = Spring.sum(xPad, cons.getConstraint("East"));
+//			}
+//			cons.setY(ySpring);
+//		}
+//		Spring maxHeightSpring = Spring.constant(dateHeight);
 		// Make the window's preferred size depend on its components.
-		SpringLayout.Constraints pCons = layout.getConstraints(panel);
-		pCons.setConstraint("East", xSpring);
-		pCons.setConstraint("South", Spring.sum(maxHeightSpring, ySpring));
+//		SpringLayout.Constraints pCons = layout.getConstraints(panel);
+//		pCons.setConstraint("East", xSpring);
+//		pCons.setConstraint("South", Spring.sum(maxHeightSpring, ySpring));
 		texts.add(panel);
 
 		if (spacer) {
 			labels.add(Box.createRigidArea(new Dimension(0, 5)));
 			texts.add(Box.createVerticalStrut(5));
 		}
+	}
+
+	@Override
+	public String toString() {
+		if (this.courseDF != null) {
+			return this.courseDF.toString();
+		} else if (this.teacherDF != null) {
+			return this.teacherDF.toString();
+		} else if (this.studentDF != null) { 
+			return this.studentDF.toString();
+		} 
+		return "";
+		//		return "FrameEdit [courseDF=" + courseDF.toString() + ", teacherDF=" + teacherDF + ", studentDF=" + studentDF + "]";
 	}
 
 	public void addCheckBox(JPanel labels, JPanel texts, String name, String text, Boolean value, int height,

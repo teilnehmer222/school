@@ -18,7 +18,7 @@ public abstract class SchoolPersonAbstract extends SchoolItemAbstract {
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Construct
-	public SchoolPersonAbstract(EDaoSchool EDataAccess) throws Exception {
+	public SchoolPersonAbstract(EDaoSchool EDataAccess) {
 		super(EDataAccess);
 		this.address = new Address(EDataAccess);
 	}
