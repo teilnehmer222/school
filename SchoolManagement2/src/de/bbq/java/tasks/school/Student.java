@@ -67,6 +67,7 @@ public class Student extends SchoolPersonAbstract implements IStudent {
 	public static void studentDeleted(IStudent student) {
 		if (allStudents.contains(student)) {
 			allStudents.remove(student);
+			Kursverwaltung.deleteElement((SchoolItemAbstract) student);
 		}
 	}
 

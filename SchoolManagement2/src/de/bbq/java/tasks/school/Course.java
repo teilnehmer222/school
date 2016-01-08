@@ -30,8 +30,8 @@ public class Course extends SchoolItemAbstract implements ICourse {
 	// Construct
 	private Course(String courseName, EDaoSchool eDataAccess) throws Exception {
 		super(eDataAccess);
-		this.courseName = courseName;
 		allCourses.add(this);
+		this.courseName = courseName;		
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -82,6 +82,7 @@ public class Course extends SchoolItemAbstract implements ICourse {
 
 	public static void courseDeleted(ICourse course) {
 		allCourses.remove(course);
+		Kursverwaltung.deleteElement((SchoolItemAbstract) course);
 	}
 
 	public static void studentDeleted(IStudent student) {
@@ -94,6 +95,7 @@ public class Course extends SchoolItemAbstract implements ICourse {
 					if (s != null) {
 						if (s.equals(student)) {
 							c.removeStudent(s);
+							Kursverwaltung.saveItem((SchoolItemAbstract) c);
 						}
 					}
 				}
@@ -106,6 +108,7 @@ public class Course extends SchoolItemAbstract implements ICourse {
 			if (c.getTeacher() != null) {
 				if (c.getTeacher().equals(teacher)) {
 					c.removeTeacher();
+					Kursverwaltung.saveItem((SchoolItemAbstract) c);
 				}
 			}
 		}
@@ -127,11 +130,13 @@ public class Course extends SchoolItemAbstract implements ICourse {
 	@Override
 	public void setTeacher(ITeacher t) {
 		this.teacher = t;
+		Kursverwaltung.saveItem((SchoolItemAbstract) this);
 	}
 
 	@Override
 	public void removeTeacher() {
 		this.teacher = null;
+		Kursverwaltung.saveItem((SchoolItemAbstract) this);
 	}
 
 	@Override
@@ -152,8 +157,10 @@ public class Course extends SchoolItemAbstract implements ICourse {
 		if (student.hasCourse()) {
 			ICourse oldCourse = student.getCourse();
 			oldCourse.removeStudent(student);
+			Kursverwaltung.saveItem((SchoolItemAbstract) oldCourse);
 		}
 		this.getStudents().add(student);
+		Kursverwaltung.saveItem((SchoolItemAbstract) this);
 		// student.setCourse(this);
 	}
 
@@ -161,6 +168,7 @@ public class Course extends SchoolItemAbstract implements ICourse {
 	public void removeStudent(IStudent student) {
 		if (this.getStudents().contains(student)) {
 			this.getStudents().remove(student);
+			Kursverwaltung.saveItem((SchoolItemAbstract) this);
 		}
 		// student.removeCourse();
 	}
@@ -184,6 +192,7 @@ public class Course extends SchoolItemAbstract implements ICourse {
 
 	public void setCourseName(String courseName) {
 		this.courseName = courseName;
+		Kursverwaltung.saveItem((SchoolItemAbstract) this);
 	}
 
 	public String getTopic() {

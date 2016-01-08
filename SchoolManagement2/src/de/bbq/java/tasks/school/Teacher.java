@@ -67,6 +67,7 @@ public class Teacher extends SchoolPersonAbstract implements ITeacher {
 	public static void teacherDeleted(SchoolItemAbstract editItem) {
 		if (allTeachers.contains(editItem)) {
 			allTeachers.remove(editItem);
+			Kursverwaltung.deleteElement((SchoolItemAbstract) editItem);
 		}
 	}
 

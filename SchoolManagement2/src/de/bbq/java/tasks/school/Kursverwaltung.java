@@ -43,9 +43,9 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 	private static Shell shell;
 	private static DateFormat dateFormatGermany;
 
-	private PanelCourse panel1;
-	private PanelTeacher panel2;
-	private PanelStudent panel3;
+	private PanelCourse panelCourse;
+	private PanelTeacher panelTeacher;
+	private PanelStudent panelStudent;
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	public static EDaoSchool getSelectedDao() {
@@ -117,9 +117,9 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 	}
 
 	private void refresh() {
-		panel1.refresh();
-		panel2.refresh();
-		panel3.refresh();
+		panelCourse.refresh();
+		panelTeacher.refresh();
+		panelStudent.refresh();
 	}
 
 	private Kursverwaltung() {
@@ -172,7 +172,7 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 		} else {
 			// JOptionPane.showMessageDialog(null, s, "Information",
 			// JOptionPane.INFORMATION_MESSAGE);
-			JOptionPane.showInternalMessageDialog(null, s, "Information", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showInternalMessageDialog(launcher, s, "Information", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 
@@ -197,19 +197,19 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 		tabbedPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		ImageIcon icon = createImageIcon("course.png");
 
-		panel1 = new PanelCourse();
-		tabbedPane.addTab("Kurse", icon, panel1, "Kurse verwalten");
+		panelCourse = new PanelCourse();
+		tabbedPane.addTab("Kurse", icon, panelCourse, "Kurse verwalten");
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
 		icon = createImageIcon("teacher.png");
-		panel2 = new PanelTeacher();
-		tabbedPane.addTab("Leerer", icon, panel2, "Leerer den Kursen zuweisen");
+		panelTeacher = new PanelTeacher();
+		tabbedPane.addTab("Leerer", icon, panelTeacher, "Leerer den Kursen zuweisen");
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
 		icon = createImageIcon("student.png");
-		panel3 = new PanelStudent();
-		tabbedPane.addTab("Schüler", icon, panel3, "Schüler den Kursen zuweisen");
-		panel3.setPreferredSize(new Dimension(410, 50));
+		panelStudent = new PanelStudent();
+		tabbedPane.addTab("Schüler", icon, panelStudent, "Schüler den Kursen zuweisen");
+		panelStudent.setPreferredSize(new Dimension(410, 50));
 		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
 
 		tabbedPane.addChangeListener(new ChangeListener() {
@@ -219,13 +219,13 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 				JTabbedPane source = (JTabbedPane) e.getSource();
 				switch (source.getSelectedIndex()) {
 				case 0:
-					panel1.refresh();
+					panelCourse.refresh();
 					break;
 				case 1:
-					panel2.refresh();
+					panelTeacher.refresh();
 					break;
 				case 2:
-					panel3.refresh();
+					panelStudent.refresh();
 					break;
 
 				}
@@ -233,7 +233,7 @@ public class Kursverwaltung extends JFrame implements WindowListener {
 		});
 		add(tabbedPane);
 		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		panel1.refresh();
+		panelCourse.refresh();
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
