@@ -1,4 +1,4 @@
-package de.bbq.java.tasks.school;
+package de.bbq.java.tasks.vce;
 
 import java.io.File;
 import java.io.FileInputStream;

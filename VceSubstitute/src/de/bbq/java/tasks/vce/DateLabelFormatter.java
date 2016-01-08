@@ -1,4 +1,4 @@
-package de.bbq.java.tasks.school;
+package de.bbq.java.tasks.vce;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

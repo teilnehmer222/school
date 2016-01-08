@@ -1,4 +1,4 @@
-package de.bbq.java.tasks.school;
+package de.bbq.java.tasks.vce;
 
 /**
  * @author Thorsten2201
