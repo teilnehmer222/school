@@ -34,9 +34,9 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 	private final int buttonWidth = 100;
 	private final int dateHeight = 26;
 
-	private Course courseDF;
-	private Teacher teacherDF;
-	private Student studentDF;
+	private Course course;
+	private Teacher teacher;
+	private Student student;
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -66,24 +66,24 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		if (e.getSource() == this.exitButton) {
 			this.dispose();
 		} else if (e.getSource() == this.saveButton) {
-			if (this.courseDF != null) {
+			if (this.course != null) {
 				ReadDataCourse();
-				Kursverwaltung.saveItem(this.courseDF);
-			} else if (this.teacherDF != null) {
-				ReadDataPerson(this.teacherDF);
-				ReadDataAdress(this.teacherDF.getAdress());
-				Kursverwaltung.saveItem(this.teacherDF);
-			} else if (this.studentDF != null) {
-				ReadDataPerson(this.studentDF);
-				ReadDataAdress(this.studentDF.getAdress());
-				Kursverwaltung.saveItem(this.studentDF);
+				Kursverwaltung.saveItem(this.course);
+			} else if (this.teacher != null) {
+				ReadDataPerson(this.teacher);
+				ReadDataAdress(this.teacher.getAdress());
+				Kursverwaltung.saveItem(this.teacher);
+			} else if (this.student != null) {
+				ReadDataPerson(this.student);
+				ReadDataAdress(this.student.getAdress());
+				Kursverwaltung.saveItem(this.student);
 			}
-			if (this.courseDF != null) {
-				this.courseDF.setInEdit(false);
-			} else if (this.teacherDF != null) {
-				this.teacherDF.setInEdit(false);
-			} else if (this.studentDF != null) {
-				this.studentDF.setInEdit(false);
+			if (this.course != null) {
+				this.course.setInEdit(false);
+			} else if (this.teacher != null) {
+				this.teacher.setInEdit(false);
+			} else if (this.student != null) {
+				this.student.setInEdit(false);
 			}
 			this.dispose();
 		}
@@ -126,7 +126,7 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 	}
 
 	public void ReadDataCourse() {
-		this.courseDF.setTopic(this.topicTextField.getText());
+		this.course.setTopic(this.topicTextField.getText());
 		Calendar cal = Calendar.getInstance(); // creates calendar
 		Calendar date = Calendar.getInstance(); // creates calendar
 		try {
@@ -138,9 +138,9 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 			cal.set(Calendar.YEAR, date.get(Calendar.YEAR));
 			cal.set(Calendar.MONTH, date.get(Calendar.MONTH));
 			cal.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH));
-			this.courseDF.setStartTime(cal.getTime());
+			this.course.setStartTime(cal.getTime());
 		} catch (Exception e2) {
-			this.courseDF.setStartTime(null);
+			this.course.setStartTime(null);
 		}
 
 		try {
@@ -152,13 +152,13 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 			cal.set(Calendar.YEAR, date.get(Calendar.YEAR));
 			cal.set(Calendar.MONTH, date.get(Calendar.MONTH));
 			cal.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH));
-			this.courseDF.setEndTime(cal.getTime());
+			this.course.setEndTime(cal.getTime());
 		} catch (Exception e2) {
-			this.courseDF.setEndTime(null);
+			this.course.setEndTime(null);
 		}
-		this.courseDF.setLanguage(this.languageTextField.getText());
-		this.courseDF.setRoomNumber(this.roomNumberTextField.getText());
-		courseDF.setNeedsBeamer(this.beamerCheckBox.isSelected());
+		this.course.setLanguage(this.languageTextField.getText());
+		this.course.setRoomNumber(this.roomNumberTextField.getText());
+		course.setNeedsBeamer(this.beamerCheckBox.isSelected());
 	}
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -220,12 +220,12 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 
 	FrameEdit(ITeacher editItem) { // ,WindowListener windowListener) {
 		// this.addWindowListener(windowListener);
-		this.teacherDF = (Teacher) editItem;
-		this.teacherDF.setInEdit(true);
-		Kursverwaltung.verifyData(this.teacherDF);
+		this.teacher = (Teacher) editItem;
+		this.teacher.setInEdit(true);
+		Kursverwaltung.verifyData(this.teacher);
 		setTitle("Leerer editieren");
 		SpringLayout layout = new SpringLayout();
-		setupSpringLayout(this.teacherDF.getId() + " " + this.teacherDF.toString(), 20, layout);
+		setupSpringLayout(this.teacher.getId() + " " + this.teacher.toString(), 20, layout);
 
 		JPanel labels = new JPanel();
 		labels.setLayout(new BoxLayout(labels, BoxLayout.Y_AXIS));
@@ -234,7 +234,7 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		JPanel texts = new JPanel();
 		texts.setLayout(new BoxLayout(texts, BoxLayout.Y_AXIS));
 
-		Construct(this.teacherDF, labels, texts);
+		Construct(this.teacher, labels, texts);
 
 		contentPane.add(labels);
 		contentPane.add(texts);
@@ -277,12 +277,12 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 
 	FrameEdit(IStudent editItem) { // ,WindowListener windowListener) {
 		// this.addWindowListener(windowListener);
-		this.studentDF = (Student) editItem;
-		this.studentDF.setInEdit(true);
-		Kursverwaltung.verifyData(this.studentDF);
+		this.student = (Student) editItem;
+		this.student.setInEdit(true);
+		Kursverwaltung.verifyData(this.student);
 		setTitle("Schüler editieren");
 		SpringLayout layout = new SpringLayout();
-		setupSpringLayout(this.studentDF.getId() + " " + this.studentDF.toString(), 20, layout);
+		setupSpringLayout(this.student.getId() + " " + this.student.toString(), 20, layout);
 
 		JPanel labels = new JPanel();
 		labels.setLayout(new BoxLayout(labels, BoxLayout.Y_AXIS));
@@ -291,7 +291,7 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		JPanel texts = new JPanel();
 		texts.setLayout(new BoxLayout(texts, BoxLayout.Y_AXIS));
 
-		Construct(this.studentDF, labels, texts);
+		Construct(this.student, labels, texts);
 
 		contentPane.add(labels);
 		contentPane.add(texts);
@@ -334,22 +334,22 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 
 	FrameEdit(ICourse editItem) { // ),WindowListener windowListener) {
 		// this.addWindowListener(windowListener);
-		this.courseDF = (Course) editItem;
-		this.courseDF.setInEdit(true);
-		Kursverwaltung.verifyData(this.courseDF);
+		this.course = (Course) editItem;
+		this.course.setInEdit(true);
+		Kursverwaltung.verifyData(this.course);
 		setTitle("Kurs editieren");
 
 		SpringLayout layout = new SpringLayout();
-		setupSpringLayout(this.courseDF.getId() + " " + this.courseDF.toString(), 20, layout);
+		setupSpringLayout(this.course.getId() + " " + this.course.toString(), 20, layout);
 		JPanel labels = new JPanel();
 		labels.setLayout(new BoxLayout(labels, BoxLayout.Y_AXIS));
 		labels.setPreferredSize(new Dimension(labelWidth, 10));
 		labels.setMaximumSize(new Dimension(labelWidth, Integer.MAX_VALUE));
 		JPanel texts = new JPanel();
 		texts.setLayout(new BoxLayout(texts, BoxLayout.Y_AXIS));
-		addTextField(labels, texts, "topicTextField", "Fach:", this.courseDF.getTopic(), this.topicTextField, true);
+		addTextField(labels, texts, "topicTextField", "Fach:", this.course.getTopic(), this.topicTextField, true);
 
-		Date value = this.courseDF.getSartTime();
+		Date value = this.course.getSartTime();
 		UtilDateModel model = getDate(value, true);// new UtilDateModel();
 		// Calendar cal = Calendar.getInstance();
 		// if (value != null) {
@@ -391,11 +391,11 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		timeSpinnerStart.setEditor(dateEditorStart);
 		timeSpinnerStart.setValue(startTextField.getModel().getValue());
 //		texts.add(timeSpinnerStart);
-		addDateTime(labels, texts, "startDatePicker", "Start:", this.courseDF.getSartTime(), this.startTextField,timeSpinnerStart, true);
+		addDateTime(labels, texts, "startDatePicker", "Start:", this.course.getSartTime(), this.startTextField,timeSpinnerStart, true);
 		//
 		// hourEndComboBox = new JComboBox<>(hourArray);
 		// minuteEndComboBox = new JComboBox<>(minuteAray);
-		value = this.courseDF.getEndTime();
+		value = this.course.getEndTime();
 		model = getDate(value, true);
 		// cal = Calendar.getInstance();
 		// if (value != null) {
@@ -421,16 +421,16 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 		timeSpinnerEnd.setValue(this.endTextField.getModel().getValue());
 		texts.add(timeSpinnerEnd);
 
-		addDateTime(labels, texts, "endDatePicker", "Ende:", this.courseDF.getEndTime(), endTextField,timeSpinnerEnd, true);
-		addTextField(labels, texts, "languageTextField", "Sprache:", this.courseDF.getLanguage(),
+		addDateTime(labels, texts, "endDatePicker", "Ende:", this.course.getEndTime(), endTextField,timeSpinnerEnd, true);
+		addTextField(labels, texts, "languageTextField", "Sprache:", this.course.getLanguage(),
 				this.languageTextField, true);
 		String roomNr = "";
-		if (this.courseDF.getRoomNumber() != null) {
-			roomNr = this.courseDF.getRoomNumber().toString();
+		if (this.course.getRoomNumber() != null) {
+			roomNr = this.course.getRoomNumber().toString();
 		}
 		addTextField(labels, texts, "roomNumberTextField", "Raum:", roomNr, this.roomNumberTextField, true);
 
-		addCheckBox(labels, texts, "beamerCheckBox", "Beamer:", this.courseDF.getNeedsBeamer(), 20, this.beamerCheckBox,
+		addCheckBox(labels, texts, "beamerCheckBox", "Beamer:", this.course.getNeedsBeamer(), 20, this.beamerCheckBox,
 				false);
 
 		contentPane.add(labels);
@@ -477,20 +477,20 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 	public boolean hastItem(SchoolItemAbstract otherItem) {
 		boolean ret = false;
 		if (otherItem != null) {
-			ret |= otherItem.equals(this.courseDF);
-			ret |= otherItem.equals(this.teacherDF);
-			ret |= otherItem.equals(this.studentDF);
+			ret |= otherItem.equals(this.course);
+			ret |= otherItem.equals(this.teacher);
+			ret |= otherItem.equals(this.student);
 		}
 		return ret;
 	}
 
 	public SchoolItemAbstract getItem() {
-		if (this.courseDF != null) {
-			return courseDF;
-		} else if (this.teacherDF != null) {
-			return teacherDF;
-		} else if (this.studentDF != null) {
-			return studentDF;
+		if (this.course != null) {
+			return course;
+		} else if (this.teacher != null) {
+			return teacher;
+		} else if (this.student != null) {
+			return student;
 		}
 		return null;
 	}
@@ -698,12 +698,12 @@ public class FrameEdit extends JFrame implements ActionListener, ComponentListen
 
 	@Override
 	public String toString() {
-		if (this.courseDF != null) {
-			return this.courseDF.toString();
-		} else if (this.teacherDF != null) {
-			return this.teacherDF.toString();
-		} else if (this.studentDF != null) { 
-			return this.studentDF.toString();
+		if (this.course != null) {
+			return this.course.toString();
+		} else if (this.teacher != null) {
+			return this.teacher.toString();
+		} else if (this.student != null) { 
+			return this.student.toString();
 		} 
 		return "";
 		//		return "FrameEdit [courseDF=" + courseDF.toString() + ", teacherDF=" + teacherDF + ", studentDF=" + studentDF + "]";
