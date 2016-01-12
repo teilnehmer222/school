@@ -44,11 +44,11 @@ public class PanelQuestion extends JPanel implements ActionListener, ListSelecti
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Controls
 	private JButton addCourseButton, deleteCourseButton, saveAllButton, loadAllButton;
-	private JList<ISolution> coursesJList;
+	private JList<IQuestion> coursesJList;
 	private JList<IAnswer> studentsJList;
 	private JTextField teacherTextField;
 	private JSlider dataBase;
-	private DefaultListModel<ISolution> courseListModel;
+	private DefaultListModel<IQuestion> courseListModel;
 	private DefaultListModel<IAnswer> studentListModel;
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -57,7 +57,7 @@ public class PanelQuestion extends JPanel implements ActionListener, ListSelecti
 	public void refresh() {
 		this.refresh = true;
 		this.teacherTextField.setText(null);
-		ISolution cindex = null;
+		IQuestion cindex = null;
 		for (int index = this.courseListModel.getSize(); index > 0; index--) {
 			try {
 				cindex = this.courseListModel.getElementAt(index - 1);
@@ -65,7 +65,7 @@ public class PanelQuestion extends JPanel implements ActionListener, ListSelecti
 				ExamenVerwaltung.showException(e);
 			}
 
-			if (!ExamenVerwaltung.getSolutionList().contains(cindex)) {
+			if (!ExamenVerwaltung.getExamList().contains(cindex)) {
 				try {
 					this.courseListModel.remove(index - 1);
 				} catch (Exception e) {
@@ -74,23 +74,23 @@ public class PanelQuestion extends JPanel implements ActionListener, ListSelecti
 
 			}
 		}
-		for (ISolution c : ExamenVerwaltung.getSolutionList()) {
+		for (IQuestion c : ExamenVerwaltung.getQuestionList()) {
 			if (!this.courseListModel.contains(c)) {
 				this.courseListModel.addElement(c);
 			}
 		}
 		this.deleteCourseButton.setEnabled(this.coursesJList.getSelectedValue() != null);
 		boolean enableSave = false, enableLoad = true;
-		if (!ExamenVerwaltung.getSolutionList().isEmpty()) {
+		if (!ExamenVerwaltung.getExamList().isEmpty()) {
 			enableSave = true;
 		} else if (!ExamenVerwaltung.getQuestionList().isEmpty()) {
 			enableSave = true;
-		} else if (!ExamenVerwaltung.getStudentList().isEmpty()) {
+		} else if (!ExamenVerwaltung.getAnswerList().isEmpty()) {
 			enableSave = true;
 		}
 		int index = this.coursesJList.getSelectedIndex();
 		if (index >= 0) {
-			selectCourse(this.coursesJList.getModel().getElementAt(index));
+			selectQuestion(this.coursesJList.getModel().getElementAt(index));
 		}
 		this.saveAllButton.setEnabled(enableSave);
 		this.loadAllButton.setEnabled(enableLoad); // ??
@@ -104,21 +104,23 @@ public class PanelQuestion extends JPanel implements ActionListener, ListSelecti
 	public void valueChanged(ListSelectionEvent arg0) {
 		ISolution selectedCourse = this.coursesJList.getSelectedValue();
 		if (!this.refresh && arg0.getSource() == this.coursesJList) {
-			selectCourse(selectedCourse);
+			selectQuestion(selectedCourse);
 		}
 	}
 
-	private void selectCourse(ISolution selectedCourse) {
-		if (selectedCourse != null) {
-			if (selectedCourse.hasQuestion()) {
-				this.teacherTextField.setText(selectedCourse.getQuestion().toString());
+	private void selectQuestion(IExam selectedExam) {
+		if (selectedExam != null) {
+			if (selectedExam.hasQuestions()) {
+				for (Question q : selectedExam.getQuestions()) {
+					this.teacherTextField.setText(selectedExam.getQuestions().toString());
+				}
 			} else
 				this.teacherTextField.setText("");
 		}
 		this.studentListModel.clear();
-		if (selectedCourse != null) {
-			if (selectedCourse.hasAnswers()) {
-				for (IAnswer student : selectedCourse.getAnswers()) {
+		if (selectedExam != null) {
+			if (selectedExam.hasAnswers()) {
+				for (IAnswer student : selectedExam.getAnswers()) {
 					this.studentListModel.addElement(student);
 				}
 			}
@@ -173,7 +175,7 @@ public class PanelQuestion extends JPanel implements ActionListener, ListSelecti
 		refresh();
 		if (index <= this.coursesJList.getModel().getSize()) {
 			this.coursesJList.setSelectedIndex(index);
-			selectCourse(this.coursesJList.getSelectedValue());
+			selectQuestion(this.coursesJList.getSelectedValue());
 		}
 		this.deleteCourseButton.setEnabled(this.coursesJList.getSelectedValue() != null);
 	}
